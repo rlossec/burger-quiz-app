@@ -1,0 +1,24 @@
+# Virtual environments
+venv/
+.venv/
+
+# Environment variables
+.env
+env/*.env
+!env/*.example
+
+# Python cache
+__pycache__/
+
+# Python files
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzw
+*.pyzwz
+*.pyzwzw
+*.pyzwzwz
+
