@@ -6,15 +6,15 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(BaseUserAdmin):
-    list_display = ("email", "first_name", "last_name", "is_staff", "is_active")
+    list_display = ("username", "email", "first_name", "last_name", "is_staff", "is_active")
     list_filter = ("is_staff", "is_active")
-    search_fields = ("email", "first_name", "last_name")
-    ordering = ("email",)
+    search_fields = ("username", "email", "first_name", "last_name")
+    ordering = ("username",)
     filter_horizontal = ()
 
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        ("Informations personnelles", {"fields": ("first_name", "last_name")}),
+        (None, {"fields": ("username", "password")}),
+        ("Informations personnelles", {"fields": ("first_name", "last_name", "email")}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Dates importantes", {"fields": ("last_login", "date_joined")}),
     )
@@ -24,7 +24,7 @@ class CustomUserAdmin(BaseUserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "password1", "password2"),
+                "fields": ("username", "email", "password1", "password2"),
             },
         ),
     )

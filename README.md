@@ -24,11 +24,8 @@ cp env/pgadmin.env.example env/pgadmin.env
 # 2. Lancer l'application
 docker compose up -d
 
-# 3. Appliquer les migrations (première fois)
-docker compose exec backend python manage.py migrate
-
-# 4. Créer un superutilisateur (optionnel)
-docker compose exec backend python manage.py createsuperuser
+# 3. Migrations et superuser (automatiques au démarrage)
+# Définir DJANGO_SUPERUSER_EMAIL et DJANGO_SUPERUSER_PASSWORD dans env/backend.env
 
 # Avec pgAdmin (optionnel)
 docker compose --profile tools up -d
@@ -46,17 +43,28 @@ docker compose --profile tools up -d
 ## Structure
 
 ```
+
 burger-quiz-app/
 ├── backend/              # Django + DRF
-│   ├── accounts/         # App utilisateurs (CustomUser)
-│   ├── config/           # Settings, URLs
-│   ├── manage.py
+│   ├── src/              # Code applicatif
+│   │   ├── config/       # Settings, URLs
+│   │   ├── accounts/     # App utilisateurs (CustomUser)
+│   │   ├── quiz/         # App quiz
+│   │   └── manage.py
 │   └── Dockerfile
 ├── frontend/             # React + Vite
 │   ├── src/
 │   └── Dockerfile
 ├── env/                  # Variables par service (db, backend, pgadmin)
 └── docker-compose.yml
+```
+
+## Développement local
+
+```bash
+cd backend
+uv run python src/manage.py migrate
+uv run python src/manage.py runserver
 ```
 
 ## Variables d'environnement
