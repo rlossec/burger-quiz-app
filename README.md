@@ -6,7 +6,7 @@ Application web pour animer des soirées Burger Quiz : préparation des manches,
 
 | Composant | Techno |
 |-----------|--------|
-| Backend | FastAPI, Python 3.12, SQLAlchemy |
+| Backend | Django 6, Django REST Framework, Python 3.12 |
 | Frontend | React, TypeScript, Vite |
 | Base de données | PostgreSQL 18 |
 | Infra | Docker Compose |
@@ -17,13 +17,18 @@ Application web pour animer des soirées Burger Quiz : préparation des manches,
 
 ```bash
 # 1. Configurer l'environnement
-cp .env.example .env
 cp env/db.env.example env/db.env
 cp env/backend.env.example env/backend.env
 cp env/pgadmin.env.example env/pgadmin.env
 
 # 2. Lancer l'application
 docker compose up -d
+
+# 3. Appliquer les migrations (première fois)
+docker compose exec backend python manage.py migrate
+
+# 4. Créer un superutilisateur (optionnel)
+docker compose exec backend python manage.py createsuperuser
 
 # Avec pgAdmin (optionnel)
 docker compose --profile tools up -d
@@ -35,23 +40,22 @@ docker compose --profile tools up -d
 |---------|-----|
 | Frontend | http://localhost:5173 |
 | Backend API | http://localhost:8000 |
-| API Docs | http://localhost:8000/docs |
+| Django Admin | http://localhost:8000/admin/ |
 | pgAdmin | http://localhost:5050 |
 
 ## Structure
 
 ```
-BurgerQuizApp/
-├── backend/          # API FastAPI
-│   ├── app/
-│   │   ├── api/      # Routes
-│   │   └── core/     # Config, logging
+burger-quiz-app/
+├── backend/              # Django + DRF
+│   ├── accounts/         # App utilisateurs (CustomUser)
+│   ├── config/           # Settings, URLs
+│   ├── manage.py
 │   └── Dockerfile
-├── frontend/         # React + Vite
+├── frontend/             # React + Vite
 │   ├── src/
 │   └── Dockerfile
-├── env/              # Variables par service (db, backend, pgadmin)
-├── docs/             # Documentation (MCD, etc.)
+├── env/                  # Variables par service (db, backend, pgadmin)
 └── docker-compose.yml
 ```
 
