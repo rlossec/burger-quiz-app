@@ -46,12 +46,15 @@ services:
       - env/pgadmin.env
     ports:
       - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin_data:/root/.pgadmin
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   postgres_data:
+  pgadmin_data:
 
 networks:
   default:
