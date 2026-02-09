@@ -18,7 +18,8 @@ class CustomUser(AbstractUser):
     Utilise le username pour la connexion (portail admin).
     """
 
-    email = models.EmailField("adresse email", blank=True)
+    email = models.EmailField("adresse email", unique=True, blank=False)
+    avatar = models.ImageField("avatar", upload_to="avatars/", blank=True, null=True)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
