@@ -23,6 +23,8 @@ services:
       - "8000:8000"
     env_file:
       - env/backend.env
+    volumes:
+      - ./backend/src/fixtures:/app/fixtures
     depends_on:
       db:
         condition: service_healthy

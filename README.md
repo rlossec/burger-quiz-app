@@ -40,6 +40,20 @@ docker compose --profile tools up -d
 | Django Admin | http://localhost:8000/admin/ |
 | pgAdmin | http://localhost:5050 |
 
+## Fixtures
+
+Le dossier `backend/src/fixtures` est monté dans le conteneur. Les commandes Django doivent être exécutées **dans le conteneur** :
+
+```bash
+# Charger les données
+docker compose exec backend uv run python manage.py loaddata fixtures/quiz_data.json
+
+# Exporter les données (depuis la racine du projet)
+docker compose exec backend uv run python manage.py dumpdata --indent 2 quiz > backend/src/fixtures/quiz_data.json
+```
+
+→ Voir [docs/fixtures.md](docs/fixtures.md) pour plus de détails.
+
 ## Structure
 
 ```
@@ -50,6 +64,7 @@ burger-quiz-app/
 │   │   ├── config/       # Settings, URLs
 │   │   ├── accounts/     # App utilisateurs (CustomUser)
 │   │   ├── quiz/         # App quiz
+│   │   ├── fixtures/     # Données (monté en volume Docker)
 │   │   └── manage.py
 │   └── Dockerfile
 ├── frontend/             # React + Vite
