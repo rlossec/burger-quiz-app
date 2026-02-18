@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-# Migrations
-python manage.py makemigrations
+# Migrations (--noinput évite EOFError quand aucun TTY, ex. Docker)
+python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
 # Fichiers statiques (admin Django)
