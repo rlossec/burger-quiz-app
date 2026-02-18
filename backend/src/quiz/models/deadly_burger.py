@@ -4,7 +4,7 @@ from django.db import models
 
 
 class DeadlyBurgerQuestion(models.Model):
-    """Lien DeadlyBurger ↔ Question avec ordre (10 questions dans l'ordre)."""
+    """Lien DeadlyBurger ↔ Question avec ordre (10 questions). Une question (type DB) peut être réutilisée dans plusieurs Burger de la mort."""
 
     deadly_burger = models.ForeignKey("DeadlyBurger", on_delete=models.CASCADE)
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
@@ -18,6 +18,10 @@ class DeadlyBurgerQuestion(models.Model):
 class DeadlyBurger(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
+    original = models.BooleanField(
+        default=False,
+        help_text="True = manche issue d'une émission diffusée.",
+    )
     questions = models.ManyToManyField(
         "Question",
         through="DeadlyBurgerQuestion",

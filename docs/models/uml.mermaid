@@ -1,0 +1,159 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ff6b35', 'primaryTextColor': '#fff', 'primaryBorderColor': '#c44d34', 'lineColor': '#2d3436', 'secondaryColor': '#fdcb6e', 'tertiaryColor': '#dfe6e9'}}}%%
+classDiagram
+
+    %% ========== MODÈLES QUIZ (CONTENU) ==========
+
+    class Question {
+        +UUID id
+        +string text
+        +CharField question_type
+        +bool original
+        +string explanations
+        +URL video_url
+        +URL audio_url
+    }
+
+    class Answer {
+        +UUID id
+        +string text
+        +Image image
+        +bool is_correct
+    }
+
+    class BurgerQuiz {
+        +UUID id
+        +string title
+        +string toss
+        +datetime created_at
+        +datetime updated_at
+    }
+
+    class Nuggets {
+        +UUID id
+        +string title
+        +bool original
+    }
+
+    class SaltOrPepper {
+        +UUID id
+        +string title
+        +string description
+        +bool original
+        +JSON choice_labels
+    }
+
+    class Addition {
+        +UUID id
+        +string title
+        +string description
+        +bool original
+    }
+
+    class DeadlyBurger {
+        +UUID id
+        +string title
+        +bool original
+    }
+
+    class MenuTheme {
+        +UUID id
+        +string title
+        +CharField type
+    }
+
+    class NuggetQuestion {
+        <<through>>
+        +int order
+    }
+    class SaltOrPepperQuestion {
+        <<through>>
+        +int order
+    }
+    class MenuThemeQuestion {
+        <<through>>
+        +int order
+    }
+    class AdditionQuestion {
+        <<through>>
+        +int order
+    }
+    class DeadlyBurgerQuestion {
+        <<through>>
+        +int order
+    }
+
+    class Menus {
+        +UUID id
+        +string title
+        +string description
+        +bool original
+    }
+
+    %% ========== MODÈLES SESSION / JEU ==========
+
+    class Session {
+        +UUID id
+        +datetime started_at
+        +datetime ended_at
+        +string status
+        +string code
+    }
+
+    class Participant {
+        +UUID id
+        +string nickname
+        +int score
+        +string team
+    }
+
+    class QuestionUsage {
+        +UUID id
+        +datetime used_at
+    }
+
+    class User {
+        <<accounts>>
+        +UUID id
+        +string email
+        +string username
+    }
+
+    %% ========== RELATIONS QUIZ ==========
+
+    Question "1" --> "*" Answer : answers
+
+    BurgerQuiz "1" --> "0..1" Nuggets
+    BurgerQuiz "1" --> "0..1" SaltOrPepper
+    BurgerQuiz "1" --> "0..1" Menus
+    BurgerQuiz "1" --> "0..1" Addition
+    BurgerQuiz "1" --> "0..1" DeadlyBurger
+
+    Nuggets "1" --> "*" NuggetQuestion
+    NuggetQuestion "*" --> "1" Question
+
+    SaltOrPepper "1" --> "*" SaltOrPepperQuestion
+    SaltOrPepperQuestion "*" --> "1" Question
+
+    MenuTheme "1" --> "*" MenuThemeQuestion
+    MenuThemeQuestion "*" --> "1" Question
+
+    Addition "1" --> "*" AdditionQuestion
+    AdditionQuestion "*" --> "1" Question
+
+    DeadlyBurger "1" --> "*" DeadlyBurgerQuestion
+    DeadlyBurgerQuestion "*" --> "1" Question
+
+    Menus "1" --> "0..1" MenuTheme : menu_1
+    Menus "1" --> "0..1" MenuTheme : menu_2
+    Menus "1" --> "0..1" MenuTheme : menu_troll
+
+    %% ========== RELATIONS SESSION ==========
+
+    Session "1" --> "1" BurgerQuiz : quiz
+    Session "1" --> "*" Participant : participants
+
+    Participant "0..1" --> "0..1" User : compte
+
+    QuestionUsage "*" --> "1" Question
+    QuestionUsage "*" --> "1" Session
+    QuestionUsage "*" --> "0..1" Participant

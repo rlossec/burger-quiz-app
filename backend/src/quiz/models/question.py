@@ -1,5 +1,3 @@
-from django.db import models
-
 import uuid
 
 from django.db import models
@@ -11,8 +9,24 @@ class Question(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.TextField()
     question_type = models.CharField(max_length=2, choices=QuestionType.choices)
+    original = models.BooleanField(
+        default=False,
+        help_text="True = question issue d'une émission diffusée, False = créée manuellement.",
+    )
     explanations = models.TextField(blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
+    video_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="Lien externe vers une vidéo (ex. extrait d'émission).",
+    )
+    audio_url = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="Lien externe vers un audio.",
+    )
 
     class Meta:
         ordering = ["order"]

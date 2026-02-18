@@ -4,7 +4,7 @@ from django.db import models
 
 
 class NuggetQuestion(models.Model):
-    """Lien Nuggets ↔ Question avec ordre pour la manche."""
+    """Lien Nuggets ↔ Question avec ordre. Une question (type NU) peut être réutilisée dans plusieurs manches Nuggets."""
 
     nuggets = models.ForeignKey("Nuggets", on_delete=models.CASCADE)
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
@@ -21,6 +21,10 @@ class Nuggets(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100)
+    original = models.BooleanField(
+        default=False,
+        help_text="True = manche issue d'une émission diffusée.",
+    )
     questions = models.ManyToManyField(
         "Question",
         through="NuggetQuestion",
