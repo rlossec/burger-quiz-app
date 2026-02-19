@@ -13,9 +13,9 @@ Les manches sont donc des entités indépendantes ; le Burger Quiz les référen
 
 ---
 
-## 3. Endpoints de création des manches
+## 2. Endpoints de création des manches
 
-### 3.1 Nuggets
+### 2.1 Nuggets
 
 **`POST /api/quiz/nuggets/`**
 
@@ -42,7 +42,7 @@ Les manches sont donc des entités indépendantes ; le Burger Quiz les référen
 
 ---
 
-### 3.2 Sel ou poivre
+### 2.2 Sel ou poivre
 
 Les réponses de chaque question sont **toujours parmi une liste restreinte de propositions** (souvent 2, 3 ou 4 ; maximum 5), définie au niveau de la manche. Exemples : « Noir » / « Blanc », ou « Noir » / « Blanc » / « Les deux ».
 
@@ -75,7 +75,7 @@ Les réponses de chaque question sont **toujours parmi une liste restreinte de p
 
 ---
 
-### 3.3 Menus
+### 2.3 Menus
 
 Une manche **Menus** est composée de **3 thèmes** : deux menus classiques et un menu troll. Chaque thème (`MenuTheme`) a son propre ensemble de questions.
 
@@ -118,7 +118,7 @@ Une manche **Menus** est composée de **3 thèmes** : deux menus classiques et u
 
 ---
 
-### 3.4 Addition
+### 2.4 Addition
 
 **`POST /api/quiz/additions/`**
 ```json
@@ -140,7 +140,7 @@ Une manche **Menus** est composée de **3 thèmes** : deux menus classiques et u
 
 ---
 
-### 3.5 Burger de la mort
+### 2.5 Burger de la mort
 
 **`POST /api/quiz/deadly-burgers/`** (ou équivalent)
 ```json
@@ -157,7 +157,7 @@ Une manche **Menus** est composée de **3 thèmes** : deux menus classiques et u
 
 ---
 
-## 4. Endpoint de création du Burger Quiz
+## 3. Endpoint de création du Burger Quiz
 
 **`POST /api/quiz/burger-quizzes/`**
 
