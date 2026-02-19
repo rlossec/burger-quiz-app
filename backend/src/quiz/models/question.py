@@ -14,22 +14,20 @@ class Question(models.Model):
         help_text="True = question issue d'une émission diffusée, False = créée manuellement.",
     )
     explanations = models.TextField(blank=True, null=True)
-    order = models.PositiveIntegerField(default=0)
     video_url = models.URLField(
         max_length=500,
         blank=True,
         null=True,
         help_text="Lien externe vers une vidéo (ex. extrait d'émission).",
     )
-    audio_url = models.URLField(
+    image_url = models.URLField(
         max_length=500,
         blank=True,
         null=True,
         help_text="Lien externe vers un audio.",
     )
-
-    class Meta:
-        ordering = ["order"]
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
         return self.text[:50]

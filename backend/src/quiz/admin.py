@@ -57,15 +57,14 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ("text_preview", "question_type", "order", "answers_count")
+    list_display = ("text_preview", "question_type", "answers_count")
     list_filter = ("question_type",)
     search_fields = ("text", "explanations")
-    ordering = ["order", "text"]
+    ordering = ["text"]
     inlines = [AnswerInline]
-    list_editable = ["order"]
     list_per_page = 25
     fieldsets = (
-        (None, {"fields": ("text", "question_type", "order")}),
+        (None, {"fields": ("text", "question_type")}),
         ("Explications", {"fields": ("explanations",), "classes": ("collapse",)}),
     )
 
