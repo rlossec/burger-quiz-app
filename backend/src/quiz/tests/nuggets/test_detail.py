@@ -1,0 +1,30 @@
+# python manage.py test quiz.tests.nuggets.test_detail
+# GET /api/quiz/nuggets/{id}/ — Détail d'une manche Nuggets.
+
+import uuid
+
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
+
+from ...tests.factories import NuggetsFactory
+
+
+class TestNuggetsDetailEndpoint(APITestCase):
+    """GET /api/quiz/nuggets/{id}/ — Détail d'une manche Nuggets."""
+
+    def setUp(self):
+        self.nuggets = NuggetsFactory.create(title="Nuggets détail", original=True)
+        self.url = reverse("nuggets-detail", kwargs={"pk": self.nuggets.pk})
+
+    def test_detail_returns_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("id"), str(self.nuggets.id))
+        self.assertEqual(response.data.get("title"), self.nuggets.title)
+        self.assertEqual(response.data.get("original"), self.nuggets.original)
+
+    def test_detail_not_found_returns_404(self):
+        url = reverse("nuggets-detail", kwargs={"pk": uuid.uuid4()})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

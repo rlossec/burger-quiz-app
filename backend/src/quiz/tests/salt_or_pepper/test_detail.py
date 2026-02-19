@@ -1,0 +1,35 @@
+# python manage.py test quiz.tests.salt_or_pepper.test_detail
+# GET /api/quiz/salt-or-pepper/{id}/ — Détail.
+
+import uuid
+
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
+
+from ...tests.factories import SaltOrPepperFactory
+
+
+class TestSaltOrPepperDetailEndpoint(APITestCase):
+    """GET /api/quiz/salt-or-pepper/{id}/ — Détail."""
+
+    def setUp(self):
+        self.sop = SaltOrPepperFactory.create(
+            title="Noir ou Blanc",
+            choice_labels=["Noir", "Blanc"],
+            original=False,
+        )
+        self.url = reverse("salt-or-pepper-detail", kwargs={"pk": self.sop.pk})
+
+    # 200 OK
+    def test_detail_salt_or_pepper_success(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("title"), self.sop.title)
+        self.assertIn("propositions", response.data)
+
+    # 404 Not Found
+    def test_detail_salt_or_pepper_not_found(self):
+        url = reverse("salt-or-pepper-detail", kwargs={"pk": uuid.uuid4()})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
