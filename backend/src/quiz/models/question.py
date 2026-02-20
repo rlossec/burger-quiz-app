@@ -24,7 +24,7 @@ class Question(models.Model):
         max_length=500,
         blank=True,
         null=True,
-        help_text="Lien externe vers un audio.",
+        help_text="Lien externe vers une image.",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

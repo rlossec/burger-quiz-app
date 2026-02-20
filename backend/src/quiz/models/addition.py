@@ -1,4 +1,3 @@
-from re import T
 import uuid
 
 from django.db import models
@@ -24,7 +23,7 @@ class Addition(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True, blank=True)
     original = models.BooleanField(
-        default=True,
+        default=False,
         help_text="True = manche issue d'une émission diffusée.",
     )
     questions = models.ManyToManyField(
