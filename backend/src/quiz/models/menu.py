@@ -26,6 +26,10 @@ class MenuTheme(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=2, choices=MENU_TYPES, default="CL")
+    original = models.BooleanField(
+        default=True,
+        help_text="True = thème créé directement, False = issue d'une émission diffusée.",
+    )
     questions = models.ManyToManyField(
         "Question",
         through="MenuThemeQuestion",
@@ -48,8 +52,8 @@ class Menus(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True, blank=True)
     original = models.BooleanField(
-        default=False,
-        help_text="True = manche issue d'une émission diffusée.",
+        default= True,
+        help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     menu_1 = models.ForeignKey("MenuTheme", on_delete=models.SET_NULL, null=True, blank=True, related_name="menus_as_menu_1")
     menu_2 = models.ForeignKey("MenuTheme", on_delete=models.SET_NULL, null=True, blank=True, related_name="menus_as_menu_2")

@@ -10,8 +10,8 @@ class Question(models.Model):
     text = models.TextField()
     question_type = models.CharField(max_length=2, choices=QuestionType.choices)
     original = models.BooleanField(
-        default=False,
-        help_text="True = question issue d'une émission diffusée, False = créée manuellement.",
+        default=True,
+        help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     explanations = models.TextField(blank=True, null=True)
     video_url = models.URLField(

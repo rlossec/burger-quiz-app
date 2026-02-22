@@ -23,8 +23,8 @@ class Addition(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True, blank=True)
     original = models.BooleanField(
-        default=False,
-        help_text="True = manche issue d'une émission diffusée.",
+        default=True,
+        help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     questions = models.ManyToManyField(
         "Question",

@@ -22,8 +22,8 @@ class Nuggets(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100)
     original = models.BooleanField(
-        default=False,
-        help_text="True = manche issue d'une émission diffusée.",
+        default= True,
+        help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     questions = models.ManyToManyField(
         "Question",
