@@ -1,5 +1,5 @@
 # Constantes partagées pour les tests du module quiz.
-# Alignées sur docs/backend/api-endpoints-et-contraintes.md et docs/api-reference.md.
+# Alignées sur docs/backend/api-reference.md.
 
 MANDATORY_FIELD_ERROR_MESSAGE = "Ce champ est obligatoire."
 
