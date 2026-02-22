@@ -6,17 +6,17 @@
 
 Chaque **Question** possède un champ booléen **`original`** qui indique sa provenance :
 
-- **`original = True`** : question issue d’une émission Burger Quiz déjà diffusée.
-- **`original = False`** (défaut) : question créée manuellement.
+- **`original = True`** (défaut) : question créée directement (par l’utilisateur / l’app).
+- **`original = False`** : question issue d’une émission Burger Quiz déjà diffusée.
 
-Chaque manche (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) possède également un champ **`original`** (booléen, défaut false), pour marquer la manche comme issue d'une émission diffusée.
+Chaque manche (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) et chaque **thème de menu** (MenuTheme) possède également un champ **`original`**. S’il n’est pas renseigné, il vaut **`true`** (créé directement) ; `false` = issue d’une émission diffusée.
 
 ### Média (lien externe)
 
-Une question peut être associée à une **vidéo** et/ou un **audio** via des liens externes :
+Une question peut être associée à une **vidéo** et/ou un **image** via des liens externes :
 
 - **`video_url`** : URL vers une vidéo (ex. extrait d’émission).
-- **`audio_url`** : URL vers un fichier audio.
+- **`image_url`** : URL vers un fichier image.
 
 Les deux champs sont optionnels (null/blank). Le contenu est hébergé à l’extérieur ; l’application ne stocke que l’URL.
 
@@ -72,14 +72,14 @@ La **provenance** (contenu issue d’une émission diffusée ou créé manuellem
 
 ### 2.1 En base de données
 
-- Chaque **Question** possède un champ **`original`** (booléen). **`original = True`** = issue d’une émission diffusée, **`original = False`** = créée manuellement (défaut).
-- Chaque **manche** (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) possède également un champ **`original`** (booléen, défaut `false`). Permet de marquer toute la manche comme originale sans dériver des questions.
+- Chaque **Question** possède un champ **`original`** (booléen, défaut **`true`**). **`original = True`** = créée directement, **`original = False`** = issue d’une émission diffusée.
+- Chaque **manche** (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) et chaque **MenuTheme** possède un champ **`original`** (booléen). S’il n’est pas renseigné, valeur par défaut **`true`** (créé directement).
 
 ### 2.2 Règles API
 
-- **Création / mise à jour d’une Question** : le champ `original` est optionnel (défaut `false`).
+- **Création / mise à jour d’une Question** : le champ **`question_type`** est obligatoire ; le champ **`original`** est optionnel (défaut **`true`** = créée directement).
 - **GET liste/détail des questions** : filtrage par **`?original=true|false`** et par **`?question_type=NU|SP|ME|AD|DB`**.
-- **Manches** : le champ **`original`** est accepté en création et mise à jour (POST/PATCH), optionnel (défaut `false`). Il est renvoyé en GET (liste et détail).
+- **Manches et thèmes de menu** : le champ **`original`** est accepté en création et mise à jour (POST/PATCH), optionnel (défaut **`true`**). Il est renvoyé en GET (liste et détail).
 
 ### 2.4 Réutilisabilité des questions
 
@@ -88,9 +88,9 @@ La **provenance** (contenu issue d’une émission diffusée ou créé manuellem
 
 ### 2.5 Média (lien externe sur une question)
 
-Une question peut être associée à une **vidéo** et/ou un **audio** via des liens externes :
+Une question peut être associée à une **vidéo** et/ou un **image** via des liens externes :
 
 - **`video_url`** : URL optionnelle vers une vidéo (ex. extrait d’émission).
-- **`audio_url`** : URL optionnelle vers un fichier audio.
+- **`image_url`** : URL optionnelle vers un fichier image.
 
 Les deux champs sont optionnels. L’endpoint de création/mise à jour de questions doit les accepter et les valider (format URL).

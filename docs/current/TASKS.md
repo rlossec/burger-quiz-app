@@ -1,0 +1,1 @@
+Configurer drf-yasg pour la doc officiel de l'api

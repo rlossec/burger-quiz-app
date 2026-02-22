@@ -10,14 +10,17 @@ classDiagram
         +bool original
         +string explanations
         +URL video_url
-        +URL audio_url
+        +URL image_url
+        +datetime created_at
+        +datetime updated_at
     }
 
     class Answer {
         +UUID id
+        +Question question
         +string text
-        +Image image
         +bool is_correct
+        +Image image
     }
 
     class BurgerQuiz {
@@ -59,6 +62,7 @@ classDiagram
         +UUID id
         +string title
         +CharField type
+        +bool original
     }
 
     class NuggetQuestion {

@@ -1,11 +1,23 @@
 # Référence API Burger Quiz
 
-Ce document décrit les endpoints de l’API Burger Quiz : **Accounts** (authentification et utilisateurs) et **Quiz** (manches, questions, Burger Quiz). Les contraintes métier détaillées et le flux de création d’un Burger Quiz sont décrits dans `docs/backend/api-endpoints-et-contraintes.md`.
+Ce document décrit les endpoints de l’API Burger Quiz par app Django :
+ - **Accounts** (authentification et utilisateurs)
+ - **Quiz** (manches, questions, Burger Quiz).
 
-**Base URL** : `/api/`  
-**Authentification** : JWT Bearer. En-tête : `Authorization: Bearer <access_token>`. Obtenir un token : `POST /api/auth/jwt/create/`.
+## 0. Général
 
----
+### 0.1. Bases
+
+**Base URL** : `/api/`
+
+### 0.2. Authentification
+
+**Authentification** : JWT Bearer. En-tête : `Authorization: Bearer <access_token>`.  
+Pour obtenir un token : `POST /api/auth/jwt/create/`.
+
+### 0.3. Permissions
+
+TODO
 
 ## 1. Accounts
 
@@ -19,9 +31,11 @@ Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
 | `POST` | `/api/auth/jwt/refresh/` | Rafraîchir l’access token avec le refresh token |
 | `POST` | `/api/auth/jwt/verify/` | Vérifier la validité d’un token |
 
-#### POST /api/auth/jwt/create/
+#### 1.1.1. Login
 
-**Corps (JSON)** :
+**Endpoint** : `POST /api/auth/jwt/create/`
+**Authentification**: AllowAny
+**Body** :
 ```json
 {
   "username": "string",
@@ -32,7 +46,7 @@ Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
 - `username` : obligatoire  
 - `password` : obligatoire  
 
-**Réponse 200** :
+**Réponse Attendue** : 200
 ```json
 {
   "access": "string",
@@ -40,18 +54,20 @@ Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
 }
 ```
 
-Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les requêtes authentifiées.
+> Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les requêtes authentifiées.
 
-#### POST /api/auth/jwt/refresh/
+#### 1.1.2. Refresh de token
 
-**Corps (JSON)** :
+**Endpoint**: `POST /api/auth/jwt/refresh/`
+**Authentification**: AllowAny
+**Body** :
 ```json
 {
   "refresh": "string"
 }
 ```
 
-**Réponse 200** :
+**Réponse Attendue** : Status 200
 ```json
 {
   "access": "string",
@@ -59,16 +75,18 @@ Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les re
 }
 ```
 
-#### POST /api/auth/jwt/verify/
+#### 1.1.3. Vérification de token
 
-**Corps (JSON)** :
+**Endpoint**: `POST /api/auth/jwt/verify/`
+**Authentification**: AllowAny
+**Body** :
 ```json
 {
   "token": "string"
 }
 ```
 
-**Réponse 200** : `{}` si le token est valide.
+**Réponse Attendue** : Status 200 `{}` si le token est valide.
 
 ---
 
@@ -76,8 +94,8 @@ Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les re
 
 | Méthode | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/auth/users/` | Inscription (création de compte) |
-| `GET` | `/api/auth/users/` | Liste des utilisateurs (paginated, 10 par page ; staff/superuser uniquement) |
+| `POST` | `/api/auth/users/` | Inscription |
+| `GET` | `/api/auth/users/` | Liste des utilisateurs |
 | `GET` | `/api/auth/users/me/` | Utilisateur connecté (authentifié) |
 | `PATCH` | `/api/auth/users/me/` | Mise à jour partielle du profil (dont avatar) |
 | `GET` | `/api/auth/users/{id}/` | Détail d’un utilisateur (soi-même ou staff/superuser) |
@@ -85,9 +103,11 @@ Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les re
 | `PATCH` | `/api/auth/users/{id}/` | Mise à jour partielle (propriétaire du compte) |
 | `DELETE` | `/api/auth/users/{id}/` | Suppression du compte (propriétaire ou staff selon règles métier) |
 
-#### POST /api/auth/users/ (inscription)
+#### 1.2.1. Inscription
 
-**Corps (JSON)** :
+**Endpoint** : `POST /api/auth/users/`
+**Authentification**: AllowAny
+**Body** :
 ```json
 {
   "email": "user@example.com",
@@ -104,29 +124,36 @@ Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les re
 
 **Réponse 201** : représentation de l’utilisateur (champs exposés selon le serializer, sans mot de passe). Le compte peut être inactif jusqu’à activation par email.
 
-#### GET /api/auth/users/
+#### Liste des utilisateurs
 
-- **Authentification** : requise (staff ou superuser pour voir tous les utilisateurs).  
-- **Pagination** : 10 éléments par page (paramètres `page`, `page_size` si supportés).  
+**Endpoint** : `GET /api/auth/users/`
+**Authentification** : isStaff
+**Pagination** : 10 éléments par page (paramètres `page`, `page_size` si supportés).  
 
-**Réponse 200** : liste paginée d’utilisateurs avec champs : `id`, `email`, `username`, `first_name`, `last_name`, `avatar`.
+**Réponse attendue** : liste paginée d’utilisateurs avec champs : `id`, `email`, `username`, `first_name`, `last_name`, `avatar`.
 
-#### GET /api/auth/users/me/
+#### Avoir ses informations
 
-- **Authentification** : requise.  
+**Endpoint** : `GET /api/auth/users/me/`
+**Authentification** : IsAuthenticated  
 
-**Réponse 200** : utilisateur connecté (même schéma que détail utilisateur).
+**Réponse attendue** : 200, info utilisateur connecté (même schéma que détail utilisateur).
 
-#### PATCH /api/auth/users/me/
+#### Mise à jour de ses informations
 
-Mise à jour partielle du profil (dont avatar). Champs modifiables : `email`, `first_name`, `last_name`, `avatar`. `id` et `username` sont en lecture seule.
+**Endpoint** : `PATCH /api/auth/users/me/`
 
-#### GET /api/auth/users/{id}/
+Mise à jour partielle du profil (dont avatar).
+Champs modifiables : `email`, `first_name`, `last_name`, `avatar`.  
+`id` et `username` sont en lecture seule.  
 
-- **Authentification** : requise.  
-- Un utilisateur simple ne peut accéder qu’à son propre `id`. Staff et superuser peuvent accéder à tout utilisateur.
+#### Detail d'un utilisateur
 
-**Réponse 200** :
+**Endpoint** : `GET /api/auth/users/{id}/`
+
+- **Authentification** : isStaffOrOwner.  
+
+**Réponse attendue** :
 ```json
 {
   "id": 1,
@@ -144,7 +171,8 @@ Mise à jour (complète ou partielle) du compte. Réservé au propriétaire du c
 
 #### DELETE /api/auth/users/{id}/
 
-Suppression du compte. Réservé au propriétaire ou au staff selon les règles métier (détails dans les tests accounts).
+Suppression du compte.
+Authentication : IsStaffOrOwner
 
 ---
 
@@ -165,9 +193,17 @@ Les schémas exacts (corps, réponses) suivent la documentation Djoser ; les tes
 
 ## 2. Quiz
 
-Tous les endpoints Quiz sont préfixés par **`/api/`**. Les chemins ci-dessous supposent un préfixe **`/api/quiz/`** pour les ressources quiz.
+Tous les endpoints Quiz sont préfixés par **`/api/quiz/`**.
 
-Les contraintes métier (types de questions, nombre de questions, cohérence des réponses, etc.) sont détaillées dans `docs/backend/api-endpoints-et-contraintes.md`.
+**Vue d'ensemble du flux (création d’un Burger Quiz)**  
+1. Créer les manches : Nuggets, Sel ou poivre, Menus, Addition, Burger de la mort.  
+2. Créer un Burger Quiz en fournissant un **toss** et les **IDs des manches** déjà créées.  
+Les manches sont des entités indépendantes ; le Burger Quiz les référence par clé étrangère.
+
+**Ordre recommandé des appels API**  
+1. **Questions et réponses** : créer les Questions avec `question_type`, `original` (optionnel), Answers conformes au type, et optionnellement `video_url` / `image_url`.  
+2. **Manches** : Nuggets (`POST /api/quiz/nuggets/`), Sel ou poivre (`POST /api/quiz/salt-or-pepper/`), Menus (3 MenuTheme puis `POST /api/quiz/menus/`), Addition (`POST /api/quiz/additions/`), Burger de la mort (`POST /api/quiz/deadly-burgers/`).  
+3. **Burger Quiz** : `POST /api/quiz/burger-quizzes/` avec `title`, `toss`, et les IDs des manches (`nuggets_id`, `salt_or_pepper_id`, `menus_id`, `addition_id`, `deadly_burger_id`).
 
 ---
 
@@ -175,7 +211,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
 
 | Méthode | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/quiz/questions/` | Liste des questions (filtres : `original`, `question_type`) |
+| `GET` | `/api/quiz/questions/` | Liste des questions |
 | `GET` | `/api/quiz/questions/{id}/` | Détail d’une question |
 | `POST` | `/api/quiz/questions/` | Création d’une question avec réponses selon le type |
 | `PUT` | `/api/quiz/questions/{id}/` | Remplacement complet d’une question (idempotent) |
@@ -208,7 +244,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
       "video_url": "https://video.com",
       "image_url": "https://image.com",
       "created_at": "2025-01-01T12:00:00Z",
-      "updated_at": "2025-01-01T12:00:00Z",
+      "updated_at": "2025-01-01T12:00:00Z"
     },
     {
       "id": "d3a9f3b1-5678-4c1b-8f3e-222222222222",
@@ -227,13 +263,9 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
 
 #### 2.1.2. Détail d'une question
 
-**Endpoint** : `GET /api/quiz/questions/<id>`
+**Endpoint** : `GET /api/quiz/questions/{id}/`
 
-**Filtres** :
-- `original` : `true` \| `false`  
-- `question_type` : `NU` \| `SP` \| `ME` \| `AD` \| `DB`  
-
-**Champs calculés (lecture seule)** :
+**Paramètres** : aucun (ressource identifiée par `id`). Les filtres `original` et `question_type` s’appliquent à la liste (GET /api/quiz/questions/), pas au détail.
 
 **Réponse attendue** :
 ```json
@@ -252,7 +284,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
         {"text": "Lyon", "is_correct": false},
         {"text": "Marseille", "is_correct": false},
         {"text": "Toulouse", "is_correct": false}
-      ],
+      ]
     }
 ```
 
@@ -260,23 +292,25 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
 
 **Endpoint** : `POST /api/quiz/questions/`
 
-**Body** : 
+**Body** :
+
+- **Obligatoire** : `text`, **`question_type`** (NU | SP | ME | AD | DB) pour toutes les questions.
+- **Requis selon le type** : `answers` obligatoire pour NU, SP, ME, AD ; absent ou tableau vide pour DB. Contraintes par type (nombre de réponses, une seule ou plusieurs correctes, pas de piège pour SP/ME/AD) — voir `docs/tests/quiz.md` et la section Quiz ci-dessous.
+- **Optionnel** : `original` (booléen, défaut **`true`** = créée directement ; `false` = issue d’une émission diffusée), `video_url`, `image_url` (URLs valides), `explanations`.
+
 ```json
 {
-  ## obligatoire
   "text": "intitulé de la question",
-  "question_type": "Type de la question parmi NU, SP, ME, AD, DB",
-  ## optionnel mais requis pour certain type de question
+  "question_type": "NU",
+  "original": true,
   "answers": [
     {"text": "Paris", "is_correct": true},
     {"text": "Lyon", "is_correct": false},
     {"text": "Marseille", "is_correct": false},
     {"text": "Toulouse", "is_correct": false}
   ],
-  ## optionnel
-  "video_url": "url d'une vidéo pour la question",
-  "audio_url": "url d'un audio pour la question",
-  "original": "Spécifié si faux"
+  "video_url": "https://example.com/video.mp4",
+  "image_url": "https://example.com/image.jpg"
 }
 ```
 
@@ -297,13 +331,13 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
         {"text": "Lyon", "is_correct": false},
         {"text": "Marseille", "is_correct": false},
         {"text": "Toulouse", "is_correct": false}
-      ],
+      ]
     }
 ```
 
 #### 2.1.4. Mise à jour complète d'une question
 
-**Endpoint** : `PUT /api/quiz/questions/<id>/`
+**Endpoint** : `PUT /api/quiz/questions/{id}/`
 
 **Body** (exemple) :
 ```json
@@ -317,7 +351,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
     {"text": "Toulouse", "is_correct": false}
   ],
   "video_url": "https://video.com/mise-a-jour",
-  "audio_url": "https://audio.com/mise-a-jour",
+  "image_url": "https://image.com/mise-a-jour",
   "original": true,
   "explanations": "Explications mises à jour"
 }
@@ -327,7 +361,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
 
 #### 2.1.5. Mise à jour partielle d'une question
 
-**Endpoint** : `PATCH /api/quiz/questions/<id>/`
+**Endpoint** : `PATCH /api/quiz/questions/{id}/`
 
 **Body** (exemple) :
 ```json
@@ -341,7 +375,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
 
 #### 2.1.6. Suppression d'une question
 
-**Endpoint** : `DELETE /api/quiz/questions/<id>/`
+**Endpoint** : `DELETE /api/quiz/questions/{id}/`
 
 - **204 No Content** si la suppression réussit.  
 - **404 Not Found** si l’`id` n’existe pas.
@@ -362,7 +396,7 @@ Les contraintes métier (types de questions, nombre de questions, cohérence des
 
 **Endpoint** : `GET /api/quiz/nuggets/`
 
-**Réponse attendue** (liste paginée) :
+**Réponse attendue** :
 ```json
 {
   "count": 1,
@@ -604,11 +638,13 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 {
   "title": "Histoire de la gastronomie",
   "type": "CL",
+  "original": true,
   "question_ids": ["uuid-1", "uuid-2", "uuid-3"]
 }
 ```
 
 - `type` : `"CL"` (Classique) ou `"TR"` (Troll).  
+- `original` : optionnel (défaut **`true`** = créé directement).  
 - Questions : type `ME` ; ordre via `question_ids`.  
 
 **Champs calculés** : `questions_count`, `used_in_menus_count`.
@@ -619,7 +655,7 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
   "id": "uuid-theme-1",
   "title": "Histoire de la gastronomie",
   "type": "CL",
-  "original": false,
+  "original": true,
   "questions_count": 3,
   "questions": [
     {
@@ -737,7 +773,7 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 ```
 
 **PUT / PATCH /api/quiz/additions/{id}/** — même corps que le POST, réponse 200 avec la manche complète (comme ci‑dessus).  
-**DELETE /api/quiz/additions/{id}/`** — 204 No Content en cas de succès.
+**DELETE /api/quiz/additions/{id}/** — 204 No Content en cas de succès.
 
 ---
 
@@ -780,7 +816,7 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 ```
 
 **PUT / PATCH /api/quiz/deadly-burgers/{id}/** — même corps que le POST, réponse 200 avec la manche complète (comme ci‑dessus).  
-**DELETE /api/quiz/deadly-burgers/{id}/`** — 204 No Content en cas de succès.
+**DELETE /api/quiz/deadly-burgers/{id}/** — 204 No Content en cas de succès.
 
 ---
 
@@ -830,7 +866,7 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 ```
 
 **PUT / PATCH /api/quiz/burger-quizzes/{id}/** — même corps que le POST, réponse 200 avec le Burger Quiz complet (comme ci‑dessus).  
-**DELETE /api/quiz/burger-quizzes/{id}/`** — 204 No Content en cas de succès.
+**DELETE /api/quiz/burger-quizzes/{id}/** — 204 No Content en cas de succès.
 
 ---
 

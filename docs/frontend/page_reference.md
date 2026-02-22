@@ -1,11 +1,14 @@
 # Liste des pages
 
+Structure des pages imaginées pour le frontend. Composants réutilisables (InlineForm, modales, etc.) : [components.md](components.md).
+
+---
 
 ## Question
 
 - QuestionsListPage : Liste les questions avec des filtres de type, original.
 - QuestionDetailPage : Détail d’une question (énoncé, réponses, type, original, médias).
-- QuestionCreatePage : Création d’une question (type, énoncé, réponses, original, video_url, audio_url).
+- QuestionCreatePage : Création d’une question (type, énoncé, réponses, original, video_url, image_url).
 - QuestionEditPage : Édition de la question sélectionnée.
 
 ### QuestionsListPage
@@ -14,11 +17,11 @@ Liste les questions avec des filtres par **type** (NU, SP, ME, AD, DB), **origin
 
 ### QuestionDetailPage
 
-Affichage en lecture seule : texte de la question, type, original ?, explications, liens vidéo/audio, liste des réponses avec indication de la bonne réponse. Liens ou boutons vers QuestionEditPage et retour à la liste.
+Affichage en lecture seule : texte de la question, type, original ?, explications, liens vidéo/image, liste des réponses avec indication de la bonne réponse. Liens ou boutons vers QuestionEditPage et retour à la liste.
 
 ### QuestionCreatePage / QuestionEditPage
 
-Formulaire : type de question (sélection), énoncé, original (case à cocher), explications optionnelles, video_url et audio_url optionnels. Bloc réponses selon le type (ex. 4 réponses pour NU, 2 pour SP, etc.) avec indication de la réponse correcte.
+Formulaire : type de question (sélection), énoncé, original (case à cocher), explications optionnelles, video_url et image_url optionnels. Bloc réponses selon le type (ex. 4 réponses pour NU, 2 pour SP, etc.) avec indication de la réponse correcte.
 
 ## Nuggets
 
@@ -33,7 +36,7 @@ On peut imaginer un tableau listant les Manches nuggets créées, avec une colon
 
 ### NuggetsCreatePage / NuggetsEditPage
 
-On peut imaginer des champs de sélection de manche Nuggets, qui soit de base au nombre de 6, deux par deux par ligne. En effet comme on pose des questions à tour de rôle, il faut qu'on est des couples de questions.
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Champs de sélection ou création inline de questions Nuggets, de base au nombre de 6, deux par deux par ligne. En effet comme on pose des questions à tour de rôle, il faut qu'on est des couples de questions.
 Aussi on pourra penser à la contrainte que lorsqu'une manche est sélectionné elle soit grisée et non cliquable pour les autres champs de sélection.
 
 > Backend : Penser à mettre dans API reference de vérifiez à la fois le fait qu'on soumette un nombre pair de question et qu'il n'y est pas deux fois la même question
@@ -54,7 +57,7 @@ Liste les manches Sel ou poivre créé, avec de même que pour les Nuggets, des 
 
 ### SaltOrPepperCreatePage
 
-On imagine un formulaire avec le nom de la manche, trois champs par défaut les uns à coté des autres permettant de mettre les alternatives de réponses. On aurait un bouton pour ajouter supprimer des champs(minumum deux champs, maximum 5 champs).
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire avec le nom de la manche, trois champs par défaut les uns à côté des autres pour les propositions de réponses. On aurait un bouton pour ajouter supprimer des champs(minumum deux champs, maximum 5 champs).
 
 Enfin une succession de champs de questions avec la réponse étant un champ déroulant avec les propositions plus haut disponibles.
 On aurait aussi un case Check pour dire si c'est une question originale ou non, à la fois au niveau de la manche (et du coup si coché toutes les questions seraient cochés et pas changeable) et au niveau question.
@@ -105,7 +108,7 @@ Détail d’un thème : titre, type (Classique / Troll), liste ordonnée des que
 
 ### MenuThemeCreatePage
 
-Formulaire : titre, type (CL ou TR), liste ordonnée de questions (question_ids). Questions de type ME uniquement. Boutons/liens pour ajouter des questions, accéder à QuestionDetail/Edit, réordonner. 
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, type (CL ou TR), liste ordonnée de questions (question_ids). Questions de type ME uniquement. Boutons/liens pour ajouter des questions, accéder à QuestionDetail/Edit, réordonner. 
 
 ### MenuThemeEditPage
 
@@ -124,7 +127,7 @@ Tableau des manches Addition avec colonnes : titre, original ?, nombre d’utili
 
 ### AdditionCreatePage
 
-Formulaire : titre, description optionnelle, liste ordonnée de questions (question_ids). Questions de type AD uniquement. Sélection parmi les questions existantes type AD (ou création inline selon choix métier).
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, description optionnelle, liste ordonnée de questions (question_ids). Questions de type AD uniquement (ex. 8 par défaut, ajout/suppression). Sélection parmi les questions existantes type AD (ou création inline selon choix métier).
 
 ### AdditionDetailPage
 
@@ -147,7 +150,7 @@ Tableau des manches Burger de la mort : titre, original ?, nombre d’utilisatio
 
 ### DeadlyBurgerCreatePage
 
-Formulaire : titre, sélection de **10 questions** exactement (type DB). Contrainte API : 10 questions, type DB. Questions réutilisables entre manches. 
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, **10 questions** exactement (type DB). Contrainte API : 10 questions, type DB. Questions réutilisables entre manches. 
 
 ### DeadlyBurgerDetailPage
 
@@ -161,10 +164,14 @@ Même structure que DeadlyBurgerCreatePage (toujours 10 questions type DB).
 
 ## Burger Quiz
 
-- BurgerQuizListPage : Liste des Burger Quiz créés.
-- BurgerQuizDetailPage : Détail d’un quiz (titre, toss, manches liées).
-- BurgerQuizCreatePage : Création d’un quiz (titre, toss, sélection des manches : nuggets, salt_or_pepper, menus, addition, deadly_burger).
-- BurgerQuizEditPage : Édition du quiz.
+1. BurgerQuizListPage : Liste des Burger Quiz créés.
+2. BurgerQuizDetailPage : Détail d’un quiz (titre, toss, manches liées).
+3. BurgerQuizCreatePage : Création d’un quiz (titre, toss, sélection des manches : nuggets, salt_or_pepper, menus, addition, deadly_burger).
+4. BurgerQuizEditPage : Édition du quiz.
+
+### 1. BurgerQuizListPage
+
+On imagine une liste des burger quiz existant. On pourrait avoir une colonne indiquant son avancement (le nombre de manche fixé sur les requises : Toss, NU, ME, AD, )
 
 ### BurgerQuizListPage
 
@@ -188,7 +195,7 @@ Les adaptations suivantes ont été prévues côté modèles et endpoints pour a
 - **Toutes les listes de manches** (Nuggets, Sel ou poivre, Menus, Addition, Burger de la mort) : champ calculé **`burger_quiz_count`** (ou `used_in_burger_quizzes_count`) pour la colonne « nombre d’utilisation » ; champ **`original`** (stocké sur la manche) pour « original ? ».
 - **MenuThemeListPage** : champs calculés **`used_in_menus_count`** et **`questions_count`**.
 - **BurgerQuizListPage** : **`created_at`** / **`updated_at`** sur le modèle BurgerQuiz pour « date/création » et tri. Réponse API : inclure ces champs.
-- **Toss** : la page reference indique « toss optionnel » ; l’API peut le laisser obligatoire ou optionnel selon le choix métier (voir `docs/api-endpoints-et-contraintes.md` §4).
+- **Toss** : la page reference indique « toss optionnel » ; l’API peut le laisser obligatoire ou optionnel selon le choix métier (voir `docs/backend/api-reference.md` §2.7 Burger Quiz).
 
-Détail des champs calculés et filtres : `docs/api-endpoints-et-contraintes.md` §7.1.
+Détail des champs calculés et filtres : `docs/backend/api-reference.md` §2.9.
 
