@@ -1,6 +1,24 @@
 # Liste des pages
 
-Structure des pages imaginées pour le frontend. Composants réutilisables (InlineForm, modales, etc.) : [components.md](components.md).
+Structure des pages imaginées pour le frontend. Composants réutilisables (InlineForm, modales, etc.) : [components.md](components.md). Maquettes fil de fer : [wireframes/README.md](wireframes/README.md).
+
+---
+
+## Avancement des pages
+
+_À mettre à jour au fur et à mesure : **Idée** | **Wireframe** | **Implémenté**_
+
+| Zone | Avancement | Maquette |
+|------|------------|----------|
+| Layout + Login | Wireframe | [layout-login.md](wireframes/layout-login.md) |
+| Questions | Wireframe | [questions.md](wireframes/questions.md) |
+| Nuggets | Wireframe | [nuggets.md](wireframes/nuggets.md) |
+| Sel ou Poivre | Wireframe | [salt-or-pepper.md](wireframes/salt-or-pepper.md) |
+| Menus + MenuTheme | Wireframe | [menus-menutheme.md](wireframes/menus-menutheme.md) |
+| Addition | Wireframe | [addition.md](wireframes/addition.md) |
+| Burger de la mort | Wireframe | [deadly-burger.md](wireframes/deadly-burger.md) |
+| Burger Quiz | Wireframe | [burger-quiz.md](wireframes/burger-quiz.md) |
+| Modales | Wireframe | [modals.md](wireframes/modals.md) |
 
 ---
 
@@ -52,7 +70,6 @@ Un bouton et une modale permettront d'ajouter des questions Nuggets et des bouto
 
 ### SaltOrPepperListPage
 
-
 Liste les manches Sel ou poivre créé, avec de même que pour les Nuggets, des colonnes original ? et e nombre d'utilisation. Enfin un bouton ajouter pour conduire vers la page d'ajout `SaltOrPepperCreatePage` et des boutons avec des icones pour aller vers SaltOrPepperDetailPage ou SaltOrPepperEditPage et enfin un bouton trashicon rouge avec modale de confirmation pour supprimer une manche.
 
 ### SaltOrPepperCreatePage
@@ -64,7 +81,7 @@ On aurait aussi un case Check pour dire si c'est une question originale ou non, 
 
 ### SaltOrPepperDetailPage
 
-Affichage en lecture : titre, description, liste des propositions (choice_labels), liste des questions avec la réponse correcte pour chacune. Indication « original ? » (valeur dérivée à partir des questions). Boutons vers SaltOrPepperEditPage et suppression (modale). 
+Affichage en lecture : titre, description, liste des propositions (choice_labels), liste des questions avec la réponse correcte pour chacune. Indication « original ? » (valeur dérivée à partir des questions). Boutons vers SaltOrPepperEditPage et suppression (modale).
 
 ### SaltOrPepperEditPage
 
@@ -108,7 +125,7 @@ Détail d’un thème : titre, type (Classique / Troll), liste ordonnée des que
 
 ### MenuThemeCreatePage
 
-Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, type (CL ou TR), liste ordonnée de questions (question_ids). Questions de type ME uniquement. Boutons/liens pour ajouter des questions, accéder à QuestionDetail/Edit, réordonner. 
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, type (CL ou TR), liste ordonnée de questions (question_ids). Questions de type ME uniquement. Boutons/liens pour ajouter des questions, accéder à QuestionDetail/Edit, réordonner.
 
 ### MenuThemeEditPage
 
@@ -150,7 +167,7 @@ Tableau des manches Burger de la mort : titre, original ?, nombre d’utilisatio
 
 ### DeadlyBurgerCreatePage
 
-Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, **10 questions** exactement (type DB). Contrainte API : 10 questions, type DB. Questions réutilisables entre manches. 
+Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, **10 questions** exactement (type DB). Contrainte API : 10 questions, type DB. Questions réutilisables entre manches.
 
 ### DeadlyBurgerDetailPage
 
@@ -198,4 +215,3 @@ Les adaptations suivantes ont été prévues côté modèles et endpoints pour a
 - **Toss** : la page reference indique « toss optionnel » ; l’API peut le laisser obligatoire ou optionnel selon le choix métier (voir `docs/backend/api-reference.md` §2.7 Burger Quiz).
 
 Détail des champs calculés et filtres : `docs/backend/api-reference.md` §2.9.
-

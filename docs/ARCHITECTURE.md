@@ -6,12 +6,12 @@ Vue d'ensemble de l'architecture du projet Burger Quiz.
 
 ## Stack technique
 
-| Composant | Technologie |
-|-----------|-------------|
-| **Backend** | Django 6, Django REST Framework, Python 3.12 |
-| **Frontend** | React 19, TypeScript, Vite 7 |
-| **Base de données** | PostgreSQL 18 |
-| **Infrastructure** | Docker Compose |
+| Composant           | Technologie                                  |
+| ------------------- | -------------------------------------------- |
+| **Backend**         | Django 6, Django REST Framework, Python 3.12 |
+| **Frontend**        | React 19, TypeScript, Vite 7                 |
+| **Base de données** | PostgreSQL 18                                |
+| **Infrastructure**  | Docker Compose                               |
 
 ---
 
@@ -22,14 +22,6 @@ Vue d'ensemble de l'architecture du projet Burger Quiz.
 │   Client    │ ───► │   Frontend  │ ───► │   Backend   │ ───► │  PostgreSQL │
 │  (navigateur)│      │ React/Vite  │      │ Django/DRF  │      │     18      │
 └─────────────┘      └─────────────┘      └─────────────┘      └─────────────┘
-       │                     │                     │
-       │                     │                     │
-       │                     │                     └── API REST /api/
-       │                     │                         JWT (auth)
-       │                     │
-       │                     └── Port 5173 (dev)
-       │
-       └── HTTP
 ```
 
 ---
@@ -73,12 +65,12 @@ burger-quiz-app/
 
 ## Services Docker
 
-| Service | Port | Rôle |
-|---------|------|------|
-| **db** | 5433 (hôte) → 5432 (conteneur) | PostgreSQL 18 |
-| **backend** | 8000 | Django + DRF, API REST |
-| **frontend** | 5173 | Vite dev server |
-| **pgadmin** | 5050 | Outil d'administration DB (profil `tools`) |
+| Service      | Port                           | Rôle                                       |
+| ------------ | ------------------------------ | ------------------------------------------ |
+| **db**       | 5433 (hôte) → 5432 (conteneur) | PostgreSQL 18                              |
+| **backend**  | 8000                           | Django + DRF, API REST                     |
+| **frontend** | 5173                           | Vite dev server                            |
+| **pgadmin**  | 5050                           | Outil d'administration DB (profil `tools`) |
 
 ---
 

@@ -1,20 +1,29 @@
 # 1. Préparation
 
-[] User stories
-[] Modèles de données
-[] MVP
-[] Wireframes
+[X] Vision [BACKLOG.md](BACKLOG.md)
+[X] User stories [BACKLOG.md](BACKLOG.md)
+[X] Modèles de données [models](../database/models/README.md)
+[X] Wireframes
 [] Evolution du projet
 [] Architecture High Level
 [] Stack
 
+# 1 Préparation
+
+[X] Vision → [BACKLOG.md](BACKLOG.md)
+[X] User stories → [BACKLOG.md](BACKLOG.md)
+[X] Modèles données → [models](../database/models/README.md)
+[ ] Wireframes → [WIREFRAMES](../frontend/)
+[ ] Architecture → ARCHITECTURE.md
+[ ] Stack → TECH.md
+
 # 2. Développement
 
-[] Squelette de l'application (dossiers, environnement, git)
-[] Base de données
-[] Backend : API et tests
-[] Frontend
-[] Itération
+[X] Squelette projet → README.md
+[X] Base données
+[ ] Backend
+[ ] Frontend
+[ ] Itérations
 
 ## Versions cibles
 
