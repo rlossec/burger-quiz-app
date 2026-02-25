@@ -10,7 +10,6 @@ from rest_framework.test import APITestCase
 from . import AUTHENTICATION_MISSING
 
 
-# (basename du routeur quiz/urls.py, libellé pour les messages)
 QUIZ_BASENAMES = [
     ("question", "questions"),
     ("nuggets", "nuggets"),

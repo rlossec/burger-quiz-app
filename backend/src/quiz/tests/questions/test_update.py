@@ -1,4 +1,4 @@
-# python manage.py test quiz.tests.questions.test_update
+# uv run manage.py test quiz.tests.questions.test_update
 # PUT /api/quiz/questions/<id>/ — Mise à jour (mêmes contraintes que la création).
 
 

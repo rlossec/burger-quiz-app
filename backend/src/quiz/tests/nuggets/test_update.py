@@ -10,8 +10,6 @@ from ...tests.factories import QuestionFactory, NuggetsFactory
 
 User = get_user_model()
 
-User = get_user_model()
-
 
 class TestNuggetsUpdateEndpoint(APITestCase):
     """PATCH / PUT /api/quiz/nuggets/{id}/ — Mise à jour avec re-vérification des contraintes."""

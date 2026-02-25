@@ -82,12 +82,12 @@ Les données de test du quiz sont créées via des **factories** (factory_boy). 
 
 |   # | Endpoint (URL + filtres)                                      | Status | Description                                                                                                                     | Avancement |
 | --: | ------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-|   1 | `GET /api/quiz/questions/`                                    | 🟢 200 | Test du succès, avec les champs attendus | 🟡         |
+|   1 | `GET /api/quiz/questions/`                                    | 🟢 200 | Test du succès, avec les champs attendus | 🟢         |
 |   2 | `GET /api/quiz/questions/`                                    | 🟢 200 | Test du champ usage_count                                               | 🔲         |
-|   3 | `GET /api/quiz/questions/?question_type=<type>`               | 🟢 200 | Test du filtre type avec sous tests pour NU, SP, ME, AD, DB.                           | 🟡         |
-|   4 | `GET /api/quiz/questions/?original=true` \| `?original=false` | 🟢 200 | Test du filtre original.                             | 🟡         |
-|   5 | `GET /api/quiz/questions/?search=...`                         | 🟢 200 | Test du filtre search (recherche sur l'énoncé, insensible à la casse, sous-tests). | 🟡         |
-|   6 | `GET /api/quiz/questions/?search=...&question_type=...`       | 🟢 200 | Test search combiné avec question_type.             | 🟡         |
+|   3 | `GET /api/quiz/questions/?question_type=<type>`               | 🟢 200 | Test du filtre type avec sous tests pour NU, SP, ME, AD, DB.                           | 🟢         |
+|   4 | `GET /api/quiz/questions/?original=true` \| `?original=false` | 🟢 200 | Test du filtre original.                             | 🟢         |
+|   5 | `GET /api/quiz/questions/?search=...`                         | 🟢 200 | Test du filtre search (recherche sur l'énoncé, insensible à la casse, sous-tests). | 🟢         |
+|   6 | `GET /api/quiz/questions/?search=...&question_type=...`       | 🟢 200 | Test search combiné avec question_type.             | 🟢         |
 
 #### Détail d'une question
 
@@ -119,8 +119,8 @@ Les données de test du quiz sont créées via des **factories** (factory_boy). 
 
 |   # | Cas                                             | Status | Description                                        | Avancement |
 | ---: | ----------------------------------------------- | ------ | -------------------------------------------------- | ---------- |
-|   1 | `GET /api/quiz/questions/<id>/` (id existant)   | 🟢 200 | Succès | 🟡         |
-|   2 | `GET /api/quiz/questions/<id>/` (id inexistant) | 🔴 404 | Id Not Found.                                         | 🟡         |
+|   1 | `GET /api/quiz/questions/<id>/` (id existant)   | 🟢 200 | Succès | 🟢         |
+|   2 | `GET /api/quiz/questions/<id>/` (id inexistant) | 🔴 404 | Id Not Found.                                         | 🟢         |
 
 #### Création d'une question
 
@@ -175,25 +175,25 @@ Les données de test du quiz sont créées via des **factories** (factory_boy). 
 
 |   # | Cas                                                 | Status | Classe / test                                                       | Avancement |
 | --: | --------------------------------------------------- | ------ | -------------------------------------------------------------------- | ---------- |
-|   1 | `POST` NU payload valide (4 réponses, 1 is_correct) | 🟢 201 | `TestQuestionCreateNU.test_create_success`                           | 🟡         |
-|   2 | `POST` avec video_url et image_url (tous types)    | 🟢 201 | `TestQuestionCreateValidation.test_video_url_and_image_url_are_saved` | 🟡         |
-|   3 | `POST` sans `text` (NU, SP, ME, AD, DB)             | 🔴 400 | `TestQuestionCreateValidation.test_missing_text_returns_400`         | 🟡         |
-|   4 | `POST` avec `text` vide ou espaces seuls            | 🔴 400 | `TestQuestionCreateValidation.test_empty_text_returns_400`            | 🟡         |
-|   5 | `POST` sans `question_type` (NU, SP, ME, AD, DB)   | 🔴 400 | `TestQuestionCreateValidation.test_missing_question_type_returns_400` | 🟡         |
-|   6 | `POST` avec video_url invalide (tous types)        | 🔴 400 | `TestQuestionCreateValidation.test_invalid_video_url_returns_400`      | 🟡         |
-|   7 | `POST` avec image_url invalide (tous types)         | 🔴 400 | `TestQuestionCreateValidation.test_invalid_image_url_returns_400`     | 🟡         |
-|   8 | `POST` NU, SP, ME ou AD sans `answers`              | 🔴 400 | `TestQuestionCreateValidation.test_missing_answers_returns_400_for_types_that_require_them` | 🟡         |
-|   9 | `POST` DB avec `answers` vide                       | 🟢 201 | `TestQuestionCreateDB.test_create_success_without_answers`          | 🟡         |
-|  10 | `POST` NU avec nombre de réponses ≠ 4 (1 ou 5)      | 🔴 400 | `TestQuestionCreateNU.test_wrong_number_of_answers_returns_400`     | 🟡         |
-|  11 | `POST` NU sans aucune `is_correct=true`             | 🔴 400 | `TestQuestionCreateNU.test_no_correct_answer_returns_400`             | 🟡         |
-|  12 | `POST` NU avec plusieurs `is_correct=true`         | 🔴 400 | `TestQuestionCreateNU.test_multiple_correct_answers_returns_400`     | 🟡         |
-|  13 | `POST` SP avec plusieurs `is_correct=true`         | 🟢 201 | `TestQuestionCreateSP.test_create_success`                           | 🟡         |
-|  14 | `POST` ME avec une réponse is_correct=true          | 🟢 201 | `TestQuestionCreateME.test_create_success`                           | 🟡         |
-|  15 | `POST` AD avec une réponse correcte                 | 🟢 201 | `TestQuestionCreateAD.test_create_success`                          | 🟡         |
-|  16 | `POST` AD sans bonne réponse                        | 🔴 400 | `TestQuestionCreateAD.test_all_incorrect_answers_returns_400`        | 🟡         |
-|  17 | `POST` DB avec réponses fournies                    | 🔴 400 | `TestQuestionCreateDB.test_create_with_answers_returns_400`         | 🟡         |
-|  18 | `POST` question_type invalide (ex. `XX`)            | 🔴 400 | `TestQuestionCreateValidation.test_invalid_question_type_returns_400` | 🟡         |
-|  19 | `POST` SP, ME ou AD avec une réponse `is_correct=false` (piège) | 🔴 400 | `TestQuestionCreateValidation.test_incorrect_answer_forbidden_for_open_types` | 🟡         |
+|   1 | `POST` NU payload valide (4 réponses, 1 is_correct) | 🟢 201 | `TestQuestionCreateNU.test_create_success`                           | 🟢         |
+|   2 | `POST` avec video_url et image_url (tous types)    | 🟢 201 | `TestQuestionCreateValidation.test_video_url_and_image_url_are_saved` | 🟢         |
+|   3 | `POST` sans `text` (NU, SP, ME, AD, DB)             | 🔴 400 | `TestQuestionCreateValidation.test_missing_text_returns_400`         | 🟢         |
+|   4 | `POST` avec `text` vide ou espaces seuls            | 🔴 400 | `TestQuestionCreateValidation.test_empty_text_returns_400`            | 🟢         |
+|   5 | `POST` sans `question_type` (NU, SP, ME, AD, DB)   | 🔴 400 | `TestQuestionCreateValidation.test_missing_question_type_returns_400` | 🟢         |
+|   6 | `POST` avec video_url invalide (tous types)        | 🔴 400 | `TestQuestionCreateValidation.test_invalid_video_url_returns_400`      | 🟢         |
+|   7 | `POST` avec image_url invalide (tous types)         | 🔴 400 | `TestQuestionCreateValidation.test_invalid_image_url_returns_400`     | 🟢         |
+|   8 | `POST` NU, SP, ME ou AD sans `answers`              | 🔴 400 | `TestQuestionCreateValidation.test_missing_answers_returns_400_for_types_that_require_them` | 🟢         |
+|   9 | `POST` DB avec `answers` vide                       | 🟢 201 | `TestQuestionCreateDB.test_create_success_without_answers`          | 🟢         |
+|  10 | `POST` NU avec nombre de réponses ≠ 4 (1 ou 5)      | 🔴 400 | `TestQuestionCreateNU.test_wrong_number_of_answers_returns_400`     | 🟢         |
+|  11 | `POST` NU sans aucune `is_correct=true`             | 🔴 400 | `TestQuestionCreateNU.test_no_correct_answer_returns_400`             | 🟢         |
+|  12 | `POST` NU avec plusieurs `is_correct=true`         | 🔴 400 | `TestQuestionCreateNU.test_multiple_correct_answers_returns_400`     | 🟢         |
+|  13 | `POST` SP avec plusieurs `is_correct=true`         | 🟢 201 | `TestQuestionCreateSP.test_create_success`                           | 🟢         |
+|  14 | `POST` ME avec une réponse is_correct=true          | 🟢 201 | `TestQuestionCreateME.test_create_success`                           | 🟢         |
+|  15 | `POST` AD avec une réponse correcte                 | 🟢 201 | `TestQuestionCreateAD.test_create_success`                          | 🟢         |
+|  16 | `POST` AD sans bonne réponse                        | 🔴 400 | `TestQuestionCreateAD.test_all_incorrect_answers_returns_400`        | 🟢         |
+|  17 | `POST` DB avec réponses fournies                    | 🔴 400 | `TestQuestionCreateDB.test_create_with_answers_returns_400`         | 🟢         |
+|  18 | `POST` question_type invalide (ex. `XX`)            | 🔴 400 | `TestQuestionCreateValidation.test_invalid_question_type_returns_400` | 🟢         |
+|  19 | `POST` SP, ME ou AD avec une réponse `is_correct=false` (piège) | 🔴 400 | `TestQuestionCreateValidation.test_incorrect_answer_forbidden_for_open_types` | 🟢         |
 
 _Tests non implémentés (à ajouter si règle métier)_ : answers en doublon → 400 ; limite max de réponses (ex. 10) → 400 ; transaction rollback si erreur sur answers.
 
@@ -209,6 +209,8 @@ Les tests de mise à jour reprennent les **mêmes contraintes** que la création
 - **Classe de base** : **`QuestionUpdateBaseTestCase`** — fournit une question existante, `self.url` (détail), `put(payload)`, `assertOk`, `assertBadRequest`.
 - **Contraintes communes** : **`TestQuestionUpdateValidation`** — mêmes tests que pour la création (text manquant/vide, question_type manquant/invalide, video_url/image_url valides ou invalides, réponses incorrectes interdites pour SP/ME/AD, answers obligatoires pour NU/SP/ME/AD).
 - **Classes par type** : **`TestQuestionUpdateNU`**, **`TestQuestionUpdateSP`**, **`TestQuestionUpdateME`**, **`TestQuestionUpdateAD`**, **`TestQuestionUpdateDB`** — succès de mise à jour et contraintes spécifiques (nombre de réponses NU, pièges interdits, etc.).
+
+**Légende Avancement** : 🔲 Skip | 🟡 Failed | 🟢 Passed
 
 |   # | Cas | Status | Classe / test |
 | --: | --- | ------ | -------------- |
