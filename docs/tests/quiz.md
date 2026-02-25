@@ -11,6 +11,8 @@ uv run manage.py test quiz.tests # Depuis backend/src
 docker compose exec backend uv run python manage.py test quiz.tests # Avec Docker
 ```
 
+**Rapport HTML** : à chaque exécution des tests, un rapport est généré dans `backend/src/reports/test-report.html` (résumé : succès / échecs / ignorés, détail des erreurs). Ouvrir ce fichier dans un navigateur pour consulter le bilan.
+
 ---
 
 ## Structure des tests
@@ -32,7 +34,7 @@ Les données de test du quiz sont créées via des **factories** (factory_boy). 
 
 | Endpoint                        | Fichier          | Nb Tests | Lien                                               |
 | ------------------------------- | ---------------- | -------- | -------------------------------------------------- |
-| `GET /api/quiz/questions/`      | `test_list.py`   | 4        | [Liste des questions](#liste-des-questions)        |
+| `GET /api/quiz/questions/`      | `test_list.py`   | 6        | [Liste des questions](#liste-des-questions)        |
 | `GET /api/quiz/questions/<id>/` | `test_detail.py` | 2        | [Détail d'une question](#détail-dune-question)     |
 | `POST /api/quiz/questions/`     | `test_create.py` | 19       | [Création d'une question](#création-dune-question) |
 | `PUT /api/quiz/questions/<id>/`  | `test_update.py` | 19       | [Mise à jour d'une question](#mise-à-jour-dune-question) |
@@ -84,6 +86,8 @@ Les données de test du quiz sont créées via des **factories** (factory_boy). 
 |   2 | `GET /api/quiz/questions/`                                    | 🟢 200 | Test du champ usage_count                                               | 🔲         |
 |   3 | `GET /api/quiz/questions/?question_type=<type>`               | 🟢 200 | Test du filtre type avec sous tests pour NU, SP, ME, AD, DB.                           | 🟡         |
 |   4 | `GET /api/quiz/questions/?original=true` \| `?original=false` | 🟢 200 | Test du filtre original.                             | 🟡         |
+|   5 | `GET /api/quiz/questions/?search=...`                         | 🟢 200 | Test du filtre search (recherche sur l'énoncé, insensible à la casse, sous-tests). | 🟡         |
+|   6 | `GET /api/quiz/questions/?search=...&question_type=...`       | 🟢 200 | Test search combiné avec question_type.             | 🟡         |
 
 #### Détail d'une question
 

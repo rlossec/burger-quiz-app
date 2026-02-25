@@ -54,7 +54,7 @@ class TestUserRetrieveUser(APITestCase):
     # Success
     def test_user_detail_success(self):
         """Un simple utilisateur ne peut pas accéder aux détails d'un autre utilisateur"""
-        self.client.login(username="simpleuser", password="password12")
+        self.client.force_authenticate(user=self.simple_user)
         response = self.client.get(reverse("user-detail", args=[self.simple_user.pk]))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -76,7 +76,7 @@ class TestUserRetrieveUser(APITestCase):
 
     # Not Found
     def test_get_user_not_found_user_id(self):
-        self.client.login(username="simpleuser", password="password12")
+        self.client.force_authenticate(user=self.simple_user)
         response = self.client.get(reverse("user-detail", args=[999]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

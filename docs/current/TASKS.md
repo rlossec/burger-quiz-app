@@ -6,8 +6,9 @@ Tâches techniques et éléments de documentation à traiter.
 
 ## En cours / prioritaire
 
-- [ ] Compléter les user stories
-- [ ] Configurer drf-yasg pour la doc officielle de l'API
+- [x] Compléter les user stories
+- [x] Configurer drf-yasg pour la doc officielle de l'API
+- [ ] media de l'Avatar supprimé si changement (test Fail)
 
 ---
 

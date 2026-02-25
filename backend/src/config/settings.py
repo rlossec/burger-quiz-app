@@ -165,6 +165,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
 }
 
 # Simple JWT (authentification par username/password par défaut via Django authenticate)
@@ -212,6 +214,10 @@ DJOSER = {
     'PASSWORD_VALIDATORS': [password_validation.validate_password],
     'USER_CREATE_PASSWORD_RETYPE': True
 }
+
+# Rapport des tests unitaires (fichier HTML généré à chaque run)
+TEST_RUNNER = "config.test_runner.HtmlReportTestRunner"
+TEST_REPORT_DIR = BASE_DIR / "reports"
 
 # Swagger / drf-yasg - authentification
 SWAGGER_SETTINGS = {
