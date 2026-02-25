@@ -225,6 +225,7 @@ Les manches sont des entités indépendantes ; le Burger Quiz les référence pa
 **Filtres** :
 - `original` : `true` \| `false`  
 - `question_type` : `NU` \| `SP` \| `ME` \| `AD` \| `DB`  
+- `search` : chaîne de caractères ; recherche textuelle sur l’énoncé de la question (usage : page liste questions, modale d’ajout de questions). Combinable avec les autres filtres.  
 
 **Champs calculés (lecture seule)** : TODO
 

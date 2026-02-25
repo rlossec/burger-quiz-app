@@ -32,7 +32,7 @@ Tableau des manches Addition avec colonnes : titre, original ?, nombre d’utili
 
 | Action | Méthode | Endpoint               | Réf.                                           |
 | ------ | ------- | ---------------------- | ---------------------------------------------- |
-| Lister | GET     | `/api/quiz/additions/` | [lien](../../../backend/api-reference.md) §2.5 |
+| Lister | GET     | `/api/quiz/additions/` | [api-reference](../../../backend/api-reference.md) §2.5 |
 
 
 ## 2 - AdditionDetailPage
@@ -64,7 +64,7 @@ Actions :
 
 | Action | Méthode | Endpoint                    | Réf.                                                    |
 | ------ | ------- | --------------------------- | ------------------------------------------------------- |
-| Détail | GET     | `/api/quiz/additions/{id}/` | [lien](../../../backend/api-reference.md) §2.5 |
+| Détail | GET     | `/api/quiz/additions/{id}/` | [api-reference](../../../backend/api-reference.md) §2.5 |
 
 
 ## 3 - AdditionCreatePage / AdditionEditPage
@@ -97,6 +97,6 @@ Pattern **InlineForm** pour les questions ([components](../../components.md)). F
 
 | Action                           | Méthode   | Endpoint                                | Réf.                                           |
 | -------------------------------- | --------- | --------------------------------------- | ---------------------------------------------- |
-| Créer                            | POST      | `/api/quiz/additions/`                  | [lien](../../../backend/api-reference.md) §2.5 |
+| Créer                            | POST      | `/api/quiz/additions/`                  | [api-reference](../../../backend/api-reference.md) §2.5 |
 | Modifier                         | PUT/PATCH | `/api/quiz/additions/{id}/`             | idem                                           |
 | Questions (liste pour sélection) | GET       | `/api/quiz/questions/?question_type=AD` | §2.1                                           |
