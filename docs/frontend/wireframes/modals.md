@@ -8,13 +8,13 @@ Modales réutilisables. Voir [../components.md](../components.md).
 
 ```
 +------------------------------------------+
-|  Confirmer la suppression                 |
+|  Confirmer la suppression                |
 +------------------------------------------+
-|  Êtes-vous sûr de vouloir supprimer       |
-|  « Culture générale » ?                   |
-|  (Manche Nuggets)                         |
+|  Êtes-vous sûr de vouloir supprimer      |
+|  « Culture générale » ?                  |
+|  (Manche Nuggets)                        |
 |                                          |
-|  ( Annuler )            ( Supprimer )     |
+|  ( Annuler )            ( Supprimer )    |
 +------------------------------------------+
 ```
 
@@ -23,14 +23,14 @@ Modales réutilisables. Voir [../components.md](../components.md).
 ## Modale ajout question (ex. Nuggets)
 
 ```
-+------------------------------------------+
-|  Ajouter des questions Nuggets            |
-+------------------------------------------+
-|  ( ) Sélectionner des questions existantes                        |
-|      [ Recherche / liste type NU ]       |
-|      [ ] Q1  [ ] Q2  [ ] Q3  ...         |
-|  ( ) Créer une nouvelle question (inline)                         |
-|                                          |
-|  ( Annuler )            ( Valider )      |
-+------------------------------------------+
++---------------------------------------------+
+|  Ajouter des questions Nuggets              |
++---------------------------------------------+
+|  ( ) Sélectionner des questions existantes  |
+|      [ Recherche / liste type NU ]          |
+|      [ ] Q1  [ ] Q2  [ ] Q3  ...            |
+|  ( ) Créer une nouvelle question (inline)   |
+|                                             |
+|  ( Annuler )               ( Valider )      |
++---------------------------------------------+
 ```

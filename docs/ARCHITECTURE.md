@@ -20,7 +20,7 @@ Vue d'ensemble de l'architecture du projet Burger Quiz.
 ```
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
 │   Client    │ ───► │   Frontend  │ ───► │   Backend   │ ───► │  PostgreSQL │
-│  (navigateur)│      │ React/Vite  │      │ Django/DRF  │      │     18      │
+│ (navigateur)│      │ React/Vite  │      │ Django/DRF  │      │     18      │
 └─────────────┘      └─────────────┘      └─────────────┘      └─────────────┘
 ```
 

@@ -1,31 +1,33 @@
-# 1. Préparation
-
-[X] Vision [BACKLOG.md](BACKLOG.md)
-[X] User stories [BACKLOG.md](BACKLOG.md)
-[X] Modèles de données [models](../database/models/README.md)
-[X] Wireframes
-[] Evolution du projet
-[] Architecture High Level
-[] Stack
-
-# 1 Préparation
+## 1 Préparation
 
 [X] Vision → [BACKLOG.md](BACKLOG.md)
 [X] User stories → [BACKLOG.md](BACKLOG.md)
-[X] Modèles données → [models](../database/models/README.md)
-[ ] Wireframes → [WIREFRAMES](../frontend/)
-[ ] Architecture → ARCHITECTURE.md
-[ ] Stack → TECH.md
+[X] Modèles données → [models/README](../database/models/README.md)
+[X] Wireframes MVP → [wireframes/README](../frontend/wireframes/README.md)
+[X] Architecture → ARCHITECTURE.md
+[X] Stack → README.md
 
-# 2. Développement
+[ ] Wireframes Session
+[ ] Wireframes Real time
+
+## 2. Développement
 
 [X] Squelette projet → README.md
 [X] Base données
 [ ] Backend
-[ ] Frontend
-[ ] Itérations
+
+- [ ] API REFERENCE
+- [ ] Tests
+- [ ] Endpoints Quiz
+      [ ] Frontend
+- [ ] Références Composants
+  - [ ] Formulaire / Card
+  - [ ] Hooks
+  - [ ] Pages
+- [ ] Implémentation
 
 ## Versions cibles
 
-- **V0.1** – Création / manipulation de Burger Quiz (backlog : [BACKLOG.md](BACKLOG.md))
-- **V0.2** – Création / manipulation de session de jeu Burger Quiz
+- **V0.1** – Création / Modification de Burger Quiz
+- **V1.0** – Session de jeu Burger Quiz
+- **V2.0** - Real time
