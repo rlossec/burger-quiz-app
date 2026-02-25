@@ -1,67 +1,38 @@
 # Wireframes — Sel ou Poivre
 
-## Sel ou Poivre
+## Sommaire
 
-Pages :
+- [SaltOrPepperListPage](#1-saltorpepperlistpage)
+- [SaltOrPepperDetailPage](#2-saltorpepperdetailpage)
+- [SaltOrPepperCreatePage / SaltOrPepperEditPage](#3-saltorpeppercreatepage--saltorpeppereditpage)
 
-- **SaltOrPepperListPage**
-- **SaltOrPepperDetailPage**
-- **SaltOrPepperCreatePage**
-- **SaltOrPepperEditPage**
+---
 
-### SaltOrPepperListPage
+## 1 - SaltOrPepperListPage
 
-Liste les manches Sel ou poivre créé, avec de même que pour les Nuggets, des colonnes original ? et e nombre d'utilisation. Enfin un bouton ajouter pour conduire vers la page d'ajout `SaltOrPepperCreatePage` et des boutons avec des icones pour aller vers SaltOrPepperDetailPage ou SaltOrPepperEditPage et enfin un bouton trashicon rouge avec modale de confirmation pour supprimer une manche.
+### Principe
 
-### SaltOrPepperCreatePage
+Liste des manches Sel ou poivre : colonnes titre, original ?, nombre d’utilisation. Bouton Ajouter → SaltOrPepperCreatePage. Actions : détail, édition, suppression (modale).
 
-Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire avec le nom de la manche, trois champs par défaut les uns à côté des autres pour les propositions de réponses. On aurait un bouton pour ajouter supprimer des champs(minumum deux champs, maximum 5 champs).
-
-Enfin une succession de champs de questions avec la réponse étant un champ déroulant avec les propositions plus haut disponibles.
-On aurait aussi un case Check pour dire si c'est une question originale ou non, à la fois au niveau de la manche (et du coup si coché toutes les questions seraient cochés et pas changeable) et au niveau question.
-
-### SaltOrPepperDetailPage
-
-Affichage en lecture : titre, description, liste des propositions (choice_labels), liste des questions avec la réponse correcte pour chacune. Indication « original ? » (valeur dérivée à partir des questions). Boutons vers SaltOrPepperEditPage et suppression (modale).
-
-### SaltOrPepperEditPage
-
-Même structure que SaltOrPepperCreatePage (titre, description, 2 à 5 propositions, questions avec réponse = un des choix). Contrainte API : réponses des questions cohérentes avec les propositions. Bouton/modale pour ajouter des questions Nuggets, icônes vers détail/édition question, poubelle avec confirmation.
-
-## SaltOrPepperListPage
+### Wireframe
 
 Même schéma que NuggetsListPage : Titre | Original ? | Utilisations | Actions.
 
----
+### Appels API
 
-## SaltOrPepperCreatePage / SaltOrPepperEditPage
-
-```
-+----------------------------------------------------------------------+
-|  Créer une manche Sel ou Poivre  (ou Modifier)                       |
-+----------------------------------------------------------------------+
-|  Titre       [________________________________________________]      |
-|  Description [________________________________________________]      |
-|  Original    [ ] oui  (si coché : toutes les questions originales)   |
-|                                                                      |
-|  Propositions (2 à 5)                                                |
-|  [ Noir    ] [ Blanc   ] [ Les deux ]  [ + ] [ − ]                   |
-|                                                                      |
-|  Questions                                                           |
-|  +----------------------------------------------------------------+  |
-|  | Énoncé [____________________________]  Réponse [ Noir ▼ ]  [🗑] |  |
-|  +----------------------------------------------------------------+  |
-|  | Énoncé [__________________ _________]  Réponse [ Blanc ▼ ] [🗑] |  |
-|  +----------------------------------------------------------------+  |
-|  [ + Ajouter une question ]                                          |
-|                                                                      |
-|  ( Annuler )                                       ( Enregistrer )   |
-+----------------------------------------------------------------------+
-```
+| Action | Méthode | Endpoint                    | Réf.                                                    |
+| ------ | ------- | --------------------------- | ------------------------------------------------------- |
+| Lister | GET     | `/api/quiz/salt-or-pepper/` | [api-reference](../../../backend/api-reference.md) §2.3 |
 
 ---
 
-## SaltOrPepperDetailPage
+## 2 - SaltOrPepperDetailPage
+
+### Principe
+
+Affichage en lecture : titre, description, original ?, propositions (choice_labels), liste des questions avec la réponse correcte pour chacune. Actions : SaltOrPepperEditPage, suppression (modale).
+
+### Wireframe
 
 ```
 +-------------------------------------------------------------------+
@@ -71,11 +42,46 @@ Même schéma que NuggetsListPage : Titre | Original ? | Utilisations | Actions.
 |  Description  ...                                                 |
 |  Original ?   oui                                                 |
 |  Propositions  Noir | Blanc | Les deux                            |
-|                                                                   |
-|  Questions :                                                      |
-|    1. Question 1  →  Noir                                         |
-|    2. Question 2  →  Blanc                                        |
-|                                                                   |
-|  ( Modifier )  ( Supprimer )                                      |
+|  Questions :  1. Question 1  →  Noir  2. Question 2  →  Blanc     |
+|  ( Modifier )  ( Supprimer )                                       |
 +-------------------------------------------------------------------+
 ```
+
+### Appels API
+
+| Action | Méthode | Endpoint                         | Réf.                                                    |
+| ------ | ------- | -------------------------------- | ------------------------------------------------------- |
+| Détail | GET     | `/api/quiz/salt-or-pepper/{id}/` | [api-reference](../../../backend/api-reference.md) §2.3 |
+
+---
+
+## 3 - SaltOrPepperCreatePage / SaltOrPepperEditPage
+
+### Principe
+
+Formulaire : titre, description, original. **Propositions** (2 à 5) en champs modifiables avec [ + ] [ − ]. Questions en InlineForm : énoncé + **déroulant** (réponse = une des propositions). Contrainte API : réponses des questions cohérentes avec les propositions. Questions type SP uniquement.
+
+### Wireframe
+
+```
++----------------------------------------------------------------------+
+|  Créer une manche Sel ou Poivre  (ou Modifier)                       |
++----------------------------------------------------------------------+
+|  Titre       [________________________________________________]      |
+|  Description [________________________________________________]      |
+|  Original    [ ] oui                                                 |
+|  Propositions (2 à 5)  [ Noir ] [ Blanc ] [ Les deux ]  [ + ] [ − ]  |
+|  Questions                                                           |
+|  | Énoncé [____________________________]  Réponse [ Noir ▼ ]  [🗑] |  |
+|  [ + Ajouter une question ]                                          |
+|  ( Annuler )                                       ( Enregistrer )   |
++----------------------------------------------------------------------+
+```
+
+### Appels API
+
+| Action                    | Méthode   | Endpoint                                | Réf.                                                    |
+| ------------------------- | --------- | --------------------------------------- | ------------------------------------------------------- |
+| Créer                     | POST      | `/api/quiz/salt-or-pepper/`             | [api-reference](../../../backend/api-reference.md) §2.3 |
+| Modifier                  | PUT/PATCH | `/api/quiz/salt-or-pepper/{id}/`        | idem                                                    |
+| Questions (liste type SP) | GET       | `/api/quiz/questions/?question_type=SP` | §2.1                                                    |

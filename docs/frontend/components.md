@@ -17,11 +17,15 @@ Pattern d’ajout de **questions** directement dans un formulaire de création/�
 - Actions : **ajouter** une ligne (nouvelle question inline), **supprimer** une ligne (avec confirmation si besoin).
 - A arbitrer : À la soumission du formulaire parent : création des questions puis de la manche (ou mise à jour) ou soumission indépendante ?
 
+#### Piocher dans les questions existantes (Nuggets, Deadly Burger)
+
+**Modale indépendante** (« Ajouter des questions ») avec **outil de recherche** (champ recherche + filtre type). Les questions sélectionnées sont ajoutées à la liste du formulaire ; les **IDs sont envoyés à la soumission** du formulaire parent (pas de sauvegarde dans la modale). Voir [wireframes modale ajout question](wireframes/modals.md). Pour Nuggets : les questions **déjà dans la manche** sont **grisées** dans la modale pour éviter les doublons.
+
 #### Par type de manche
 
 | Page                              | question_type | Nombre / contraintes                                        | Remarques                                                                                                                                   |
 | --------------------------------- | ------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **NuggetsCreatePage / Edit**      | NU            | Nombre **pair** (ex. 6 champs possibles), 2 par 2 par ligne | Sélection ou création inline selon choix métier. Si sélection Une question sélectionnée peut être grisée ailleurs pour éviter les doublons. |
+| **NuggetsCreatePage / Edit**      | NU            | Nombre **pair** (ex. 6 champs possibles), 2 par 2 par ligne | Sélection (modale recherche) ou création inline. Une question déjà choisie peut être grisée dans la modale pour éviter les doublons.       |
 | **SaltOrPepperCreatePage / Edit** | SP            | Variable                                                    | Champs « propositions » (2 à 5) en haut ; chaque question a sa réponse dans un **déroulant** = une des propositions.                        |
 | **MenuThemeCreatePage / Edit**    | ME            | Variable                                                    | InlineForm pour les questions du thème.                                                                                                     |
 | **AdditionCreatePage / Edit**     | AD            | 8 inline form par défaut, ajout/suppression possible        | InlineForm avec question_type = AD.                                                                                                         |

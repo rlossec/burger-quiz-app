@@ -1,30 +1,22 @@
 # Wireframes — Nuggets
 
-## Nuggets
+Réf. : [page_reference](../../page_reference.md) · [README](README.md) · [components](../../components.md)
 
-Pages :
+## Sommaire
 
-- **NuggetsListPage** : Liste des manche Nuggets disponibles
-- **NuggetsDetailPage** : Detail de la manche Nuggets cliqué
-- **NuggetsCreatePage** : Création d'une manche Nuggets
-- **NuggetsEditPage** : Edition de la manche Nuggets cliqué
-
-### NuggetsListPage
-
-On peut imaginer un tableau listant les Manches nuggets créées, avec une colonne original ?, une colonne Utilisation (correspondant au nombre de fois où elle est dans un BurgerQuiz), et une colonne nbre de Nuggets. Enfin un bouton Ajouter en haut à droite du tableau permet d'aller vers la page de création.
-
-### NuggetsCreatePage / NuggetsEditPage
-
-Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Champs de sélection ou création inline de questions Nuggets, de base au nombre de 6, deux par deux par ligne. En effet comme on pose des questions à tour de rôle, il faut qu'on est des couples de questions.
-Aussi on pourra penser à la contrainte que lorsqu'une manche est sélectionné elle soit grisée et non cliquable pour les autres champs de sélection.
-
-> Backend : Penser à mettre dans API reference de vérifiez à la fois le fait qu'on soumette un nombre pair de question et qu'il n'y est pas deux fois la même question
-
-Un bouton et une modale permettront d'ajouter des questions Nuggets et des boutons avec des icones pour aller vers SaltOrPepperDetailPage ou SaltOrPepperEditPage et enfin un bouton trashicon rouge avec modale de confirmation pour supprimer une manche.
+- [NuggetsListPage](#1-nuggetslistpage)
+- [NuggetsDetailPage](#2-nuggetsdetailpage)
+- [NuggetsCreatePage / NuggetsEditPage](#3-nuggetscreatepage--nuggetseditpage)
 
 ---
 
-## NuggetsListPage
+## 1 - NuggetsListPage
+
+### Principe
+
+Tableau des manches Nuggets : colonnes titre, original ?, nombre d’utilisation (dans un BurgerQuiz), nombre de questions. Bouton Ajouter → NuggetsCreatePage. Actions : détail, édition, suppression (modale).
+
+### Wireframe
 
 ```
 +------------------------------------------------------------------+
@@ -37,35 +29,62 @@ Un bouton et une modale permettront d'ajouter des questions Nuggets et des bouto
 +------------------------------------------------------------------+
 ```
 
+### Appels API
+
+| Action | Méthode | Endpoint             | Réf.                                                    |
+| ------ | ------- | -------------------- | ------------------------------------------------------- |
+| Lister | GET     | `/api/quiz/nuggets/` | [api-reference](../../../backend/api-reference.md) §2.2 |
+
 ---
 
-## NuggetsCreatePage / NuggetsEditPage (InlineForm, 2 par 2)
+## 2 - NuggetsDetailPage
+
+### Principe
+
+Affichage en lecture : titre, original ?, liste des questions (énoncé + réponses, ordre). Actions : NuggetsEditPage, suppression (modale).
+
+### Wireframe
+
+_(Schéma identique à la liste avec zone détail : titre, questions complètes.)_
+
+### Appels API
+
+| Action | Méthode | Endpoint                  | Réf.                                                    |
+| ------ | ------- | ------------------------- | ------------------------------------------------------- |
+| Détail | GET     | `/api/quiz/nuggets/{id}/` | [api-reference](../../../backend/api-reference.md) §2.2 |
+
+---
+
+## 3 - NuggetsCreatePage / NuggetsEditPage
+
+### Principe
+
+Pattern **InlineForm** ([components](../../components.md)) : questions Nuggets par **paires** (nombre pair), 2 par 2 par ligne. Chaque question : énoncé + 4 réponses (1 correcte) ou **référence à une question existante**. Contraintes : nombre pair, pas de doublon.
+
+**Piocher dans les questions existantes** : le bouton « Ajouter une paire » ouvre une **modale** ([modale ajout question](../modals.md)) avec recherche et filtre type NU. On sélectionne une ou deux questions, on valide : les IDs sont **ajoutés à la liste** dans le formulaire ; à la **soumission** du formulaire parent, on envoie `question_ids` à l'API (une seule requête). Les questions **déjà choisies** dans la manche sont **grisées** dans la modale pour éviter les doublons.
+
+### Wireframe
 
 ```
 +------------------------------------------------------------------+
-|  Créer une manche Nuggets  (ou Modifier)                           |
+|  Créer une manche Nuggets  (ou Modifier)                          |
 +------------------------------------------------------------------+
 |  Titre  [________________________________________________]        |
 |  Original  [ ] oui                                                |
-|                                                                  |
-|  Questions (nombre pair, 2 par 2)                                 |
-|  +-------------------------------+  +-------------------------------+    |
+|  Questions (nombre pair, 2 par 2)                                |
+|  +-------------------------------+  +-------------------------------+  |
 |  | Q1 [________________________] |  | Q2 [________________________] |[🗑] |
-|  | Réponse correcte              |  | Réponses  correcte            |    |
-|  | Réponse piège 1               |  | Réponse piège 1               |    |
-|  | Réponse piège 2               |  | Réponse piège 2               |    |
-|  | Réponse piège 3               |  | Réponse piège 3               |    |
-|  +-------------------------------+  +-------------------------------+    |
-|  +-------------------------------+  +-------------------------------+ [🗑]|
-|  | Q3 [________________________] |  | Q4 [________________________] |    |
-|  | ...                           |  | ...                           |    |
-|  +-------------------------------+  +-------------------------------+    |
-|  +-------------------------------+  +-------------------------------+    |
-|  | Q5 [________________________] |  | Q6 [________________________] |    |
-|  +-------------------------------+  +-------------------------------+    |
-|                                                                  |
-|  [ + Ajouter une paire de questions ]
-|                                                                  |
+|  | 4 réponses + correcte  [👁]   |  | ou question existante [👁]   |  |
+|  +-------------------------------+  +-------------------------------+  |
+|  [ + Ajouter une paire ]  (ouvre modale : recherche + sélection)  |
 |  ( Annuler )                                    ( Enregistrer )   |
 +------------------------------------------------------------------+
 ```
+
+### Appels API
+
+| Action                    | Méthode   | Endpoint                                | Réf.                                                    |
+| ------------------------- | --------- | --------------------------------------- | ------------------------------------------------------- |
+| Créer                     | POST      | `/api/quiz/nuggets/`                    | [api-reference](../../../backend/api-reference.md) §2.2 |
+| Modifier                  | PUT/PATCH | `/api/quiz/nuggets/{id}/`               | idem                                                    |
+| Questions (liste / recherche type NU) | GET | `/api/quiz/questions/?question_type=NU&search=...` | §2.1 |

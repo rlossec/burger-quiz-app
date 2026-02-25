@@ -1,58 +1,79 @@
 # Wireframes — Addition
 
-## Addition
+Réf. : [page_reference](../../page_reference.md) · [README](README.md)
 
-Pages
+## Sommaire
 
-- **AdditionListPage**
-- **AdditionCreatePage**
-- **AdditionDetailPage**
-- **AdditionEditPage**
+- [AdditionListPage](#1-additionlistpage)
+- [AdditionDetailPage](#2-additiondetailpage)
+- [AdditionCreatePage / AdditionEditPage](#3-additioncreatepage--additioneditpage)
 
-### AdditionListPage
+---
+
+## 1 - AdditionListPage
+
+### Principe
 
 Tableau des manches Addition avec colonnes : titre, original ?, nombre d’utilisation, nombre de questions. Bouton Ajouter → AdditionCreatePage. Icônes vers détail / édition, poubelle avec modale de confirmation.
 
-### AdditionCreatePage
+### Wireframe
 
-Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, description optionnelle, liste ordonnée de questions (question_ids). Questions de type AD uniquement (ex. 8 par défaut, ajout/suppression). Sélection parmi les questions existantes type AD (ou création inline selon choix métier).
+```
++------------------------------------------------------------------+
+|  Manches Addition                             [ + Ajouter ]      |
++------------------------------------------------------------------+
+|  Titre           | Original ? | Utilisations | Nbre questions | Actions   |
+|------------------|------------|--------------|---------------|-----------|
+|  ...             | ...        | ...          | ...           | [👁][✏️][🗑] |
++------------------------------------------------------------------+
+```
 
-### AdditionDetailPage
+### Appels API
 
-Affichage : titre, description, liste des questions dans l’ordre. Valeur dérivée. Actions : AdditionEditPage, suppression (modale).
+| Action | Méthode | Endpoint               | Réf.                                           |
+| ------ | ------- | ---------------------- | ---------------------------------------------- |
+| Lister | GET     | `/api/quiz/additions/` | [lien](../../../backend/api-reference.md) §2.5 |
 
-### AdditionEditPage
 
-Même champs que AdditionCreatePage.
+## 2 - AdditionDetailPage
 
-## Burger de la mort
+### Principe
 
-- **DeadlyBurgerListPage**
-- **DeadlyBurgerCreatePage**
-- **DeadlyBurgerDetailPage**
-- **DeadlyBurgerEditPage**
+Affichage en lecture : titre, description, liste des questions dans l’ordre.
+Actions :
 
-### DeadlyBurgerListPage
+- Modifier -> AdditionEditPage, suppression
+- Supprimer -> modale
 
-Tableau des manches Burger de la mort : titre, original ?, nombre d’utilisation. Bouton Ajouter → DeadlyBurgerCreatePage. Actions : détail, édition, suppression (modale).
+### Wireframe
 
-### DeadlyBurgerCreatePage
+```
++------------------------------------------------------------------+
+|  Détail manche Addition                                          |
++------------------------------------------------------------------+
+|  Titre       [________________________________________________]   |
+|  Description [________________________________________________]   |
+|  Questions :                                                      |
+|    1. [________________________________________________]          |
+|    2. ...                                                         |
+|  ( Modifier )  ( Supprimer )                                      |
++------------------------------------------------------------------+
+```
 
-Pattern **InlineForm** pour les questions (détail : [components.md](components.md)). Formulaire : titre, **10 questions** exactement (type DB). Contrainte API : 10 questions, type DB. Questions réutilisables entre manches.
+### Appels API
 
-### DeadlyBurgerDetailPage
+| Action | Méthode | Endpoint                    | Réf.                                                    |
+| ------ | ------- | --------------------------- | ------------------------------------------------------- |
+| Détail | GET     | `/api/quiz/additions/{id}/` | [lien](../../../backend/api-reference.md) §2.5 |
 
-Affichage : titre, liste des 10 questions dans l’ordre. Actions : DeadlyBurgerEditPage, suppression (modale).
 
-### DeadlyBurgerEditPage
+## 3 - AdditionCreatePage / AdditionEditPage
 
-Même structure que DeadlyBurgerCreatePage (toujours 10 questions type DB).
+### Principe
 
-## AdditionListPage
+Pattern **InlineForm** pour les questions ([components](../../components.md)). Formulaire : titre, description optionnelle, liste ordonnée de questions (question_ids). Questions de type AD uniquement (ex. 8 par défaut, ajout/suppression). Sélection parmi les questions existantes type AD ou création inline.
 
-Colonnes : Titre | Original ? | Utilisations | Nbre questions | Actions.
-
-## AdditionCreatePage / AdditionEditPage
+### Wireframe
 
 ```
 +------------------------------------------------------------------+
@@ -71,3 +92,11 @@ Colonnes : Titre | Original ? | Utilisations | Nbre questions | Actions.
 |  ( Annuler )                                    ( Enregistrer )  |
 +------------------------------------------------------------------+
 ```
+
+### Appels API
+
+| Action                           | Méthode   | Endpoint                                | Réf.                                           |
+| -------------------------------- | --------- | --------------------------------------- | ---------------------------------------------- |
+| Créer                            | POST      | `/api/quiz/additions/`                  | [lien](../../../backend/api-reference.md) §2.5 |
+| Modifier                         | PUT/PATCH | `/api/quiz/additions/{id}/`             | idem                                           |
+| Questions (liste pour sélection) | GET       | `/api/quiz/questions/?question_type=AD` | §2.1                                           |
