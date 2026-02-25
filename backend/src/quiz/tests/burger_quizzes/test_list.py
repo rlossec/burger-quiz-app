@@ -1,15 +1,25 @@
 # python manage.py test quiz.tests.burger_quizzes.test_list
 # GET /api/quiz/burger-quizzes/ — Liste avec created_at, updated_at.
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
+
+User = get_user_model()
 
 
 class TestBurgerQuizListEndpoint(APITestCase):
     """GET /api/quiz/burger-quizzes/ — Liste avec created_at, updated_at."""
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.url = reverse("burger-quiz-list")
 
     # 200 OK

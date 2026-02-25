@@ -3,6 +3,7 @@
 
 import uuid
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -10,11 +11,20 @@ from rest_framework.test import APITestCase
 from ...models import Question, Nuggets
 from ...tests.factories import QuestionFactory, NuggetsFactory
 
+User = get_user_model()
+
 
 class TestNuggetsCreateEndpoint(APITestCase):
     """POST /api/quiz/nuggets/ — Nombre pair de questions, type NU, pas de doublon."""
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.url = reverse("nuggets-list")
         self.q1, self.q2, self.q3, self.q4 = (
             QuestionFactory.create_nu("N1"),

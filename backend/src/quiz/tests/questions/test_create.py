@@ -1,6 +1,7 @@
 # uv run manage.py test quiz.tests.questions.test_create
 # POST /api/quiz/questions/ — Création avec original, video_url, image_url et réponses selon le type.
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -59,6 +60,9 @@ TYPES_WITH_ANSWERS = [
 # Base commune à tous les tests
 # ---------------------------------------------------------------------------
 
+User = get_user_model()
+
+
 class QuestionCreateBaseTestCase(APITestCase):
     """
     Classe de base : accès à l'URL, builder de payload, et helper de création.
@@ -66,6 +70,13 @@ class QuestionCreateBaseTestCase(APITestCase):
     """
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.url = reverse("question-list")
 
     def build_payload(self, question_type, text="Question", answers=None, **kwargs):

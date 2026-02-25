@@ -1,6 +1,9 @@
 # Constantes partagées pour les tests du module quiz.
 # Alignées sur docs/backend/api-reference.md.
 
+# Message DRF lorsque les credentials ne sont pas fournis (routes privées)
+AUTHENTICATION_MISSING = "Authentication credentials were not provided."
+
 MANDATORY_FIELD_ERROR_MESSAGE = "Ce champ est obligatoire."
 
 # Messages d'erreur métier (contraintes manches)
@@ -31,6 +34,7 @@ MENU_TYPE_TR = "TR"
 
 # Export pour tests
 __all__ = [
+    "AUTHENTICATION_MISSING",
     "MANDATORY_FIELD_ERROR_MESSAGE",
     "QUESTION_TYPE_NU",
     "QUESTION_TYPE_SP",

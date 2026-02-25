@@ -3,6 +3,7 @@
 
 import uuid
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -10,12 +11,23 @@ from rest_framework.test import APITestCase
 from ...models import Answer, Question
 from ...tests.factories import QuestionFactory
 
+User = get_user_model()
+
 
 class TestQuestionDeleteEndpoint(APITestCase):
     """
     Test de l'endpoint DELETE /api/quiz/questions/<id>/
     Commande : uv run manage.py test quiz.tests.questions.test_delete
     """
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
 
     def test_delete_unknown_id_returns_404(self):
         """Un id inexistant doit renvoyer 404."""

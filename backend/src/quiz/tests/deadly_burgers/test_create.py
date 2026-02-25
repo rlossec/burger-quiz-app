@@ -3,6 +3,7 @@
 
 import uuid
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -10,11 +11,20 @@ from rest_framework.test import APITestCase
 from ...models import DeadlyBurger
 from ...tests.factories import QuestionFactory
 
+User = get_user_model()
+
 
 class TestDeadlyBurgerCreateEndpoint(APITestCase):
     """POST /api/quiz/deadly-burgers/ — Exactement 10 questions, type DB."""
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.url = reverse("deadly-burger-list")
         self.questions = [QuestionFactory.create_db(f"DB{i}") for i in range(1, 11)]
         self.valid_payload = {

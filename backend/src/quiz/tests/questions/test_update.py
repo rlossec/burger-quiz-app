@@ -2,6 +2,7 @@
 # PUT /api/quiz/questions/<id>/ — Mise à jour (mêmes contraintes que la création).
 
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -15,6 +16,9 @@ from ...tests import (
     QUESTION_TYPE_SP,
 )
 from ...tests.factories import QuestionFactory
+
+User = get_user_model()
+
 
 # ---------------------------------------------------------------------------
 # Fixtures et helpers (alignés sur test_create)
@@ -77,6 +81,13 @@ class QuestionUpdateBaseTestCase(APITestCase):
     """Base pour les tests de mise à jour : URL détail, put, assertions."""
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.question = QuestionFactory.create_nu_with_answers(text="Question à mettre à jour")
         self.url = reverse("question-detail", kwargs={"pk": self.question.pk})
 
@@ -253,6 +264,7 @@ class TestQuestionUpdateNU(QuestionUpdateBaseTestCase):
 class TestQuestionUpdateSP(QuestionUpdateBaseTestCase):
 
     def setUp(self):
+        super().setUp()
         self.question = QuestionFactory.create_sp()
         self.url = reverse("question-detail", kwargs={"pk": self.question.pk})
 
@@ -268,6 +280,7 @@ class TestQuestionUpdateSP(QuestionUpdateBaseTestCase):
 class TestQuestionUpdateME(QuestionUpdateBaseTestCase):
 
     def setUp(self):
+        super().setUp()
         self.question = QuestionFactory.create_me()
         self.url = reverse("question-detail", kwargs={"pk": self.question.pk})
 
@@ -283,6 +296,7 @@ class TestQuestionUpdateME(QuestionUpdateBaseTestCase):
 class TestQuestionUpdateAD(QuestionUpdateBaseTestCase):
 
     def setUp(self):
+        super().setUp()
         self.question = QuestionFactory.create_ad()
         self.url = reverse("question-detail", kwargs={"pk": self.question.pk})
 
@@ -304,6 +318,7 @@ class TestQuestionUpdateAD(QuestionUpdateBaseTestCase):
 class TestQuestionUpdateDB(QuestionUpdateBaseTestCase):
 
     def setUp(self):
+        super().setUp()
         self.question = QuestionFactory.create_db()
         self.url = reverse("question-detail", kwargs={"pk": self.question.pk})
 

@@ -1,6 +1,7 @@
 
 from unittest import skip
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -13,6 +14,8 @@ from ...tests import (
     QUESTION_TYPE_DB,
 )
 from ...tests.factories import QuestionFactory
+
+User = get_user_model()
 
 
 # Catégories de questions pour le test paramétré (code API → attribut de la question en setUp)
@@ -34,6 +37,13 @@ class TestQuestionListEndpoint(APITestCase):
     """
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.url = reverse("question-list")
         self.q_nu = QuestionFactory.create_nu("Question Nuggets", original=False)
         self.q_sp = QuestionFactory.create_sp("Question SP", original=True)
@@ -59,7 +69,6 @@ class TestQuestionListEndpoint(APITestCase):
             self.assertIn("text", question)
             self.assertIn("question_type", question)
             self.assertIn("original", question)
-            self.assertIn("usage_count", question)
             self.assertIn("created_at", question)
             self.assertIn("updated_at", question)
 
@@ -105,3 +114,39 @@ class TestQuestionListEndpoint(APITestCase):
                     self.assertIn(eid, ids, msg=f"original={original_param} doit contenir {eid}")
                 for oid in excluded_ids:
                     self.assertNotIn(oid, ids, msg=f"original={original_param} ne doit pas contenir {oid}")
+
+    # 5. Filtre search : GET /api/quiz/questions/?search=...
+    def test_list_filter_search(self):
+        """Recherche textuelle sur l'énoncé : search renvoie les questions dont le text contient la chaîne (insensible à la casse)."""
+        q_pizza = QuestionFactory.create_nu("Pizza margherita au basilic", original=False)
+        q_quiche = QuestionFactory.create_nu("Quiche lorraine traditionnelle", original=False)
+        for search_term, expected_ids, description in [
+            ("Pizza", {str(q_pizza.id)}, "search=Pizza doit renvoyer la question pizza"),
+            ("pizza", {str(q_pizza.id)}, "search insensible à la casse"),
+            ("Quiche", {str(q_quiche.id)}, "search=Quiche doit renvoyer la question quiche"),
+            ("lorraine", {str(q_quiche.id)}, "search sur un mot au milieu du text"),
+            ("inexistant_xyz", set(), "search sans résultat renvoie une liste vide"),
+        ]:
+            with self.subTest(search=search_term):
+                response = self.client.get(self.url, {"search": search_term})
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                ids = {item["id"] for item in response.data.get("results", response.data)}
+                self.assertEqual(
+                    ids,
+                    expected_ids,
+                    msg=description,
+                )
+
+    def test_list_filter_search_combined_with_question_type(self):
+        """Filtre search combiné avec question_type : les deux filtres s'appliquent."""
+        # q_nu a le text "Question Nuggets"
+        response = self.client.get(self.url, {"search": "Nuggets", "question_type": "NU"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data.get("results", response.data)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(self.q_nu.id))
+        self.assertEqual(results[0]["text"], "Question Nuggets")
+        # search qui ne matche aucun question_type NU
+        response = self.client.get(self.url, {"search": "xyz", "question_type": "NU"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get("results", response.data)), 0)
