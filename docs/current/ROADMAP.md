@@ -16,10 +16,12 @@
 [X] Base données
 [ ] Backend
 
-- [ ] API REFERENCE
-- [ ] Tests
-- [ ] Endpoints Quiz
-      [ ] Frontend
+- [x] API REFERENCE
+- [x] Tests Quiz
+- [x] Endpoints Quiz
+
+[ ] Frontend
+
 - [ ] Références Composants
   - [ ] Formulaire / Card
   - [ ] Hooks

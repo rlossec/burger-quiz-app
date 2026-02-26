@@ -15,7 +15,8 @@ L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans
 **Fonctionne :**
 - Squelette app (backend Django/DRF, frontend React/Vite, Docker, PostgreSQL)
 - Modèles quiz (Questions, manches, Burger Quiz)
-- API CRUD quiz (endpoints de création listés dans le backlog)
+- API CRUD quiz complète (tous les endpoints implémentés et documentés)
+- Tests API quiz complets
 - Fixtures et chargement de données
 
 **Manque :**
@@ -27,8 +28,8 @@ L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans
 
 ## 3. Priorités
 
-1. Structurer (docs, suivi)
-2. Endpoints API (finaliser / documenter selon [BACKLOG.md](BACKLOG.md))
+1. ~~Structurer (docs, suivi)~~ ✅
+2. ~~Endpoints API Quiz~~ ✅
 3. Frontend – parcours Création Burger Quiz (V0.1)
 
 ---
