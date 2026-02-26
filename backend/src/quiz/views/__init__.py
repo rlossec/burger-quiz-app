@@ -7,6 +7,9 @@ from .nugget import NuggetsViewSet
 from .salt_or_pepper import SaltOrPepperViewSet
 from .menus import MenusViewSet
 from .menu_theme import MenuThemeViewSet
+from .addition import AdditionViewSet
+from .deadly_burger import DeadlyBurgerViewSet
+from .burger_quiz import BurgerQuizViewSet
 
 __all__ = [
     "QuestionViewSet",
@@ -14,4 +17,7 @@ __all__ = [
     "SaltOrPepperViewSet",
     "MenusViewSet",
     "MenuThemeViewSet",
+    "AdditionViewSet",
+    "DeadlyBurgerViewSet",
+    "BurgerQuizViewSet",
 ]

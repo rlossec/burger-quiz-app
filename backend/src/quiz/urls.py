@@ -7,6 +7,9 @@ from .views import (
     SaltOrPepperViewSet,
     MenusViewSet,
     MenuThemeViewSet,
+    AdditionViewSet,
+    DeadlyBurgerViewSet,
+    BurgerQuizViewSet,
 )
 
 router = DefaultRouter()
@@ -15,6 +18,9 @@ router.register("nuggets", NuggetsViewSet, basename="nuggets")
 router.register("salt-or-pepper", SaltOrPepperViewSet, basename="salt-or-pepper")
 router.register("menus", MenusViewSet, basename="menus")
 router.register("menu-theme", MenuThemeViewSet, basename="menu-theme")
+router.register("additions", AdditionViewSet, basename="addition")
+router.register("deadly-burgers", DeadlyBurgerViewSet, basename="deadly-burger")
+router.register("burger-quizzes", BurgerQuizViewSet, basename="burger-quiz")
 
 urlpatterns = [
     path("quiz/", include(router.urls)),

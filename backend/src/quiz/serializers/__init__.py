@@ -8,6 +8,9 @@ from .nugget import NuggetsSerializer
 from .salt_or_pepper import SaltOrPepperSerializer
 from .menus import MenusSerializer
 from .menu_theme import MenuThemeSerializer
+from .addition import AdditionSerializer
+from .deadly_burger import DeadlyBurgerSerializer
+from .burger_quiz import BurgerQuizSerializer
 
 __all__ = [
     "AnswerSerializer",
@@ -17,4 +20,7 @@ __all__ = [
     "SaltOrPepperSerializer",
     "MenusSerializer",
     "MenuThemeSerializer",
+    "AdditionSerializer",
+    "DeadlyBurgerSerializer",
+    "BurgerQuizSerializer",
 ]
