@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 
     'corsheaders',
     'rest_framework',
@@ -167,6 +168,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Simple JWT (authentification par username/password par défaut via Django authenticate)
@@ -219,19 +221,15 @@ DJOSER = {
 TEST_RUNNER = "config.test_runner.HtmlReportTestRunner"
 TEST_REPORT_DIR = BASE_DIR / "reports"
 
-# Swagger / drf-yasg - authentification
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT Bearer. Exemple: "Bearer <access_token>". Obtenir un token via POST /api/auth/jwt/create/'
-        },
-    },
-    'SECURITY_REQUIREMENTS': [{'Bearer': []}],
-    # api-auth : login/logout pour l’authentification par session (browsable API)
-    'USE_SESSION_AUTH': True,
-    'LOGIN_URL': '/api-auth/login/',
-    'LOGOUT_URL': '/api-auth/logout/',
+# drf-spectacular - OpenAPI schema
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Burger Quiz API',
+    'DESCRIPTION': 'API for Burger Quiz',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{'BearerAuth': []}],
 }
