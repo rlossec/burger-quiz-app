@@ -58,7 +58,7 @@ class TestAdditionCreateEndpoint(APITestCase):
             "title": "Addition rapide",
             "questions": [str(self.q1.id), str(self.q2.id), str(self.q3.id)],
         }
-        response = self.client.post(self.url, payload)
+        response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], payload["title"])
         self.assertEqual(response.data["questions"], payload["questions"])
@@ -72,22 +72,22 @@ class TestAdditionCreateEndpoint(APITestCase):
         response = self.client.post(self.url, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("title", response.data)
-        self.assertEqual(response.data["title"],  MANDATORY_FIELD_ERROR_MESSAGE)
+        self.assertEqual(response.data["title"], [MANDATORY_FIELD_ERROR_MESSAGE])
 
     def test_create_additions_duplicate_question_ids(self):
         payload = {
-            **self.valid_payload,
+            "title": self.valid_payload["title"],
             "question_ids": [str(self.q1.id), str(self.q2.id), str(self.q1.id)],
         }
-        response = self.client.post(self.url, payload)
+        response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["questions"], DUPLICATE_QUESTION_IDS_ERROR_MESSAGE)
+        self.assertEqual(response.data["questions"], [DUPLICATE_QUESTION_IDS_ERROR_MESSAGE])
 
     def test_create_additions_nonexistent_question_id(self):
         payload = {
-            **self.valid_payload,
+            "title": self.valid_payload["title"],
             "question_ids": [str(self.q1.id), str(uuid.uuid4()), str(self.q3.id)],
         }
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["questions"], NONE_EXISTENT_QUESTION_ID_ERROR_MESSAGE)
+        self.assertEqual(response.data["questions"], [NONE_EXISTENT_QUESTION_ID_ERROR_MESSAGE])

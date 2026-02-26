@@ -1,4 +1,4 @@
-# python manage.py test quiz.tests.menu_themes.test_create
+# uv run manage.py test quiz.tests.menu_themes.test_create
 # POST /api/quiz/menu-themes/ — type CL ou TR, questions type ME.
 
 import uuid

@@ -37,6 +37,7 @@ class TestSaltOrPepperDetailEndpoint(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("title"), self.sop.title)
         self.assertIn("propositions", response.data)
+        self.assertEqual(response.data["propositions"], ["Noir", "Blanc"])
 
     # 404 Not Found
     def test_detail_salt_or_pepper_not_found(self):

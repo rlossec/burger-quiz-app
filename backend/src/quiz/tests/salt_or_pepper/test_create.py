@@ -1,4 +1,4 @@
-# python manage.py test quiz.tests.salt_or_pepper.test_create
+# uv run manage.py test quiz.tests.salt_or_pepper.test_create
 # POST /api/quiz/salt-or-pepper/ — 2 à 5 propositions, questions type SP, cohérence réponses.
 
 import uuid
