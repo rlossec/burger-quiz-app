@@ -1,5 +1,45 @@
 # Les modèles
 
+## Champs communs : author, tags, timestamps
+
+### Author (auteur)
+
+Tous les modèles de contenu quiz possèdent un champ **`author`** qui référence l'utilisateur ayant créé l'entité :
+
+- **`author`** : ForeignKey vers `CustomUser`, nullable (`SET_NULL` si l'utilisateur est supprimé).
+- Automatiquement assigné lors de la création via le JWT de la requête.
+- Permet de filtrer le contenu par créateur et de tracer la propriété.
+
+**Modèles concernés** : Question, BurgerQuiz, Nuggets, SaltOrPepper, Menus, MenuTheme, Addition, DeadlyBurger.
+
+### Tags (étiquettes)
+
+Tous les modèles de contenu quiz supportent un système de tags via **django-taggit** :
+
+- **`tags`** : TaggableManager permettant d'associer plusieurs tags à une entité.
+- Tags normalisés et réutilisables (modèle `Tag` partagé).
+- Permet le filtrage, la recherche et le regroupement par tags.
+
+**Exemples de tags** : `humour`, `culture`, `sport`, `tv`, `original`, `difficile`...
+
+**Usage API** :
+```json
+{
+  "tags": ["humour", "culture-générale"]
+}
+```
+
+### Timestamps (horodatage)
+
+Tous les modèles de contenu quiz possèdent des champs d'horodatage :
+
+- **`created_at`** : Date/heure de création (auto, non modifiable).
+- **`updated_at`** : Date/heure de dernière modification (auto).
+
+**Modèles concernés** : Question, BurgerQuiz, Nuggets, SaltOrPepper, Menus, MenuTheme, Addition, DeadlyBurger.
+
+---
+
 ## Question : original, média, réutilisabilité
 
 ### Original
