@@ -700,31 +700,51 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 **Contraintes** : exactement 2 menus classiques (`menu_1`, `menu_2` avec `type = "CL"`) et 1 menu troll (`menu_troll` avec `type = "TR"`) ; les trois IDs distincts et existants.
 
 **GET /api/quiz/menus/{id}/** — Détail (exemple de réponse) :
+
+En **lecture**, le détail expose les **thèmes complets** avec leurs **questions désérialisées** :
+
 ```json
 {
   "id": "uuid-menus-1",
   "title": "Menus du jour",
   "description": "Optionnel",
   "original": false,
+  "author": {"id": 1, "username": "johndoe"},
+  "tags": ["culture"],
+  "created_at": "2025-01-02T09:30:00Z",
+  "updated_at": "2025-01-02T09:30:00Z",
   "menu_1": {
     "id": "uuid-theme-1",
-    "title": "Thème 1",
-    "type": "CL"
+    "title": "Cinéma",
+    "type": "CL",
+    "original": true,
+    "author": {"id": 1, "username": "johndoe"},
+    "tags": ["cinéma"],
+    "questions": [
+      {
+        "id": "uuid-q1",
+        "text": "Qui a réalisé Pulp Fiction ?",
+        "question_type": "ME",
+        "answers": [{"id": "uuid-a1", "text": "Quentin Tarantino", "is_correct": true}]
+      }
+    ]
   },
   "menu_2": {
     "id": "uuid-theme-2",
-    "title": "Thème 2",
-    "type": "CL"
+    "title": "Musique",
+    "type": "CL",
+    "questions": []
   },
   "menu_troll": {
     "id": "uuid-theme-troll",
-    "title": "Thème troll",
-    "type": "TR"
+    "title": "Piège",
+    "type": "TR",
+    "questions": []
   }
 }
 ```
 
-**PUT / PATCH /api/quiz/menus/{id}/** — même corps que le POST, réponse 200 avec la manche complète (comme ci‑dessus).  
+**PUT / PATCH /api/quiz/menus/{id}/** — même corps que le POST (avec les IDs des thèmes), réponse 200 avec la manche complète incluant les thèmes et questions désérialisées.  
 **DELETE /api/quiz/menus/{id}/** — 204 No Content en cas de succès.
 
 ---
@@ -848,25 +868,110 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 - IDs des manches : optionnels (null/omis si la manche n’est pas utilisée). Si fournis, doivent référencer des ressources existantes du bon type.  
 - Au moins une manche recommandée.  
 
-**Réponse 201** : id, title, toss, `created_at`, `updated_at`, manches liées.
+**Réponse 201** : id, title, toss, `created_at`, `updated_at`, manches liées avec leurs questions complètes.
 
 **GET /api/quiz/burger-quizzes/{id}/** — Détail (exemple de réponse) :
+
+En **lecture**, le détail expose les **manches complètes** avec toutes leurs **questions désérialisées** (intitulé, réponses, métadonnées). Cela permet d'afficher un Burger Quiz complet en une seule requête :
+
 ```json
 {
   "id": "uuid-bq-1",
   "title": "Burger PCaT Episode 1",
   "toss": "Description ou consigne du toss.",
-  "nuggets": {"id": "uuid-nuggets", "title": "Culture générale"},
-  "salt_or_pepper": {"id": "uuid-sop", "title": "Noir, Blanc ou Les deux"},
-  "menus": {"id": "uuid-menus", "title": "Menus du jour"},
-  "addition": {"id": "uuid-addition", "title": "Addition rapide"},
-  "deadly_burger": {"id": "uuid-db", "title": "Burger de la mort - Finale"},
+  "author": {"id": 1, "username": "johndoe"},
+  "tags": ["humour", "culture"],
   "created_at": "2025-01-02T09:30:00Z",
-  "updated_at": "2025-01-02T09:30:00Z"
+  "updated_at": "2025-01-02T09:30:00Z",
+  "nuggets": {
+    "id": "uuid-nuggets",
+    "title": "Culture générale",
+    "original": false,
+    "author": {"id": 1, "username": "johndoe"},
+    "tags": ["culture"],
+    "questions": [
+      {
+        "id": "uuid-q1",
+        "text": "Quelle est la capitale de la France ?",
+        "question_type": "NU",
+        "original": false,
+        "answers": [
+          {"id": "uuid-a1", "text": "Paris", "is_correct": true},
+          {"id": "uuid-a2", "text": "Lyon", "is_correct": false},
+          {"id": "uuid-a3", "text": "Marseille", "is_correct": false},
+          {"id": "uuid-a4", "text": "Toulouse", "is_correct": false}
+        ]
+      }
+    ]
+  },
+  "salt_or_pepper": {
+    "id": "uuid-sop",
+    "title": "Noir ou Blanc",
+    "propositions": ["Noir", "Blanc"],
+    "questions": [
+      {
+        "id": "uuid-q2",
+        "text": "La nuit ?",
+        "question_type": "SP",
+        "answers": [{"id": "uuid-a5", "text": "Noir", "is_correct": true}]
+      }
+    ]
+  },
+  "menus": {
+    "id": "uuid-menus",
+    "title": "Menus du jour",
+    "menu_1": {
+      "id": "uuid-theme-1",
+      "title": "Cinéma",
+      "type": "CL",
+      "questions": [
+        {
+          "id": "uuid-q3",
+          "text": "Qui a réalisé Pulp Fiction ?",
+          "question_type": "ME",
+          "answers": [{"id": "uuid-a6", "text": "Quentin Tarantino", "is_correct": true}]
+        }
+      ]
+    },
+    "menu_2": {
+      "id": "uuid-theme-2",
+      "title": "Musique",
+      "type": "CL",
+      "questions": []
+    },
+    "menu_troll": {
+      "id": "uuid-theme-troll",
+      "title": "Piège",
+      "type": "TR",
+      "questions": []
+    }
+  },
+  "addition": {
+    "id": "uuid-addition",
+    "title": "Addition rapide",
+    "questions": [
+      {
+        "id": "uuid-q4",
+        "text": "2 + 2 ?",
+        "question_type": "AD",
+        "answers": [{"id": "uuid-a7", "text": "4", "is_correct": true}]
+      }
+    ]
+  },
+  "deadly_burger": {
+    "id": "uuid-db",
+    "title": "Burger de la mort - Finale",
+    "questions": [
+      {"id": "uuid-q5", "text": "Question DB 1", "question_type": "DB"},
+      {"id": "uuid-q6", "text": "Question DB 2", "question_type": "DB"}
+    ]
+  }
 }
 ```
 
-**PUT / PATCH /api/quiz/burger-quizzes/{id}/** — même corps que le POST, réponse 200 avec le Burger Quiz complet (comme ci‑dessus).  
+> **Note** : L'exemple ci-dessus est simplifié. En pratique, chaque manche contient tous ses champs (`created_at`, `updated_at`, `author`, `tags`, etc.) et chaque question contient également ses champs complets (`explanations`, `video_url`, `image_url`, etc.).
+
+**PUT / PATCH /api/quiz/burger-quizzes/{id}/** — même corps que le POST (avec les IDs des manches), réponse 200 avec le Burger Quiz complet incluant les manches et questions désérialisées.  
 **DELETE /api/quiz/burger-quizzes/{id}/** — 204 No Content en cas de succès.
 
 ---
