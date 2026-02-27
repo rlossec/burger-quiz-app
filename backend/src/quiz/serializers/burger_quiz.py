@@ -1,15 +1,29 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from ..models import BurgerQuiz, Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger
+from .base import AuthorSerializer
+from .nugget import NuggetsSerializer
+from .salt_or_pepper import SaltOrPepperSerializer
+from .menus import MenusSerializer
+from .addition import AdditionSerializer
+from .deadly_burger import DeadlyBurgerSerializer
 
 
-class BurgerQuizSerializer(ModelSerializer):
+class BurgerQuizSerializer(TaggitSerializer, ModelSerializer):
     nuggets_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
     salt_or_pepper_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
     menus_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
     addition_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
     deadly_burger_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
+    nuggets = NuggetsSerializer(read_only=True)
+    salt_or_pepper = SaltOrPepperSerializer(read_only=True)
+    menus = MenusSerializer(read_only=True)
+    addition = AdditionSerializer(read_only=True)
+    deadly_burger = DeadlyBurgerSerializer(read_only=True)
+    author = AuthorSerializer(read_only=True)
+    tags = TagListSerializerField(required=False)
 
     class Meta:
         model = BurgerQuiz
@@ -17,6 +31,8 @@ class BurgerQuizSerializer(ModelSerializer):
             "id",
             "title",
             "toss",
+            "author",
+            "tags",
             "created_at",
             "updated_at",
             "nuggets",
@@ -30,7 +46,7 @@ class BurgerQuizSerializer(ModelSerializer):
             "addition_id",
             "deadly_burger_id",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger"]
+        read_only_fields = ["id", "author", "created_at", "updated_at", "nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger"]
         extra_kwargs = {
             "toss": {"error_messages": {"required": "Ce champ est obligatoire.", "blank": "Ce champ ne peut pas être vide."}},
         }
@@ -96,6 +112,7 @@ class BurgerQuizSerializer(ModelSerializer):
         menus_id = validated_data.pop("menus_id", None)
         addition_id = validated_data.pop("addition_id", None)
         deadly_burger_id = validated_data.pop("deadly_burger_id", None)
+        tags = validated_data.pop("tags", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -112,4 +129,8 @@ class BurgerQuizSerializer(ModelSerializer):
             instance.deadly_burger_id = deadly_burger_id
 
         instance.save()
+
+        if tags is not None:
+            instance.tags.set(tags)
+
         return instance

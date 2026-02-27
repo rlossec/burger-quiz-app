@@ -1,18 +1,26 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from ..models import Menus, MenuTheme
+from .base import AuthorSerializer
+from .menu_theme import MenuThemeSerializer
 
 
-class MenusSerializer(ModelSerializer):
+class MenusSerializer(TaggitSerializer, ModelSerializer):
     menu_1_id = serializers.UUIDField(write_only=True, required=False)
     menu_2_id = serializers.UUIDField(write_only=True, required=False)
     menu_troll_id = serializers.UUIDField(write_only=True, required=False)
+    menu_1 = MenuThemeSerializer(read_only=True)
+    menu_2 = MenuThemeSerializer(read_only=True)
+    menu_troll = MenuThemeSerializer(read_only=True)
+    author = AuthorSerializer(read_only=True)
+    tags = TagListSerializerField(required=False)
 
     class Meta:
         model = Menus
-        fields = ["id", "title", "description", "original", "menu_1", "menu_2", "menu_troll", "menu_1_id", "menu_2_id", "menu_troll_id"]
-        read_only_fields = ["id", "menu_1", "menu_2", "menu_troll"]
+        fields = ["id", "title", "description", "original", "author", "tags", "created_at", "updated_at", "menu_1", "menu_2", "menu_troll", "menu_1_id", "menu_2_id", "menu_troll_id"]
+        read_only_fields = ["id", "author", "created_at", "updated_at", "menu_1", "menu_2", "menu_troll"]
         extra_kwargs = {
             "title": {"error_messages": {"required": "Ce champ est obligatoire.", "blank": "Ce champ ne peut pas être vide."}},
         }
@@ -80,6 +88,7 @@ class MenusSerializer(ModelSerializer):
         menu_1_id = validated_data.pop("menu_1_id", None)
         menu_2_id = validated_data.pop("menu_2_id", None)
         menu_troll_id = validated_data.pop("menu_troll_id", None)
+        tags = validated_data.pop("tags", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -92,4 +101,8 @@ class MenusSerializer(ModelSerializer):
             instance.menu_troll_id = menu_troll_id
 
         instance.save()
+
+        if tags is not None:
+            instance.tags.set(tags)
+
         return instance

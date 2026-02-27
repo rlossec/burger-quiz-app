@@ -1,3 +1,4 @@
+from .tags import UUIDTaggedItem
 from .question import Question
 from .enums import QuestionType
 from .answer import Answer
@@ -9,6 +10,7 @@ from .deadly_burger import DeadlyBurgerQuestion, DeadlyBurger
 from .burger_quiz import BurgerQuiz
 
 __all__ = [
+    "UUIDTaggedItem",
     "Question", "QuestionType", "Answer",
     "NuggetQuestion", "Nuggets",
     "SaltOrPepperQuestion", "SaltOrPepper",

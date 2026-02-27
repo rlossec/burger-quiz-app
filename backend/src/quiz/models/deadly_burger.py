@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from .base import QuizContentMixin
+
 
 class DeadlyBurgerQuestion(models.Model):
     """Lien DeadlyBurger ↔ Question avec ordre (10 questions). Une question (type DB) peut être réutilisée dans plusieurs Burger de la mort."""
@@ -15,7 +17,7 @@ class DeadlyBurgerQuestion(models.Model):
         unique_together = [["deadly_burger", "question"]]
 
 
-class DeadlyBurger(models.Model):
+class DeadlyBurger(QuizContentMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     original = models.BooleanField(

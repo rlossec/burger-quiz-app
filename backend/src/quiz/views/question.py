@@ -2,12 +2,13 @@ from rest_framework import viewsets, filters
 
 from ..models import Question
 from ..serializers import QuestionSerializer, QuestionListSerializer
+from .base import AuthorAutoAssignMixin
 
 
-class QuestionViewSet(viewsets.ModelViewSet):
+class QuestionViewSet(AuthorAutoAssignMixin, viewsets.ModelViewSet):
     """
     ViewSet pour le modèle Question.
-    Liste : GET /api/quiz/questions/ (filtres search, question_type, original).
+    Liste : GET /api/quiz/questions/ (filtres search, question_type, original, author, tags).
     Détail : GET /api/quiz/questions/{id}/ (avec answers).
     """
 
@@ -24,6 +25,11 @@ class QuestionViewSet(viewsets.ModelViewSet):
             qs = qs.filter(question_type=query_params["question_type"])
         if query_params.get("original") in ("true", "false"):
             qs = qs.filter(original=query_params["original"].lower() == "true")
+        if query_params.get("author"):
+            qs = qs.filter(author_id=query_params["author"])
+        if query_params.get("tags"):
+            tags = query_params["tags"].split(",")
+            qs = qs.filter(tags__name__in=tags).distinct()
         return qs
 
     def get_serializer_class(self):

@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from .base import QuizContentMixin
+
 
 class AdditionQuestion(models.Model):
     """Lien Addition ↔ Question avec ordre. Une question (type AD) n'appartient qu'à une seule Addition."""
@@ -18,7 +20,7 @@ class AdditionQuestion(models.Model):
         ]
 
 
-class Addition(models.Model):
+class Addition(QuizContentMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True, blank=True)

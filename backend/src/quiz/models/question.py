@@ -2,10 +2,11 @@ import uuid
 
 from django.db import models
 
+from .base import QuizContentMixin
 from .enums import QuestionType
 
 
-class Question(models.Model):
+class Question(QuizContentMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.TextField()
     question_type = models.CharField(max_length=2, choices=QuestionType.choices)
@@ -26,8 +27,6 @@ class Question(models.Model):
         null=True,
         help_text="Lien externe vers une image.",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
         return self.text[:50]

@@ -2,9 +2,10 @@ from rest_framework import viewsets
 
 from ..models import SaltOrPepper
 from ..serializers import SaltOrPepperSerializer
+from .base import AuthorAutoAssignMixin
 
 
-class SaltOrPepperViewSet(viewsets.ModelViewSet):
+class SaltOrPepperViewSet(AuthorAutoAssignMixin, viewsets.ModelViewSet):
     """ViewSet pour le modèle SaltOrPepper (manche Sel ou poivre)."""
 
     queryset = SaltOrPepper.objects.all().order_by("title")

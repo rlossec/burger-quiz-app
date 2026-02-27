@@ -2,8 +2,10 @@ import uuid
 
 from django.db import models
 
+from .base import QuizContentMixin
 
-class BurgerQuiz(models.Model):
+
+class BurgerQuiz(QuizContentMixin, models.Model):
     class Meta:
         verbose_name_plural = "Burger Quiz"
         ordering = ["-created_at"]
@@ -11,8 +13,6 @@ class BurgerQuiz(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100, null=True, blank=True)
     toss = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     nuggets = models.ForeignKey("Nuggets", on_delete=models.SET_NULL, null=True, blank=True)
     salt_or_pepper = models.ForeignKey("SaltOrPepper", on_delete=models.SET_NULL, null=True, blank=True)
     menus = models.ForeignKey("Menus", on_delete=models.SET_NULL, related_name="burger_quiz", null=True, blank=True)

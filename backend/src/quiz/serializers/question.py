@@ -1,11 +1,13 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from ..models import Question
 from ..models.answer import Answer
 from ..models.enums import QuestionType
 from .answer import AnswerSerializer
+from .base import AuthorSerializer
 
 
 class AnswerWriteSerializer(serializers.Serializer):
@@ -15,8 +17,10 @@ class AnswerWriteSerializer(serializers.Serializer):
     is_correct = serializers.BooleanField(default=False)
 
 
-class QuestionSerializer(ModelSerializer):
+class QuestionSerializer(TaggitSerializer, ModelSerializer):
     answers = AnswerWriteSerializer(many=True, required=False)
+    author = AuthorSerializer(read_only=True)
+    tags = TagListSerializerField(required=False)
 
     class Meta:
         model = Question
@@ -28,11 +32,13 @@ class QuestionSerializer(ModelSerializer):
             "explanations",
             "video_url",
             "image_url",
+            "author",
+            "tags",
             "created_at",
             "updated_at",
             "answers",
         ]
-        read_only_fields = ["id", "created_at", "updated_at"]
+        read_only_fields = ["id", "author", "created_at", "updated_at"]
         extra_kwargs = {
             "text": {"error_messages": {"required": "Ce champ est obligatoire.", "blank": "Ce champ ne peut pas être vide."}},
             "question_type": {"error_messages": {"required": "Ce champ est obligatoire."}},
@@ -122,6 +128,8 @@ class QuestionSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         answers_data = validated_data.pop("answers", None)
+        tags = validated_data.pop("tags", None)
+
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)
@@ -131,6 +139,10 @@ class QuestionSerializer(ModelSerializer):
                 instance.answers.all().delete()
                 for answer_data in answers_data:
                     Answer.objects.create(question=instance, **answer_data)
+
+            if tags is not None:
+                instance.tags.set(tags)
+
         return instance
 
     def to_representation(self, instance):
@@ -152,6 +164,8 @@ class QuestionListSerializer(QuestionSerializer):
             "explanations",
             "video_url",
             "image_url",
+            "author",
+            "tags",
             "created_at",
             "updated_at",
         ]

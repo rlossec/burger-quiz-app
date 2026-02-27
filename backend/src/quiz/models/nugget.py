@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from .base import QuizContentMixin
+
 
 class NuggetQuestion(models.Model):
     """Lien Nuggets ↔ Question avec ordre. Une question (type NU) peut être réutilisée dans plusieurs manches Nuggets."""
@@ -15,14 +17,14 @@ class NuggetQuestion(models.Model):
         unique_together = [["nuggets", "question"]]
 
 
-class Nuggets(models.Model):
+class Nuggets(QuizContentMixin, models.Model):
     class Meta:
         verbose_name_plural = "Nuggets"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=100)
     original = models.BooleanField(
-        default= True,
+        default=True,
         help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     questions = models.ManyToManyField(

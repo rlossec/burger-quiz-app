@@ -1,13 +1,16 @@
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from ..models import SaltOrPepper, Question
 from ..models.enums import QuestionType
 from ..models.salt_or_pepper import SaltOrPepperQuestion
+from .base import AuthorSerializer
+from .question import QuestionSerializer
 
 
-class SaltOrPepperSerializer(ModelSerializer):
+class SaltOrPepperSerializer(TaggitSerializer, ModelSerializer):
     propositions = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
@@ -19,17 +22,22 @@ class SaltOrPepperSerializer(ModelSerializer):
         required=False,
     )
     questions = serializers.SerializerMethodField(read_only=True)
+    author = AuthorSerializer(read_only=True)
+    tags = TagListSerializerField(required=False)
 
     class Meta:
         model = SaltOrPepper
-        fields = ["id", "title", "description", "original", "propositions", "questions", "question_ids"]
-        read_only_fields = ["id"]
+        fields = ["id", "title", "description", "original", "author", "tags", "created_at", "updated_at", "propositions", "questions", "question_ids"]
+        read_only_fields = ["id", "author", "created_at", "updated_at"]
         extra_kwargs = {
             "title": {"error_messages": {"required": "Ce champ est obligatoire.", "blank": "Ce champ ne peut pas être vide."}},
         }
 
     def get_questions(self, obj):
-        return [str(q.id) for q in obj.questions.all()]
+        """Retourne les questions avec leur contenu complet (texte, réponses)."""
+        ordered_qs = SaltOrPepperQuestion.objects.filter(salt_or_pepper=obj).order_by("order")
+        questions = [spq.question for spq in ordered_qs]
+        return QuestionSerializer(questions, many=True).data
 
     def validate_propositions(self, value):
         if value is None:
@@ -88,6 +96,7 @@ class SaltOrPepperSerializer(ModelSerializer):
     def update(self, instance, validated_data):
         propositions = validated_data.pop("propositions", None)
         question_ids = validated_data.pop("question_ids", None)
+        tags = validated_data.pop("tags", None)
 
         if propositions is not None:
             validated_data["choice_labels"] = propositions
@@ -101,4 +110,8 @@ class SaltOrPepperSerializer(ModelSerializer):
                 instance.questions.clear()
                 for order, qid in enumerate(question_ids):
                     SaltOrPepperQuestion.objects.create(salt_or_pepper=instance, question_id=qid, order=order)
+
+            if tags is not None:
+                instance.tags.set(tags)
+
         return instance
