@@ -1,6 +1,7 @@
 # Factories avec factory_boy pour les données de test du module quiz.
 
 import factory
+from django.contrib.auth import get_user_model
 from factory.django import DjangoModelFactory
 
 from ..models import (
@@ -28,6 +29,29 @@ from . import (
     MENU_TYPE_TR,
 )
 
+User = get_user_model()
+
+
+# ---------------------------------------------------------------------------
+# User Factory (pour les tests d'auteur)
+# ---------------------------------------------------------------------------
+
+
+class UserFactory(DjangoModelFactory):
+    """Factory pour créer des utilisateurs de test."""
+
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: f"testuser{n}")
+    email = factory.LazyAttribute(lambda obj: f"{obj.username}@example.com")
+    password = factory.PostGenerationMethodCall("set_password", "TestPassword123!")
+
+    @classmethod
+    def create_author(cls, username="author", **kwargs):
+        """Crée un utilisateur destiné à être auteur de contenu."""
+        return cls.create(username=username, **kwargs)
+
 
 # ---------------------------------------------------------------------------
 # Question & Answer
@@ -43,30 +67,38 @@ class QuestionFactory(DjangoModelFactory):
     text = factory.Sequence(lambda n: f"Question {n}")
     question_type = QUESTION_TYPE_NU
     original = False
+    author = None
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags à la question si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
     @classmethod
-    def create_nu(cls, text="Q NU", original=False, **kwargs):
-        return cls.create(text=text, question_type=QUESTION_TYPE_NU, original=original, **kwargs)
+    def create_nu(cls, text="Q NU", original=False, author=None, tags=None, **kwargs):
+        return cls.create(text=text, question_type=QUESTION_TYPE_NU, original=original, author=author, tags=tags, **kwargs)
 
     @classmethod
-    def create_sp(cls, text="Q SP", original=False, **kwargs):
-        return cls.create(text=text, question_type=QUESTION_TYPE_SP, original=original, **kwargs)
+    def create_sp(cls, text="Q SP", original=False, author=None, tags=None, **kwargs):
+        return cls.create(text=text, question_type=QUESTION_TYPE_SP, original=original, author=author, tags=tags, **kwargs)
 
     @classmethod
-    def create_me(cls, text="Q ME", original=False, **kwargs):
-        return cls.create(text=text, question_type=QUESTION_TYPE_ME, original=original, **kwargs)
+    def create_me(cls, text="Q ME", original=False, author=None, tags=None, **kwargs):
+        return cls.create(text=text, question_type=QUESTION_TYPE_ME, original=original, author=author, tags=tags, **kwargs)
 
     @classmethod
-    def create_ad(cls, text="Q AD", original=False, **kwargs):
-        return cls.create(text=text, question_type=QUESTION_TYPE_AD, original=original, **kwargs)
+    def create_ad(cls, text="Q AD", original=False, author=None, tags=None, **kwargs):
+        return cls.create(text=text, question_type=QUESTION_TYPE_AD, original=original, author=author, tags=tags, **kwargs)
 
     @classmethod
-    def create_db(cls, text="Q DB", original=False, **kwargs):
-        return cls.create(text=text, question_type=QUESTION_TYPE_DB, original=original, **kwargs)
+    def create_db(cls, text="Q DB", original=False, author=None, tags=None, **kwargs):
+        return cls.create(text=text, question_type=QUESTION_TYPE_DB, original=original, author=author, tags=tags, **kwargs)
 
     @classmethod
-    def create_nu_with_answers(cls, text="Q NU avec réponses", correct_index=2, **kwargs):
-        q = cls.create_nu(text=text, **kwargs)
+    def create_nu_with_answers(cls, text="Q NU avec réponses", correct_index=2, author=None, tags=None, **kwargs):
+        q = cls.create_nu(text=text, author=author, tags=tags, **kwargs)
         for i in range(4):
             AnswerFactory.create(
                 question=q,
@@ -96,6 +128,14 @@ class NuggetsFactory(DjangoModelFactory):
 
     title = factory.Sequence(lambda n: f"Culture générale {n}")
     original = False
+    author = None
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags aux nuggets si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
     @factory.post_generation
     def questions(obj, create, extracted, **kwargs):
@@ -118,6 +158,14 @@ class SaltOrPepperFactory(DjangoModelFactory):
     choice_labels = ["Noir", "Blanc"]
     original = False
     description = ""
+    author = None
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags au sel ou poivre si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
     @factory.post_generation
     def questions(obj, create, extracted, **kwargs):
@@ -141,6 +189,14 @@ class MenuThemeFactory(DjangoModelFactory):
 
     title = factory.Sequence(lambda n: f"Thème {n}")
     type = MENU_TYPE_CL
+    author = None
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags au thème de menu si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
     @factory.post_generation
     def question_ids(obj, create, extracted, **kwargs):
@@ -152,8 +208,8 @@ class MenuThemeFactory(DjangoModelFactory):
             )
 
     @classmethod
-    def create_classic(cls, title="Thème classique", question_ids=None, **kwargs):
-        inst = cls.create(title=title, type=MENU_TYPE_CL, **kwargs)
+    def create_classic(cls, title="Thème classique", question_ids=None, author=None, tags=None, **kwargs):
+        inst = cls.create(title=title, type=MENU_TYPE_CL, author=author, tags=tags, **kwargs)
         if question_ids:
             for order, q in enumerate(question_ids):
                 MenuThemeQuestion.objects.create(
@@ -162,8 +218,8 @@ class MenuThemeFactory(DjangoModelFactory):
         return inst
 
     @classmethod
-    def create_troll(cls, title="Thème troll", question_ids=None, **kwargs):
-        inst = cls.create(title=title, type=MENU_TYPE_TR, **kwargs)
+    def create_troll(cls, title="Thème troll", question_ids=None, author=None, tags=None, **kwargs):
+        inst = cls.create(title=title, type=MENU_TYPE_TR, author=author, tags=tags, **kwargs)
         if question_ids:
             for order, q in enumerate(question_ids):
                 MenuThemeQuestion.objects.create(
@@ -184,9 +240,17 @@ class MenusFactory(DjangoModelFactory):
     title = factory.Sequence(lambda n: f"Menus du jour {n}")
     original = False
     description = ""
+    author = None
     menu_1 = factory.SubFactory(MenuThemeFactory, type=MENU_TYPE_CL)
     menu_2 = factory.SubFactory(MenuThemeFactory, type=MENU_TYPE_CL)
     menu_troll = factory.SubFactory(MenuThemeFactory, type=MENU_TYPE_TR)
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags aux menus si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +265,14 @@ class AdditionFactory(DjangoModelFactory):
     title = factory.Sequence(lambda n: f"Addition rapide {n}")
     original = False
     description = ""
+    author = None
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags à l'addition si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
     @factory.post_generation
     def questions(obj, create, extracted, **kwargs):
@@ -223,6 +295,14 @@ class DeadlyBurgerFactory(DjangoModelFactory):
 
     title = factory.Sequence(lambda n: f"Burger de la mort {n}")
     original = False
+    author = None
+
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags au burger de la mort si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
 
     @factory.post_generation
     def questions(obj, create, extracted, **kwargs):
@@ -234,11 +314,11 @@ class DeadlyBurgerFactory(DjangoModelFactory):
             )
 
     @classmethod
-    def create_with_ten_questions(cls, title="Burger de la mort - Finale", **kwargs):
+    def create_with_ten_questions(cls, title="Burger de la mort - Finale", author=None, tags=None, **kwargs):
         questions = [
             QuestionFactory.create_db(text=f"DB{i}") for i in range(1, 11)
         ]
-        return cls.create(title=title, questions=questions, **kwargs)
+        return cls.create(title=title, questions=questions, author=author, tags=tags, **kwargs)
 
 
 # ---------------------------------------------------------------------------
@@ -252,18 +332,28 @@ class BurgerQuizFactory(DjangoModelFactory):
 
     title = factory.Sequence(lambda n: f"Session test {n}")
     toss = "Consigne du toss."
+    author = None
     nuggets = None
     salt_or_pepper = None
     menus = None
     addition = None
     deadly_burger = None
 
+    @factory.post_generation
+    def tags(obj, create, extracted, **kwargs):
+        """Ajoute des tags au burger quiz si fournis."""
+        if not create or extracted is None:
+            return
+        obj.tags.add(*extracted)
+
     @classmethod
-    def create_full(cls, title="Session complète", toss="Toss complet", **kwargs):
+    def create_full(cls, title="Session complète", toss="Toss complet", author=None, tags=None, **kwargs):
         """Burger Quiz avec toutes les manches créées automatiquement."""
         return cls.create(
             title=title,
             toss=toss,
+            author=author,
+            tags=tags,
             nuggets=NuggetsFactory.create(),
             salt_or_pepper=SaltOrPepperFactory.create(),
             menus=MenusFactory.create(),

@@ -1,4 +1,4 @@
-# python manage.py test quiz.tests.salt_or_pepper.test_detail
+# uv run manage.py test quiz.tests.salt_or_pepper.test_detail
 # GET /api/quiz/salt-or-pepper/{id}/ — Détail.
 
 import uuid
@@ -8,7 +8,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from ...tests.factories import SaltOrPepperFactory
+from ..factories import SaltOrPepperFactory
+from ..mixins import (
+    AuthorInDetailResponseMixin,
+    TagsInDetailResponseMixin,
+    TimestampsInDetailResponseMixin,
+)
 
 User = get_user_model()
 
@@ -44,3 +49,56 @@ class TestSaltOrPepperDetailEndpoint(APITestCase):
         url = reverse("salt-or-pepper-detail", kwargs={"pk": uuid.uuid4()})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# ---------------------------------------------------------------------------
+# Tests Author, Tags, Timestamps dans le détail (via mixins)
+# ---------------------------------------------------------------------------
+
+
+class TestSaltOrPepperDetailAuthor(AuthorInDetailResponseMixin, APITestCase):
+    """Tests author dans le détail de SaltOrPepper."""
+
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="author_detail_user",
+            email="author_detail@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
+
+
+class TestSaltOrPepperDetailTags(TagsInDetailResponseMixin, APITestCase):
+    """Tests tags dans le détail de SaltOrPepper."""
+
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="tags_detail_user",
+            email="tags_detail@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
+
+
+class TestSaltOrPepperDetailTimestamps(TimestampsInDetailResponseMixin, APITestCase):
+    """Tests timestamps dans le détail de SaltOrPepper."""
+
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="timestamps_detail_user",
+            email="timestamps_detail@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)

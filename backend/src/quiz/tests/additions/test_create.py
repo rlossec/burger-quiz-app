@@ -39,16 +39,19 @@ class TestAdditionCreateEndpoint(APITestCase):
 
     # 201 Created
     def test_create_additions_success(self):
-        # Authentification API
-        
-        response = self.client.post(self.url, self.valid_payload)
+        response = self.client.post(self.url, self.valid_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("id", response.data)
         # Check response data
         self.assertEqual(response.data["title"], self.valid_payload["title"])
         self.assertEqual(response.data["description"], self.valid_payload["description"])
         self.assertEqual(response.data["original"], self.valid_payload["original"])
-        self.assertEqual(response.data["questions"], self.valid_payload["questions"])
+        # Les questions sont désérialisées avec leur contenu complet
+        questions = response.data["questions"]
+        self.assertEqual(len(questions), 3)
+        self.assertEqual(questions[0]["id"], str(self.q1.id))
+        self.assertEqual(questions[0]["text"], self.q1.text)
+        self.assertIn("answers", questions[0])
         # Check addition object
         a = Addition.objects.get(title=self.valid_payload["title"])
         self.assertEqual(a.questions.count(), 3)
@@ -56,12 +59,15 @@ class TestAdditionCreateEndpoint(APITestCase):
     def test_create_additions_with_only_title_and_question_ids(self):
         payload = {
             "title": "Addition rapide",
-            "questions": [str(self.q1.id), str(self.q2.id), str(self.q3.id)],
+            "question_ids": [str(self.q1.id), str(self.q2.id), str(self.q3.id)],
         }
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["title"], payload["title"])
-        self.assertEqual(response.data["questions"], payload["questions"])
+        # Les questions sont désérialisées avec leur contenu complet
+        questions = response.data["questions"]
+        self.assertEqual(len(questions), 3)
+        self.assertEqual(questions[0]["id"], str(self.q1.id))
         self.assertEqual(response.data["description"], None)
         self.assertEqual(response.data["original"], True)
 
@@ -81,7 +87,7 @@ class TestAdditionCreateEndpoint(APITestCase):
         }
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["questions"], [DUPLICATE_QUESTION_IDS_ERROR_MESSAGE])
+        self.assertEqual(response.data["question_ids"], [DUPLICATE_QUESTION_IDS_ERROR_MESSAGE])
 
     def test_create_additions_nonexistent_question_id(self):
         payload = {
@@ -90,4 +96,4 @@ class TestAdditionCreateEndpoint(APITestCase):
         }
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data["questions"], [NONE_EXISTENT_QUESTION_ID_ERROR_MESSAGE])
+        self.assertEqual(response.data["question_ids"], [NONE_EXISTENT_QUESTION_ID_ERROR_MESSAGE])

@@ -8,7 +8,13 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from ...tests.factories import QuestionFactory
+from ..factories import QuestionFactory, SaltOrPepperFactory
+from ..mixins import (
+    AuthorAutoAssignOnCreateMixin,
+    AuthorReadOnlyOnCreateMixin,
+    TagsOnCreateMixin,
+    TimestampsReadOnlyMixin,
+)
 
 User = get_user_model()
 
@@ -86,3 +92,83 @@ class TestSaltOrPepperCreateEndpoint(APITestCase):
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+
+# ---------------------------------------------------------------------------
+# Tests Author, Tags, Timestamps à la création (via mixins)
+# ---------------------------------------------------------------------------
+
+
+class TestSaltOrPepperCreateAuthor(
+    AuthorAutoAssignOnCreateMixin,
+    AuthorReadOnlyOnCreateMixin,
+    APITestCase,
+):
+    """Tests author à la création de SaltOrPepper."""
+
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="author_test_user",
+            email="author_test@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.q1 = QuestionFactory.create_sp("SP1")
+
+    def get_valid_payload(self):
+        return {
+            "title": "Test SOP Author",
+            "propositions": ["A", "B"],
+            "question_ids": [str(self.q1.id)],
+        }
+
+
+class TestSaltOrPepperCreateTags(TagsOnCreateMixin, APITestCase):
+    """Tests tags à la création de SaltOrPepper."""
+
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="tags_test_user",
+            email="tags_test@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.q1 = QuestionFactory.create_sp("SP1")
+
+    def get_valid_payload(self):
+        return {
+            "title": "Test SOP Tags",
+            "propositions": ["A", "B"],
+            "question_ids": [str(self.q1.id)],
+        }
+
+
+class TestSaltOrPepperCreateTimestamps(TimestampsReadOnlyMixin, APITestCase):
+    """Tests timestamps à la création de SaltOrPepper."""
+
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="timestamps_test_user",
+            email="timestamps_test@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.q1 = QuestionFactory.create_sp("SP1")
+
+    def get_valid_payload(self):
+        return {
+            "title": "Test SOP Timestamps",
+            "propositions": ["A", "B"],
+            "question_ids": [str(self.q1.id)],
+        }
