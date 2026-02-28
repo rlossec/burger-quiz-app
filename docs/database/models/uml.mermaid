@@ -22,7 +22,7 @@ classDiagram
         +Question question
         +string text
         +bool is_correct
-        +Image image
+        +URL image_url
     }
 
     class BurgerQuiz {
@@ -50,7 +50,7 @@ classDiagram
         +string title
         +string description
         +bool original
-        +JSON choice_labels
+        +JSON propositions
         +User author
         +TaggableManager tags
         +datetime created_at
@@ -98,6 +98,30 @@ classDiagram
         +TaggableManager tags
         +datetime created_at
         +datetime updated_at
+    }
+
+    class VideoInterlude {
+        +UUID id
+        +string title
+        +URL youtube_url
+        +string youtube_video_id
+        +CharField interlude_type
+        +int duration_seconds
+        +bool autoplay
+        +bool skip_allowed
+        +int skip_after_seconds
+        +User author
+        +TaggableManager tags
+        +datetime created_at
+        +datetime updated_at
+    }
+
+    class BurgerQuizElement {
+        <<through>>
+        +UUID id
+        +int order
+        +CharField type
+        +CharField round_type
     }
 
     class Tag {
@@ -176,8 +200,14 @@ classDiagram
     BurgerQuiz "1" --> "0..1" Menus
     BurgerQuiz "1" --> "0..1" Addition
     BurgerQuiz "1" --> "0..1" DeadlyBurger
+    BurgerQuiz "1" --> "*" BurgerQuizElement : structure
     BurgerQuiz "*" --> "0..1" User : author
     BurgerQuiz "*" ..> "*" Tag : tags
+
+    BurgerQuizElement "*" --> "0..1" VideoInterlude : interlude
+
+    VideoInterlude "*" --> "0..1" User : author
+    VideoInterlude "*" ..> "*" Tag : tags
 
     Nuggets "1" --> "*" NuggetQuestion
     Nuggets "*" --> "0..1" User : author

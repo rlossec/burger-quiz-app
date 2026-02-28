@@ -1,5 +1,16 @@
 # Les modèles
 
+## Sommaire
+
+- [Champs communs](#champs-communs--author-tags-timestamps)
+- [Question](#question--original-média-réutilisabilité)
+- [Burger Quiz](#burger-quiz)
+- [Manches](#nuggets)
+- [VideoInterlude](#videointerlude)
+- [Structure du quiz (BurgerQuizElement)](#structure-du-quiz-burgerquizelement)
+
+---
+
 ## Champs communs : author, tags, timestamps
 
 ### Author (auteur)
@@ -10,7 +21,7 @@ Tous les modèles de contenu quiz possèdent un champ **`author`** qui référen
 - Automatiquement assigné lors de la création via le JWT de la requête.
 - Permet de filtrer le contenu par créateur et de tracer la propriété.
 
-**Modèles concernés** : Question, BurgerQuiz, Nuggets, SaltOrPepper, Menus, MenuTheme, Addition, DeadlyBurger.
+**Modèles concernés** : Question, BurgerQuiz, Nuggets, SaltOrPepper, Menus, MenuTheme, Addition, DeadlyBurger, VideoInterlude.
 
 ### Tags (étiquettes)
 
@@ -20,9 +31,10 @@ Tous les modèles de contenu quiz supportent un système de tags via **django-ta
 - Tags normalisés et réutilisables (modèle `Tag` partagé).
 - Permet le filtrage, la recherche et le regroupement par tags.
 
-**Exemples de tags** : `humour`, `culture`, `sport`, `tv`, `original`, `difficile`...
+**Exemples de tags** : `humour`, `culture`, `sport`, `tv`, `original`, `difficile`, `intro`, `pub`...
 
 **Usage API** :
+
 ```json
 {
   "tags": ["humour", "culture-générale"]
@@ -36,7 +48,7 @@ Tous les modèles de contenu quiz possèdent des champs d'horodatage :
 - **`created_at`** : Date/heure de création (auto, non modifiable).
 - **`updated_at`** : Date/heure de dernière modification (auto).
 
-**Modèles concernés** : Question, BurgerQuiz, Nuggets, SaltOrPepper, Menus, MenuTheme, Addition, DeadlyBurger.
+**Modèles concernés** : Question, BurgerQuiz, Nuggets, SaltOrPepper, Menus, MenuTheme, Addition, DeadlyBurger, VideoInterlude.
 
 ---
 
@@ -46,42 +58,53 @@ Tous les modèles de contenu quiz possèdent des champs d'horodatage :
 
 Chaque **Question** possède un champ booléen **`original`** qui indique sa provenance :
 
-- **`original = True`** (défaut) : question créée directement (par l’utilisateur / l’app).
-- **`original = False`** : question issue d’une émission Burger Quiz déjà diffusée.
+- **`original = True`** (défaut) : question créée directement (par l'utilisateur / l'app).
+- **`original = False`** : question issue d'une émission Burger Quiz déjà diffusée.
 
-Chaque manche (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) et chaque **thème de menu** (MenuTheme) possède également un champ **`original`**. S’il n’est pas renseigné, il vaut **`true`** (créé directement) ; `false` = issue d’une émission diffusée.
+Chaque manche (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) et chaque **thème de menu** (MenuTheme) possède également un champ **`original`**. S'il n'est pas renseigné, il vaut **`true`** (créé directement) ; `false` = issue d'une émission diffusée.
 
 ### Média (lien externe)
 
-Une question peut être associée à une **vidéo** et/ou un **image** via des liens externes :
+Une question peut être associée à une **vidéo** et/ou une **image** via des liens externes :
 
-- **`video_url`** : URL vers une vidéo (ex. extrait d’émission).
+- **`video_url`** : URL vers une vidéo (ex. extrait d'émission).
 - **`image_url`** : URL vers un fichier image.
 
-Les deux champs sont optionnels (null/blank). Le contenu est hébergé à l’extérieur ; l’application ne stocke que l’URL.
+Les deux champs sont optionnels (null/blank). Le contenu est hébergé à l'extérieur ; l'application ne stocke que l'URL.
+
+### Média sur les réponses (Answer)
+
+Chaque **Answer** peut également être associée à une image via un lien externe :
+
+- **`image_url`** : URL optionnelle vers un fichier image (ex. pour des questions visuelles où les propositions sont des images).
 
 ### Réutilisabilité des questions
 
-- **Nuggets** et **Burger de la mort** : une même question (type NU ou DB) peut être **réutilisée** dans plusieurs manches Nuggets / plusieurs Burger de la mort. Les tables de liaison (NuggetQuestion, DeadlyBurgerQuestion) n’imposent pas d’unicité sur la question.
-- **Sel ou poivre**, **Menu** (MenuTheme), **Addition** : les questions sont **propres à une seule manche**. Une question de type SP, ME ou AD n’appartient qu’à un seul Sel ou poivre, un seul thème de menu, ou une seule Addition. C’est assuré en base par une contrainte d’unicité sur `question` dans SaltOrPepperQuestion, MenuThemeQuestion et AdditionQuestion.
+- **Nuggets** et **Burger de la mort** : une même question (type NU ou DB) peut être **réutilisée** dans plusieurs manches Nuggets / plusieurs Burger de la mort. Les tables de liaison (NuggetQuestion, DeadlyBurgerQuestion) n'imposent pas d'unicité sur la question.
+- **Sel ou poivre**, **Menu** (MenuTheme), **Addition** : les questions sont **propres à une seule manche**. Une question de type SP, ME ou AD n'appartient qu'à un seul Sel ou poivre, un seul thème de menu, ou une seule Addition. C'est assuré en base par une contrainte d'unicité sur `question` dans SaltOrPepperQuestion, MenuThemeQuestion et AdditionQuestion.
 
 ---
 
 ## Burger Quiz
 
-Un burger quiz est un ensemble de manches, chaque manche comprenant une suite de questions. Le modèle **BurgerQuiz** comporte **`created_at`** et **`updated_at`** (horodatage de création et de dernière modification) pour l’affichage liste (date/création) et le tri. Les manches sont dans l’ordre :
-- le Toss*
+Un burger quiz est un ensemble de manches, chaque manche comprenant une suite de questions. Le modèle **BurgerQuiz** comporte **`created_at`** et **`updated_at`** (horodatage de création et de dernière modification) pour l'affichage liste (date/création) et le tri.
+
+L'ordre de passage des manches et l'insertion d'interludes vidéo sont définis par la table **BurgerQuizElement** (voir [Structure du quiz](#structure-du-quiz-burgerquizelement)).
+
+Les manches standard (dans l'ordre par défaut) :
+
+- le Toss\*
 - les Nuggets
 - le Sel ou Poivre
 - les Menus
-- l'addition
-- le burger de la mort
+- l'Addition
+- le Burger de la mort
 
 On utilise les modèles Question/Answer pour décrire les questions et réponses de toutes les manches.
 
-Des modèles intermédiaires (NuggetQuestion, SaltOrPepperQuestion, MenuThemeQuestion, AdditionQuestion, DeadlyBurgerQuestion) permettent d’ordonner les questions au sein de chaque manche via un champ `order`.
+Des modèles intermédiaires (NuggetQuestion, SaltOrPepperQuestion, MenuThemeQuestion, AdditionQuestion, DeadlyBurgerQuestion) permettent d'ordonner les questions au sein de chaque manche via un champ `order`.
 
-> * Le toss est une manche particulière, consistant en une petite mission pour départager le choix des équipes et l'équipe qui débute.
+> - Le toss est une manche particulière, consistant en une petite mission pour départager le choix des équipes et l'équipe qui débute.
 
 ## Nuggets
 
@@ -91,46 +114,200 @@ Chaque équipe répond l'une après l'autre à des questions comportant quatre p
 
 Les candidats doivent répondre le plus vite possible à une série de questions en piochant parmi une **liste restreinte de propositions** donnée en début de manche (souvent 2, 3 ou 4 ; maximum 5). Exemples : « Noir » / « Blanc », ou « Noir » / « Blanc » / « Les deux ».
 
-La manche **SaltOrPepper** possède un champ **`choice_labels`** (liste de chaînes) qui définit ces propositions. Chaque question de la manche doit avoir des réponses (Answer) dont le libellé est exactement l’un de ces choix.
+La manche **SaltOrPepper** possède :
+- un champ **`propositions`** (tableau JSON) qui définit ces propositions. Chaque question de la manche doit avoir des réponses (Answer) dont le libellé est exactement l'un de ces choix.
+- un champ **`description`** (optionnel) pour décrire la manche.
 
 ## Les menus
 
 Sur une liste de trois propositions de thème, chaque équipe doit répondre à une série de questions sur le thème choisi.
 
+La manche **Menus** possède un champ **`description`** (optionnel) pour décrire la manche.
+
 ## Addition
 
-Épreuve de rapidité lors de laquelle les équipes doivent buzzer pour répondre à un questionnaire comportant une contrainte jusqu'à atteindre les 25 miams. Selon l'avancement des scores, les questions peuvent valoir davantage de points
+Épreuve de rapidité lors de laquelle les équipes doivent buzzer pour répondre à un questionnaire comportant une contrainte jusqu'à atteindre les 25 miams. Selon l'avancement des scores, les questions peuvent valoir davantage de points.
+
+La manche **Addition** possède un champ **`description`** (optionnel) pour décrire la manche.
 
 ## Burger de la mort
 
 Un membre de l'équipe gagnante doit répondre à 10 questions dans l'ordre seulement après avoir écouté les 10 questions.
 
+---
 
 ## 2. Champ `original` (questions et manches)
 
-La **provenance** (contenu issue d’une émission diffusée ou créé manuellement) est portée par un booléen **`original`** à la fois sur les **Question** et sur les **manches** (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger).
+La **provenance** (contenu issue d'une émission diffusée ou créé manuellement) est portée par un booléen **`original`** à la fois sur les **Question** et sur les **manches** (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger).
 
 ### 2.1 En base de données
 
-- Chaque **Question** possède un champ **`original`** (booléen, défaut **`true`**). **`original = True`** = créée directement, **`original = False`** = issue d’une émission diffusée.
-- Chaque **manche** (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) et chaque **MenuTheme** possède un champ **`original`** (booléen). S’il n’est pas renseigné, valeur par défaut **`true`** (créé directement).
+- Chaque **Question** possède un champ **`original`** (booléen, défaut **`true`**). **`original = True`** = créée directement, **`original = False`** = issue d'une émission diffusée.
+- Chaque **manche** (Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger) et chaque **MenuTheme** possède un champ **`original`** (booléen). S'il n'est pas renseigné, valeur par défaut **`true`** (créé directement).
 
 ### 2.2 Règles API
 
-- **Création / mise à jour d’une Question** : le champ **`question_type`** est obligatoire ; le champ **`original`** est optionnel (défaut **`true`** = créée directement).
+- **Création / mise à jour d'une Question** : le champ **`question_type`** est obligatoire ; le champ **`original`** est optionnel (défaut **`true`** = créée directement).
 - **GET liste/détail des questions** : filtrage par **`?original=true|false`** et par **`?question_type=NU|SP|ME|AD|DB`**.
 - **Manches et thèmes de menu** : le champ **`original`** est accepté en création et mise à jour (POST/PATCH), optionnel (défaut **`true`**). Il est renvoyé en GET (liste et détail).
 
 ### 2.4 Réutilisabilité des questions
 
 - **Nuggets** et **Burger de la mort** : une même question (type NU ou DB) peut être **réutilisée** dans plusieurs manches. On peut donc référencer une question déjà utilisée dans un autre Nuggets / un autre Burger de la mort.
-- **Sel ou poivre**, **Menu** (MenuTheme), **Addition** : les questions sont **propres à une seule manche**. Une question de type SP, ME ou AD ne peut appartenir qu’à un seul Sel ou poivre, un seul thème de menu, ou une seule Addition. En base, une contrainte d’unicité l’impose ; l’API doit refuser d’ajouter une question déjà liée à une autre manche du même type.
+- **Sel ou poivre**, **Menu** (MenuTheme), **Addition** : les questions sont **propres à une seule manche**. Une question de type SP, ME ou AD ne peut appartenir qu'à un seul Sel ou poivre, un seul thème de menu, ou une seule Addition. En base, une contrainte d'unicité l'impose ; l'API doit refuser d'ajouter une question déjà liée à une autre manche du même type.
 
 ### 2.5 Média (lien externe sur une question)
 
 Une question peut être associée à une **vidéo** et/ou un **image** via des liens externes :
 
-- **`video_url`** : URL optionnelle vers une vidéo (ex. extrait d’émission).
+- **`video_url`** : URL optionnelle vers une vidéo (ex. extrait d'émission).
 - **`image_url`** : URL optionnelle vers un fichier image.
 
-Les deux champs sont optionnels. L’endpoint de création/mise à jour de questions doit les accepter et les valider (format URL).
+Les deux champs sont optionnels. L'endpoint de création/mise à jour de questions doit les accepter et les valider (format URL).
+
+---
+
+## VideoInterlude
+
+Un **VideoInterlude** représente une vidéo (YouTube) pouvant être insérée dans la structure d'un Burger Quiz : intro, pub, interlude entre manches, outro, etc.
+
+### Champs
+
+| Champ                | Type            | Description                                                       |
+| -------------------- | --------------- | ----------------------------------------------------------------- |
+| `id`                 | UUID            | Identifiant unique                                                |
+| `title`              | string          | Titre de l'interlude (ex: "Intro Burger Quiz", "Pub Ketchup")     |
+| `youtube_url`        | URL             | URL de la vidéo YouTube                                           |
+| `youtube_video_id`   | string          | ID extrait de l'URL YouTube (calculé automatiquement)             |
+| `interlude_type`     | CharField       | Type d'interlude : `IN`, `OU`, `PU`, `IL`                         |
+| `duration_seconds`   | int             | Durée en secondes (optionnel, peut être récupéré via API YouTube) |
+| `autoplay`           | bool            | Lecture automatique (défaut: `true`)                              |
+| `skip_allowed`       | bool            | L'utilisateur peut-il passer la vidéo ? (défaut: `true`)          |
+| `skip_after_seconds` | int             | Temps avant de pouvoir skip en secondes (optionnel, ex: 5)        |
+| `author`             | FK User         | Créateur de l'interlude                                           |
+| `tags`               | TaggableManager | Tags associés                                                     |
+| `created_at`         | datetime        | Date de création                                                  |
+| `updated_at`         | datetime        | Date de modification                                              |
+
+### Types d'interludes
+
+| Type      | Code | Description                          |
+| --------- | ---- | ------------------------------------ |
+| Intro     | `IN` | Vidéo d'introduction (début du quiz) |
+| Outro     | `OU` | Vidéo de clôture (fin du quiz)       |
+| Publicité | `PU` | Publicité / Pause pub                |
+| Interlude | `IL` | Interlude générique entre manches    |
+
+### Réutilisabilité
+
+Un **VideoInterlude** peut être réutilisé dans plusieurs BurgerQuiz via la table de liaison `BurgerQuizElement`. Cela permet de créer une bibliothèque d'interludes partagés.
+
+### Extraction de l'ID YouTube
+
+L'`youtube_video_id` est extrait automatiquement depuis `youtube_url` pour faciliter l'intégration du player. Formats supportés :
+
+- `https://www.youtube.com/watch?v=VIDEO_ID`
+- `https://youtu.be/VIDEO_ID`
+- `https://www.youtube.com/embed/VIDEO_ID`
+
+---
+
+## Structure du quiz (BurgerQuizElement)
+
+La table **BurgerQuizElement** définit la **structure ordonnée** d'un Burger Quiz. Elle permet d'intercaler des interludes vidéo entre les manches dans un ordre totalement personnalisable.
+
+### Principe
+
+Chaque élément de la structure est soit :
+
+- Une **manche** (nuggets, salt_pepper, menus, addition, deadly_burger)
+- Un **interlude vidéo**
+
+L'ordre est défini par le champ `order`.
+
+### Champs
+
+| Champ         | Type              | Description                                                               |
+| ------------- | ----------------- | ------------------------------------------------------------------------- |
+| `id`          | UUID              | Identifiant unique                                                        |
+| `burger_quiz` | FK BurgerQuiz     | Quiz parent                                                               |
+| `order`       | int               | Position dans la structure (1, 2, 3...)                                   |
+| `type`        | CharField         | Type : `round` ou `interlude`                                             |
+| `round_type`  | CharField         | Si `type=round` : `NU`, `SP`, `ME`, `AD`, `DB` (nullable)                 |
+| `interlude`   | FK VideoInterlude | Si `type=interlude` : référence vers l'interlude (nullable)               |
+
+### Contraintes
+
+- Un BurgerQuiz peut avoir **0 à N** éléments dans sa structure.
+- Chaque type de manche (`nuggets`, `salt_pepper`, etc.) ne peut apparaître qu'**une seule fois** dans la structure.
+- Les interludes peuvent apparaître **plusieurs fois** (ex: plusieurs pubs).
+- L'`order` doit être unique par `burger_quiz`.
+
+### Exemple de structure
+
+```
+BurgerQuiz "Soirée PCaT #1"
+├── order=1  │ type=interlude │ interlude="Intro Burger Quiz"
+├── order=2  │ type=round     │ round_type=NU
+├── order=3  │ type=interlude │ interlude="Pub Ketchup"
+├── order=4  │ type=round     │ round_type=SP
+├── order=5  │ type=round     │ round_type=ME
+├── order=6  │ type=interlude │ interlude="Pub Mayo"
+├── order=7  │ type=round     │ round_type=AD
+├── order=8  │ type=round     │ round_type=DB
+└── order=9  │ type=interlude │ interlude="Outro + Crédits"
+```
+
+### Relation avec les manches
+
+La table `BurgerQuizElement` ne stocke pas directement les FK vers les manches (Nuggets, SaltOrPepper, etc.). Ces relations restent sur le modèle `BurgerQuiz` :
+
+- `BurgerQuiz.nuggets` → FK Nuggets
+- `BurgerQuiz.salt_or_pepper` → FK SaltOrPepper
+- etc.
+
+`BurgerQuizElement` définit uniquement l'**ordre de passage** et l'**insertion des interludes**.
+
+### Structure par défaut
+
+Si aucun `BurgerQuizElement` n'est défini pour un quiz, l'ordre par défaut est :
+
+1. Nuggets
+2. Sel ou Poivre
+3. Menus
+4. Addition
+5. Burger de la mort
+
+(Sans interludes)
+
+### API
+
+**GET /api/quiz/burger-quizzes/{id}/** retourne la structure ordonnée :
+
+```json
+{
+  "id": "...",
+  "title": "Soirée PCaT #1",
+  "toss": "...",
+  "structure": [
+    { "order": 1, "type": "interlude", "interlude": { "id": "...", "title": "Intro", "youtube_url": "..." } },
+    { "order": 2, "type": "round", "round_type": "NU", "round": { "id": "...", "title": "Culture G", "question_count": 6 } },
+    { "order": 3, "type": "interlude", "interlude": { "id": "...", "title": "Pub Ketchup", "youtube_url": "..." } },
+    { "order": 4, "type": "round", "round_type": "SP", "round": { "id": "...", "title": "Noir ou Blanc", "question_count": 5 } }
+  ],
+  "nuggets": { ... },
+  "salt_or_pepper": { ... }
+}
+```
+
+**PUT /api/quiz/burger-quizzes/{id}/structure/** ou **PATCH /api/quiz/burger-quizzes/{id}/structure/** pour réordonner :
+
+```json
+{
+  "elements": [
+    { "type": "interlude", "interlude_id": "..." },
+    { "type": "round", "round_type": "NU" },
+    { "type": "round", "round_type": "SP" }
+  ]
+}
+```
