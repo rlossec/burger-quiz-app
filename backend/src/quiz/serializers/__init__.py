@@ -10,6 +10,17 @@ from .menus import MenusSerializer
 from .menu_theme import MenuThemeSerializer
 from .addition import AdditionSerializer
 from .deadly_burger import DeadlyBurgerSerializer
+from .video_interlude import (
+    VideoInterludeSerializer,
+    VideoInterludeListSerializer,
+    VideoInterludeMinimalSerializer,
+)
+from .burger_quiz_element import (
+    BurgerQuizElementReadSerializer,
+    BurgerQuizElementWriteSerializer,
+    BurgerQuizStructureSerializer,
+    BurgerQuizStructureReadSerializer,
+)
 from .burger_quiz import BurgerQuizSerializer
 
 __all__ = [
@@ -22,5 +33,12 @@ __all__ = [
     "MenuThemeSerializer",
     "AdditionSerializer",
     "DeadlyBurgerSerializer",
+    "VideoInterludeSerializer",
+    "VideoInterludeListSerializer",
+    "VideoInterludeMinimalSerializer",
+    "BurgerQuizElementReadSerializer",
+    "BurgerQuizElementWriteSerializer",
+    "BurgerQuizStructureSerializer",
+    "BurgerQuizStructureReadSerializer",
     "BurgerQuizSerializer",
 ]

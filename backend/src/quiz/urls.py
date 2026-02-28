@@ -9,10 +9,12 @@ from .views import (
     MenuThemeViewSet,
     AdditionViewSet,
     DeadlyBurgerViewSet,
+    VideoInterludeViewSet,
     BurgerQuizViewSet,
 )
 
 router = DefaultRouter()
+router.register("interludes", VideoInterludeViewSet, basename="interlude")
 router.register("questions", QuestionViewSet, basename="question")
 router.register("nuggets", NuggetsViewSet, basename="nuggets")
 router.register("salt-or-pepper", SaltOrPepperViewSet, basename="salt-or-pepper")

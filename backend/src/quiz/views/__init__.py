@@ -9,6 +9,7 @@ from .menus import MenusViewSet
 from .menu_theme import MenuThemeViewSet
 from .addition import AdditionViewSet
 from .deadly_burger import DeadlyBurgerViewSet
+from .video_interlude import VideoInterludeViewSet
 from .burger_quiz import BurgerQuizViewSet
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "MenuThemeViewSet",
     "AdditionViewSet",
     "DeadlyBurgerViewSet",
+    "VideoInterludeViewSet",
     "BurgerQuizViewSet",
 ]

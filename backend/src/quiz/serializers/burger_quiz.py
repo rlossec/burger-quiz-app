@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from taggit.serializers import TagListSerializerField, TaggitSerializer
@@ -9,6 +10,7 @@ from .salt_or_pepper import SaltOrPepperSerializer
 from .menus import MenusSerializer
 from .addition import AdditionSerializer
 from .deadly_burger import DeadlyBurgerSerializer
+from .burger_quiz_element import BurgerQuizElementReadSerializer
 
 
 class BurgerQuizSerializer(TaggitSerializer, ModelSerializer):
@@ -24,6 +26,7 @@ class BurgerQuizSerializer(TaggitSerializer, ModelSerializer):
     deadly_burger = DeadlyBurgerSerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     tags = TagListSerializerField(required=False)
+    structure = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = BurgerQuiz
@@ -45,11 +48,29 @@ class BurgerQuizSerializer(TaggitSerializer, ModelSerializer):
             "menus_id",
             "addition_id",
             "deadly_burger_id",
+            "structure",
         ]
-        read_only_fields = ["id", "author", "created_at", "updated_at", "nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger"]
+        read_only_fields = [
+            "id",
+            "author",
+            "created_at",
+            "updated_at",
+            "nuggets",
+            "salt_or_pepper",
+            "menus",
+            "addition",
+            "deadly_burger",
+            "structure",
+        ]
         extra_kwargs = {
             "toss": {"error_messages": {"required": "Ce champ est obligatoire.", "blank": "Ce champ ne peut pas être vide."}},
         }
+
+    @extend_schema_field(BurgerQuizElementReadSerializer(many=True))
+    def get_structure(self, obj):
+        """Retourne la structure ordonnée du Burger Quiz."""
+        elements = obj.structure_elements.all().order_by("order")
+        return BurgerQuizElementReadSerializer(elements, many=True).data
 
     def validate_nuggets_id(self, value):
         if value is None:

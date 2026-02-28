@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from taggit.serializers import TagListSerializerField, TaggitSerializer
@@ -28,6 +29,7 @@ class NuggetsSerializer(TaggitSerializer, ModelSerializer):
             "title": {"error_messages": {"required": "Ce champ est obligatoire.", "blank": "Ce champ ne peut pas être vide."}},
         }
 
+    @extend_schema_field(QuestionSerializer(many=True))
     def get_questions(self, obj):
         """Retourne les questions avec leur contenu complet (texte, réponses)."""
         ordered_qs = NuggetQuestion.objects.filter(nuggets=obj).order_by("order")

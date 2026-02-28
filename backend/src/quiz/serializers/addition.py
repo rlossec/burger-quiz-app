@@ -1,4 +1,5 @@
 from django.db import transaction
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from taggit.serializers import TagListSerializerField, TaggitSerializer
@@ -29,6 +30,7 @@ class AdditionSerializer(TaggitSerializer, ModelSerializer):
             "original": {"required": False},
         }
 
+    @extend_schema_field(QuestionSerializer(many=True))
     def get_questions(self, obj):
         """Retourne les questions avec leur contenu complet (texte, réponses)."""
         ordered_qs = AdditionQuestion.objects.filter(addition=obj).order_by("order")
