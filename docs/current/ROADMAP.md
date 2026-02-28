@@ -31,10 +31,10 @@
 #### Phase 2 – Setup technique
 
 - [x] React + TypeScript (Vite)
-- [ ] React Router
-- [ ] Tailwind + shadcn/ui
-- [ ] TanStack Query
-- [ ] ESLint + Prettier
+- [x] React Router
+- [x] Tailwind + shadcn/ui
+- [x] TanStack Query
+- [x] ESLint + Prettier
 
 #### Phase 3 – Layout global
 
