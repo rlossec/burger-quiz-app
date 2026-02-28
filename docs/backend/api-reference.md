@@ -224,14 +224,14 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 
 ### 2.1 Interludes vidéo
 
-| Méthode  | Endpoint                      | Description                    |
-| -------- | ----------------------------- | ------------------------------ |
-| `GET`    | `/api/quiz/interludes/`       | Liste des interludes           |
-| `GET`    | `/api/quiz/interludes/{id}/`  | Détail d'un interlude          |
-| `POST`   | `/api/quiz/interludes/`       | Création d'un interlude        |
-| `PUT`    | `/api/quiz/interludes/{id}/`  | Mise à jour complète           |
-| `PATCH`  | `/api/quiz/interludes/{id}/`  | Mise à jour partielle          |
-| `DELETE` | `/api/quiz/interludes/{id}/`  | Suppression d'un interlude     |
+| Méthode  | Endpoint                     | Description                |
+| -------- | ---------------------------- | -------------------------- |
+| `GET`    | `/api/quiz/interludes/`      | Liste des interludes       |
+| `GET`    | `/api/quiz/interludes/{id}/` | Détail d'un interlude      |
+| `POST`   | `/api/quiz/interludes/`      | Création d'un interlude    |
+| `PUT`    | `/api/quiz/interludes/{id}/` | Mise à jour complète       |
+| `PATCH`  | `/api/quiz/interludes/{id}/` | Mise à jour partielle      |
+| `DELETE` | `/api/quiz/interludes/{id}/` | Suppression d'un interlude |
 
 #### 2.1.1. Liste des interludes
 
@@ -466,7 +466,11 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
   "answers": [
     { "text": "Paris", "is_correct": true, "image_url": null },
     { "text": "Lyon", "is_correct": false, "image_url": null },
-    { "text": "Marseille", "is_correct": false, "image_url": "https://example.com/lyon.jpg" },
+    {
+      "text": "Marseille",
+      "is_correct": false,
+      "image_url": "https://example.com/lyon.jpg"
+    },
     { "text": "Toulouse", "is_correct": false, "image_url": null }
   ],
   "video_url": "https://example.com/video.mp4",
@@ -1250,14 +1254,69 @@ En **lecture**, le détail expose les **manches complètes** avec toutes leurs *
     ]
   },
   "structure": [
-    { "order": 1, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-intro", "title": "Intro", "interlude_type": "IN", "youtube_video_id": "abc123" } },
-    { "order": 2, "element_type": "round", "round_type": "NU", "interlude": null },
-    { "order": 3, "element_type": "round", "round_type": "SP", "interlude": null },
-    { "order": 4, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-pub-1", "title": "Pub Ketchup", "interlude_type": "PU", "youtube_video_id": "def456" } },
-    { "order": 5, "element_type": "round", "round_type": "ME", "interlude": null },
-    { "order": 6, "element_type": "round", "round_type": "AD", "interlude": null },
-    { "order": 7, "element_type": "round", "round_type": "DB", "interlude": null },
-    { "order": 8, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-outro", "title": "Outro", "interlude_type": "OU", "youtube_video_id": "ghi789" } }
+    {
+      "order": 1,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-intro",
+        "title": "Intro",
+        "interlude_type": "IN",
+        "youtube_video_id": "abc123"
+      }
+    },
+    {
+      "order": 2,
+      "element_type": "round",
+      "round_type": "NU",
+      "interlude": null
+    },
+    {
+      "order": 3,
+      "element_type": "round",
+      "round_type": "SP",
+      "interlude": null
+    },
+    {
+      "order": 4,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-pub-1",
+        "title": "Pub Ketchup",
+        "interlude_type": "PU",
+        "youtube_video_id": "def456"
+      }
+    },
+    {
+      "order": 5,
+      "element_type": "round",
+      "round_type": "ME",
+      "interlude": null
+    },
+    {
+      "order": 6,
+      "element_type": "round",
+      "round_type": "AD",
+      "interlude": null
+    },
+    {
+      "order": 7,
+      "element_type": "round",
+      "round_type": "DB",
+      "interlude": null
+    },
+    {
+      "order": 8,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-outro",
+        "title": "Outro",
+        "interlude_type": "OU",
+        "youtube_video_id": "ghi789"
+      }
+    }
   ]
 }
 ```
@@ -1273,10 +1332,10 @@ En **lecture**, le détail expose les **manches complètes** avec toutes leurs *
 
 ### 2.9 Structure du Burger Quiz
 
-| Méthode | Endpoint                                     | Description                  |
-| ------- | -------------------------------------------- | ---------------------------- |
-| `GET`   | `/api/quiz/burger-quizzes/{id}/structure/`   | Lecture de la structure      |
-| `PUT`   | `/api/quiz/burger-quizzes/{id}/structure/`   | Remplacement de la structure |
+| Méthode | Endpoint                                   | Description                  |
+| ------- | ------------------------------------------ | ---------------------------- |
+| `GET`   | `/api/quiz/burger-quizzes/{id}/structure/` | Lecture de la structure      |
+| `PUT`   | `/api/quiz/burger-quizzes/{id}/structure/` | Remplacement de la structure |
 
 La structure définit l'ordre des éléments d'un Burger Quiz : manches et interludes. Les interludes doivent exister au préalable (pas de création inline).
 
@@ -1290,15 +1349,80 @@ La structure définit l'ordre des éléments d'un Burger Quiz : manches et inter
 {
   "burger_quiz_id": "uuid-bq-1",
   "elements": [
-    { "order": 1, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-intro", "title": "Intro", "interlude_type": "IN", "youtube_video_id": "abc123" } },
-    { "order": 2, "element_type": "round", "round_type": "NU", "interlude": null },
-    { "order": 3, "element_type": "round", "round_type": "SP", "interlude": null },
-    { "order": 4, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-pub-1", "title": "Pub Ketchup", "interlude_type": "PU", "youtube_video_id": "def456" } },
-    { "order": 5, "element_type": "round", "round_type": "ME", "interlude": null },
-    { "order": 6, "element_type": "round", "round_type": "AD", "interlude": null },
-    { "order": 7, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-pub-2", "title": "Pub Mayo", "interlude_type": "PU", "youtube_video_id": "jkl012" } },
-    { "order": 8, "element_type": "round", "round_type": "DB", "interlude": null },
-    { "order": 9, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-outro", "title": "Outro", "interlude_type": "OU", "youtube_video_id": "mno345" } }
+    {
+      "order": 1,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-intro",
+        "title": "Intro",
+        "interlude_type": "IN",
+        "youtube_video_id": "abc123"
+      }
+    },
+    {
+      "order": 2,
+      "element_type": "round",
+      "round_type": "NU",
+      "interlude": null
+    },
+    {
+      "order": 3,
+      "element_type": "round",
+      "round_type": "SP",
+      "interlude": null
+    },
+    {
+      "order": 4,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-pub-1",
+        "title": "Pub Ketchup",
+        "interlude_type": "PU",
+        "youtube_video_id": "def456"
+      }
+    },
+    {
+      "order": 5,
+      "element_type": "round",
+      "round_type": "ME",
+      "interlude": null
+    },
+    {
+      "order": 6,
+      "element_type": "round",
+      "round_type": "AD",
+      "interlude": null
+    },
+    {
+      "order": 7,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-pub-2",
+        "title": "Pub Mayo",
+        "interlude_type": "PU",
+        "youtube_video_id": "jkl012"
+      }
+    },
+    {
+      "order": 8,
+      "element_type": "round",
+      "round_type": "DB",
+      "interlude": null
+    },
+    {
+      "order": 9,
+      "element_type": "interlude",
+      "round_type": null,
+      "interlude": {
+        "id": "uuid-outro",
+        "title": "Outro",
+        "interlude_type": "OU",
+        "youtube_video_id": "mno345"
+      }
+    }
   ]
 }
 ```

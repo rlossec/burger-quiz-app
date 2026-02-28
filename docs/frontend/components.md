@@ -23,13 +23,13 @@ Pattern d’ajout de **questions** directement dans un formulaire de création/�
 
 #### Par type de manche
 
-| Page                              | question_type | Nombre / contraintes                                        | Remarques                                                                                                                                   |
-| --------------------------------- | ------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **NuggetsCreatePage / Edit**      | NU            | Nombre **pair** (ex. 6 champs possibles), 2 par 2 par ligne | Sélection (modale recherche) ou création inline. Une question déjà choisie peut être grisée dans la modale pour éviter les doublons.       |
-| **SaltOrPepperCreatePage / Edit** | SP            | Variable                                                    | Champs « propositions » (2 à 5) en haut ; chaque question a sa réponse dans un **déroulant** = une des propositions.                        |
-| **MenuThemeCreatePage / Edit**    | ME            | Variable                                                    | InlineForm pour les questions du thème.                                                                                                     |
-| **AdditionCreatePage / Edit**     | AD            | 8 inline form par défaut, ajout/suppression possible        | InlineForm avec question_type = AD.                                                                                                         |
-| **DeadlyBurgerCreatePage / Edit** | DB            | **10** questions exactement                                 | 10 InlineForm fixes, question_type = DB.                                                                                                    |
+| Page                              | question_type | Nombre / contraintes                                        | Remarques                                                                                                                            |
+| --------------------------------- | ------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **NuggetsCreatePage / Edit**      | NU            | Nombre **pair** (ex. 6 champs possibles), 2 par 2 par ligne | Sélection (modale recherche) ou création inline. Une question déjà choisie peut être grisée dans la modale pour éviter les doublons. |
+| **SaltOrPepperCreatePage / Edit** | SP            | Variable                                                    | Champs « propositions » (2 à 5) en haut ; chaque question a sa réponse dans un **déroulant** = une des propositions.                 |
+| **MenuThemeCreatePage / Edit**    | ME            | Variable                                                    | InlineForm pour les questions du thème.                                                                                              |
+| **AdditionCreatePage / Edit**     | AD            | 8 inline form par défaut, ajout/suppression possible        | InlineForm avec question_type = AD.                                                                                                  |
+| **DeadlyBurgerCreatePage / Edit** | DB            | **10** questions exactement                                 | 10 InlineForm fixes, question_type = DB.                                                                                             |
 
 #### Champs communs (par ligne question)
 

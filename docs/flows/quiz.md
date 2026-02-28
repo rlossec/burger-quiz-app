@@ -395,13 +395,13 @@ type SaveStatus = "new" | "dirty" | "saving" | "saved" | "error";
 
 ### Composants par type de manche
 
-| Manche            | InlineForm                           | Particularité                       |
-| ----------------- | ------------------------------------ | ----------------------------------- |
-| Nuggets           | `<NuggetsQuestionInlineForm />`      | Par paires, 4 réponses + correcte   |
-| Sel ou Poivre     | `<SaltOrPepperQuestionInlineForm />` | Réponse = dropdown des propositions |
-| Menus             | `<MenuThemeInlineForm />` + `<MenusQuestionInlineForm />` | 3 slots de thèmes (2 CL + 1 TR)    |
-| Addition          | `<AdditionQuestionInlineForm />`     | Énoncé + réponse courte             |
-| Burger de la mort | `<DeadlyBurgerQuestionInlineForm />` | Énoncé seul (pas de réponse)        |
+| Manche            | InlineForm                                                | Particularité                       |
+| ----------------- | --------------------------------------------------------- | ----------------------------------- |
+| Nuggets           | `<NuggetsQuestionInlineForm />`                           | Par paires, 4 réponses + correcte   |
+| Sel ou Poivre     | `<SaltOrPepperQuestionInlineForm />`                      | Réponse = dropdown des propositions |
+| Menus             | `<MenuThemeInlineForm />` + `<MenusQuestionInlineForm />` | 3 slots de thèmes (2 CL + 1 TR)     |
+| Addition          | `<AdditionQuestionInlineForm />`                          | Énoncé + réponse courte             |
+| Burger de la mort | `<DeadlyBurgerQuestionInlineForm />`                      | Énoncé seul (pas de réponse)        |
 
 > **Note Menus** : La manche Menus a une structure imbriquée. Le `<MenusForm />` contient 3 slots pour des `MenuTheme`. Chaque slot permet d'**attacher** un thème existant ou de **créer** un nouveau thème via `<MenuThemeInlineForm />`. Les questions sont gérées au niveau du thème via `<MenusQuestionInlineForm />`.
 

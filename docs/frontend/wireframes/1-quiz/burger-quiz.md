@@ -245,32 +245,32 @@ Slot individuel pour une manche (générique).
 
 Éditeur drag & drop de la structure ordonnée du quiz.
 
-| Prop       | Type                  | Description                              |
-| ---------- | --------------------- | ---------------------------------------- |
-| quizId     | string                | ID du Burger Quiz                        |
-| structure  | BurgerQuizElement[]   | Structure actuelle                       |
-| onSave     | (elements) => void    | Callback de sauvegarde                   |
-| isLoading? | boolean               | État de chargement                       |
+| Prop       | Type                | Description            |
+| ---------- | ------------------- | ---------------------- |
+| quizId     | string              | ID du Burger Quiz      |
+| structure  | BurgerQuizElement[] | Structure actuelle     |
+| onSave     | (elements) => void  | Callback de sauvegarde |
+| isLoading? | boolean             | État de chargement     |
 
 #### `<StructureElement />`
 
 Élément individuel dans la structure (manche ou interlude).
 
-| Prop         | Type              | Description                              |
-| ------------ | ----------------- | ---------------------------------------- |
-| element      | BurgerQuizElement | Données de l'élément                     |
-| index        | number            | Position dans la liste                   |
-| isDragging?  | boolean           | État de drag                             |
-| onRemove?    | () => void        | Suppression (interludes uniquement)      |
+| Prop        | Type              | Description                         |
+| ----------- | ----------------- | ----------------------------------- |
+| element     | BurgerQuizElement | Données de l'élément                |
+| index       | number            | Position dans la liste              |
+| isDragging? | boolean           | État de drag                        |
+| onRemove?   | () => void        | Suppression (interludes uniquement) |
 
 #### `<AddInterludeButton />`
 
 Bouton pour ajouter un interlude à la structure.
 
-| Prop       | Type              | Description                              |
-| ---------- | ----------------- | ---------------------------------------- |
-| onSelect   | (interlude) => void | Callback quand un interlude est choisi |
-| position?  | number            | Position d'insertion souhaitée           |
+| Prop      | Type                | Description                            |
+| --------- | ------------------- | -------------------------------------- |
+| onSelect  | (interlude) => void | Callback quand un interlude est choisi |
+| position? | number              | Position d'insertion souhaitée         |
 
 ---
 
@@ -370,23 +370,23 @@ Pour attacher une manche existante au quiz.
 
 ### Page BurgerQuizDetailEdit
 
-| Action              | Méthode | Endpoint                                   | Body / Params                       |
-| ------------------- | ------- | ------------------------------------------ | ----------------------------------- |
-| Charger quiz        | GET     | `/api/quiz/burger-quizzes/{id}/`           | —                                   |
-| Modifier infos      | PATCH   | `/api/quiz/burger-quizzes/{id}/`           | `{ title?, toss?, tags? }`          |
-| Attacher manche     | PATCH   | `/api/quiz/burger-quizzes/{id}/`           | `{ nuggets_id: 123 }` (ex.)         |
-| Détacher manche     | PATCH   | `/api/quiz/burger-quizzes/{id}/`           | `{ nuggets_id: null }` (ex.)        |
-| Supprimer quiz      | DELETE  | `/api/quiz/burger-quizzes/{id}/`           | —                                   |
-| Charger structure   | GET     | `/api/quiz/burger-quizzes/{id}/structure/` | —                                   |
-| Sauver structure    | PUT     | `/api/quiz/burger-quizzes/{id}/structure/` | `{ elements: [...] }`               |
+| Action            | Méthode | Endpoint                                   | Body / Params                |
+| ----------------- | ------- | ------------------------------------------ | ---------------------------- |
+| Charger quiz      | GET     | `/api/quiz/burger-quizzes/{id}/`           | —                            |
+| Modifier infos    | PATCH   | `/api/quiz/burger-quizzes/{id}/`           | `{ title?, toss?, tags? }`   |
+| Attacher manche   | PATCH   | `/api/quiz/burger-quizzes/{id}/`           | `{ nuggets_id: 123 }` (ex.)  |
+| Détacher manche   | PATCH   | `/api/quiz/burger-quizzes/{id}/`           | `{ nuggets_id: null }` (ex.) |
+| Supprimer quiz    | DELETE  | `/api/quiz/burger-quizzes/{id}/`           | —                            |
+| Charger structure | GET     | `/api/quiz/burger-quizzes/{id}/structure/` | —                            |
+| Sauver structure  | PUT     | `/api/quiz/burger-quizzes/{id}/structure/` | `{ elements: [...] }`        |
 
 ### Structure (BurgerQuizElement)
 
-| Champ          | Type        | Description                                        |
-| -------------- | ----------- | -------------------------------------------------- |
-| element_type   | string      | `"round"` ou `"interlude"`                         |
-| round_type     | string?     | `"NU"`, `"SP"`, `"ME"`, `"AD"`, `"DB"` (si round)  |
-| interlude_id   | string?     | UUID de l'interlude (si interlude)                 |
+| Champ        | Type    | Description                                       |
+| ------------ | ------- | ------------------------------------------------- |
+| element_type | string  | `"round"` ou `"interlude"`                        |
+| round_type   | string? | `"NU"`, `"SP"`, `"ME"`, `"AD"`, `"DB"` (si round) |
+| interlude_id | string? | UUID de l'interlude (si interlude)                |
 
 ### Exemple de payload structure
 

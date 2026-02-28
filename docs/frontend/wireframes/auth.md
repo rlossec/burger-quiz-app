@@ -40,9 +40,9 @@ Connexion par email ou identifiant + mot de passe. Lien « Mot de passe oublié 
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Connexion | POST | `/api/auth/jwt/create/` | [api-reference](../../backend/api-reference.md) §1.1 |
+| Action    | Méthode | Endpoint                | Réf.                                                 |
+| --------- | ------- | ----------------------- | ---------------------------------------------------- |
+| Connexion | POST    | `/api/auth/jwt/create/` | [api-reference](../../backend/api-reference.md) §1.1 |
 
 ---
 
@@ -69,9 +69,9 @@ Création de compte : email, username, mot de passe, confirmation. Compte créé
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Inscription | POST | `/api/auth/users/` | [api-reference](../../backend/api-reference.md) §1.2 |
+| Action      | Méthode | Endpoint           | Réf.                                                 |
+| ----------- | ------- | ------------------ | ---------------------------------------------------- |
+| Inscription | POST    | `/api/auth/users/` | [api-reference](../../backend/api-reference.md) §1.2 |
 
 ---
 
@@ -87,9 +87,9 @@ Succès : message + ( Se connecter ). Échec : message + ( Renvoyer l'email d'ac
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Activer le compte | POST | `/api/auth/users/activation/` | [api-reference](../../backend/api-reference.md) §1.3 |
+| Action            | Méthode | Endpoint                      | Réf.                                                 |
+| ----------------- | ------- | ----------------------------- | ---------------------------------------------------- |
+| Activer le compte | POST    | `/api/auth/users/activation/` | [api-reference](../../backend/api-reference.md) §1.3 |
 
 ---
 
@@ -114,9 +114,9 @@ Champ email du compte. Bouton Envoyer. Message de confirmation neutre (« Si un 
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Renvoyer activation | POST | `/api/auth/users/resend_activation/` | [api-reference](../../backend/api-reference.md) §1.3 |
+| Action              | Méthode | Endpoint                             | Réf.                                                 |
+| ------------------- | ------- | ------------------------------------ | ---------------------------------------------------- |
+| Renvoyer activation | POST    | `/api/auth/users/resend_activation/` | [api-reference](../../backend/api-reference.md) §1.3 |
 
 ---
 
@@ -141,9 +141,9 @@ Champ email. Bouton Envoyer le lien. Message neutre après envoi. Lien Retour à
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Demande reset | POST | `/api/auth/users/reset_password/` | [api-reference](../../backend/api-reference.md) §1.3 |
+| Action        | Méthode | Endpoint                          | Réf.                                                 |
+| ------------- | ------- | --------------------------------- | ---------------------------------------------------- |
+| Demande reset | POST    | `/api/auth/users/reset_password/` | [api-reference](../../backend/api-reference.md) §1.3 |
 
 ---
 
@@ -167,9 +167,9 @@ Page via lien email (uid + token dans l’URL). Champs : nouveau mot de passe, c
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Confirmer nouveau MDP | POST | `/api/auth/users/reset_password_confirm/` | [api-reference](../../backend/api-reference.md) §1.3 |
+| Action                | Méthode | Endpoint                                  | Réf.                                                 |
+| --------------------- | ------- | ----------------------------------------- | ---------------------------------------------------- |
+| Confirmer nouveau MDP | POST    | `/api/auth/users/reset_password_confirm/` | [api-reference](../../backend/api-reference.md) §1.3 |
 
 ---
 
@@ -192,9 +192,9 @@ Page dans l’app (utilisateur connecté). Email actuel en lecture seule, champ 
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Modifier email | PATCH | `/api/auth/users/me/` ou `PATCH /api/auth/users/{id}/` | [api-reference](../../backend/api-reference.md) §1.2 |
+| Action         | Méthode | Endpoint                                               | Réf.                                                 |
+| -------------- | ------- | ------------------------------------------------------ | ---------------------------------------------------- |
+| Modifier email | PATCH   | `/api/auth/users/me/` ou `PATCH /api/auth/users/{id}/` | [api-reference](../../backend/api-reference.md) §1.2 |
 
 ---
 

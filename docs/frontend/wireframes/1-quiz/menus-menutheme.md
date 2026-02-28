@@ -203,6 +203,7 @@ Affichage : titre, description, les 3 thèmes (menu 1, menu 2, menu troll) avec 
 ### Principe
 
 Page dédiée pour créer/modifier une manche Menus. Contient **3 slots de MenuTheme** :
+
 - 2 slots Classique (CL)
 - 1 slot Troll (TR)
 
@@ -255,12 +256,12 @@ Chaque slot permet soit d'**attacher** un thème existant, soit de **créer** un
 
 ### Appels API
 
-| Action                        | Méthode   | Endpoint                            | Réf.                                                    |
-| ----------------------------- | --------- | ----------------------------------- | ------------------------------------------------------- |
-| Créer manche                  | POST      | `/api/quiz/menus/`                  | [api-reference](../../../backend/api-reference.md) §2.4 |
-| Modifier manche               | PUT/PATCH | `/api/quiz/menus/{id}/`             | idem                                                    |
-| Liste thèmes (pour recherche) | GET       | `/api/quiz/menu-themes/?type=CL`    | idem                                                    |
-| Créer thème (inline)          | POST      | `/api/quiz/menu-themes/`            | idem                                                    |
+| Action                        | Méthode   | Endpoint                         | Réf.                                                    |
+| ----------------------------- | --------- | -------------------------------- | ------------------------------------------------------- |
+| Créer manche                  | POST      | `/api/quiz/menus/`               | [api-reference](../../../backend/api-reference.md) §2.4 |
+| Modifier manche               | PUT/PATCH | `/api/quiz/menus/{id}/`          | idem                                                    |
+| Liste thèmes (pour recherche) | GET       | `/api/quiz/menu-themes/?type=CL` | idem                                                    |
+| Créer thème (inline)          | POST      | `/api/quiz/menu-themes/`         | idem                                                    |
 
 ---
 
@@ -373,8 +374,8 @@ Composant inline pour créer un MenuTheme directement dans le formulaire de manc
 
 ```typescript
 interface MenuThemeInlineFormProps {
-  type: 'CL' | 'TR';                    // Type imposé par le slot
-  theme?: MenuTheme;                    // Thème existant (édition)
+  type: "CL" | "TR"; // Type imposé par le slot
+  theme?: MenuTheme; // Thème existant (édition)
   onSave: (data: MenuThemeData) => void;
   onCancel: () => void;
 }
@@ -382,13 +383,13 @@ interface MenuThemeInlineFormProps {
 
 ### États de sauvegarde
 
-| Statut   | Icône | Description                | Couleur |
-| -------- | ----- | -------------------------- | ------- |
-| `new`    | 📝    | Nouveau thème              | Gris    |
-| `dirty`  | ⏳    | Non sauvegardé             | Jaune   |
-| `saving` | ⏳    | Sauvegarde en cours        | Bleu    |
-| `saved`  | ✓     | Sauvegardé                 | Vert    |
-| `error`  | ⚠️    | Erreur de validation/save  | Rouge   |
+| Statut   | Icône | Description               | Couleur |
+| -------- | ----- | ------------------------- | ------- |
+| `new`    | 📝    | Nouveau thème             | Gris    |
+| `dirty`  | ⏳    | Non sauvegardé            | Jaune   |
+| `saving` | ⏳    | Sauvegarde en cours       | Bleu    |
+| `saved`  | ✓     | Sauvegardé                | Vert    |
+| `error`  | ⚠️    | Erreur de validation/save | Rouge   |
 
 ### Wireframe détaillé
 
@@ -457,10 +458,10 @@ interface MenuThemeInlineFormProps {
 
 ### Validation
 
-| Champ      | Règle                                  |
-| ---------- | -------------------------------------- |
-| Titre      | Requis, min 3 caractères               |
-| Questions  | Au moins 1 requise, toutes validées    |
+| Champ     | Règle                               |
+| --------- | ----------------------------------- |
+| Titre     | Requis, min 3 caractères            |
+| Questions | Au moins 1 requise, toutes validées |
 
 ---
 
@@ -474,8 +475,8 @@ Composant inline pour saisir une question de type ME (Menus). Énoncé + répons
 
 ```typescript
 interface MenusQuestionInlineFormProps {
-  question?: MenusQuestion;          // Question existante (édition)
-  index: number;                     // Position dans la liste
+  question?: MenusQuestion; // Question existante (édition)
+  index: number; // Position dans la liste
   onSave: (data: MenusQuestionData) => void;
   onRemove?: () => void;
 }
@@ -483,13 +484,13 @@ interface MenusQuestionInlineFormProps {
 
 ### États de sauvegarde
 
-| Statut   | Icône | Description                | Couleur |
-| -------- | ----- | -------------------------- | ------- |
-| `new`    | 📝    | Nouvelle question          | Gris    |
-| `dirty`  | ⏳    | Non sauvegardée            | Jaune   |
-| `saving` | ⏳    | Sauvegarde en cours        | Bleu    |
-| `saved`  | ✓     | Sauvegardée                | Vert    |
-| `error`  | ⚠️    | Erreur de validation/save  | Rouge   |
+| Statut   | Icône | Description               | Couleur |
+| -------- | ----- | ------------------------- | ------- |
+| `new`    | 📝    | Nouvelle question         | Gris    |
+| `dirty`  | ⏳    | Non sauvegardée           | Jaune   |
+| `saving` | ⏳    | Sauvegarde en cours       | Bleu    |
+| `saved`  | ✓     | Sauvegardée               | Vert    |
+| `error`  | ⚠️    | Erreur de validation/save | Rouge   |
 
 ### Wireframe détaillé
 
@@ -522,10 +523,10 @@ interface MenusQuestionInlineFormProps {
 
 ### Validation
 
-| Champ          | Règle                       |
-| -------------- | --------------------------- |
-| Énoncé         | Requis, min 10 caractères   |
-| Réponse courte | Requis, max 100 caractères  |
+| Champ          | Règle                      |
+| -------------- | -------------------------- |
+| Énoncé         | Requis, min 10 caractères  |
+| Réponse courte | Requis, max 100 caractères |
 
 ---
 
@@ -584,29 +585,29 @@ BurgerQuizDetailEdit
 
 ### Composants
 
-| Composant                     | Description                                   |
-| ----------------------------- | --------------------------------------------- |
-| `<MenusForm />`               | Formulaire manche Menus (3 slots)             |
-| `<MenuThemeInlineForm />`     | Création inline d'un thème dans un slot       |
-| `<MenusQuestionInlineForm />` | Question type ME avec énoncé + réponse courte |
-| `<SearchAndSelectMenus />`    | Recherche manche Menus existante              |
-| `<SearchAndSelectMenuTheme />`| Recherche thème existant (filtre CL/TR)       |
+| Composant                      | Description                                   |
+| ------------------------------ | --------------------------------------------- |
+| `<MenusForm />`                | Formulaire manche Menus (3 slots)             |
+| `<MenuThemeInlineForm />`      | Création inline d'un thème dans un slot       |
+| `<MenusQuestionInlineForm />`  | Question type ME avec énoncé + réponse courte |
+| `<SearchAndSelectMenus />`     | Recherche manche Menus existante              |
+| `<SearchAndSelectMenuTheme />` | Recherche thème existant (filtre CL/TR)       |
 
 ---
 
 ## Appels API récapitulatifs
 
-| Action                         | Méthode   | Endpoint                                | Réf.  |
-| ------------------------------ | --------- | --------------------------------------- | ----- |
-| Lister thèmes                  | GET       | `/api/quiz/menu-themes/`                | §2.4  |
-| Lister thèmes (filtre type)    | GET       | `/api/quiz/menu-themes/?type=CL`        | §2.4  |
-| Détail thème                   | GET       | `/api/quiz/menu-themes/{id}/`           | §2.4  |
-| Créer thème                    | POST      | `/api/quiz/menu-themes/`                | §2.4  |
-| Modifier thème                 | PATCH     | `/api/quiz/menu-themes/{id}/`           | §2.4  |
-| Supprimer thème                | DELETE    | `/api/quiz/menu-themes/{id}/`           | §2.4  |
-| Lister manches Menus           | GET       | `/api/quiz/menus/`                      | §2.4  |
-| Détail manche Menus            | GET       | `/api/quiz/menus/{id}/`                 | §2.4  |
-| Créer manche Menus             | POST      | `/api/quiz/menus/`                      | §2.4  |
-| Modifier manche Menus          | PATCH     | `/api/quiz/menus/{id}/`                 | §2.4  |
-| Supprimer manche Menus         | DELETE    | `/api/quiz/menus/{id}/`                 | §2.4  |
-| Rechercher questions (type ME) | GET       | `/api/quiz/questions/?question_type=ME` | §2.1  |
+| Action                         | Méthode | Endpoint                                | Réf. |
+| ------------------------------ | ------- | --------------------------------------- | ---- |
+| Lister thèmes                  | GET     | `/api/quiz/menu-themes/`                | §2.4 |
+| Lister thèmes (filtre type)    | GET     | `/api/quiz/menu-themes/?type=CL`        | §2.4 |
+| Détail thème                   | GET     | `/api/quiz/menu-themes/{id}/`           | §2.4 |
+| Créer thème                    | POST    | `/api/quiz/menu-themes/`                | §2.4 |
+| Modifier thème                 | PATCH   | `/api/quiz/menu-themes/{id}/`           | §2.4 |
+| Supprimer thème                | DELETE  | `/api/quiz/menu-themes/{id}/`           | §2.4 |
+| Lister manches Menus           | GET     | `/api/quiz/menus/`                      | §2.4 |
+| Détail manche Menus            | GET     | `/api/quiz/menus/{id}/`                 | §2.4 |
+| Créer manche Menus             | POST    | `/api/quiz/menus/`                      | §2.4 |
+| Modifier manche Menus          | PATCH   | `/api/quiz/menus/{id}/`                 | §2.4 |
+| Supprimer manche Menus         | DELETE  | `/api/quiz/menus/{id}/`                 | §2.4 |
+| Rechercher questions (type ME) | GET     | `/api/quiz/questions/?question_type=ME` | §2.1 |

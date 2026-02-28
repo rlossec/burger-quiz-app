@@ -124,30 +124,30 @@ Structure des pages et URLs du frontend.
 
 ### Composants principaux
 
-| Composant              | Description                            | Utilisé dans       |
-| ---------------------- | -------------------------------------- | ------------------ |
-| `<BurgerQuizForm />`   | Formulaire titre/toss/tags             | Create, DetailEdit |
-| `<BQDetailCard />`     | Affichage lecture seule des infos quiz | DetailEdit         |
-| `<RoundStructure />`   | Structure des 5 manches avec slots     | DetailEdit         |
-| `<RoundSlot />`        | Slot individuel pour une manche        | RoundStructure     |
+| Composant            | Description                            | Utilisé dans       |
+| -------------------- | -------------------------------------- | ------------------ |
+| `<BurgerQuizForm />` | Formulaire titre/toss/tags             | Create, DetailEdit |
+| `<BQDetailCard />`   | Affichage lecture seule des infos quiz | DetailEdit         |
+| `<RoundStructure />` | Structure des 5 manches avec slots     | DetailEdit         |
+| `<RoundSlot />`      | Slot individuel pour une manche        | RoundStructure     |
 
 ### Formulaires de manches (dans modales)
 
-| Composant              | Description                                  |
-| ---------------------- | -------------------------------------------- |
-| `<NuggetsForm />`      | Formulaire manche Nuggets                    |
-| `<SaltOrPepperForm />` | Formulaire manche SP                         |
-| `<MenusForm />`        | Formulaire manche Menus (3 slots de thèmes)  |
-| `<AdditionForm />`     | Formulaire manche Addition                   |
-| `<DeadlyBurgerForm />` | Formulaire manche DB                         |
+| Composant              | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `<NuggetsForm />`      | Formulaire manche Nuggets                   |
+| `<SaltOrPepperForm />` | Formulaire manche SP                        |
+| `<MenusForm />`        | Formulaire manche Menus (3 slots de thèmes) |
+| `<AdditionForm />`     | Formulaire manche Addition                  |
+| `<DeadlyBurgerForm />` | Formulaire manche DB                        |
 
 ### Composants Menus (structure imbriquée)
 
-| Composant                  | Description                                      |
-| -------------------------- | ------------------------------------------------ |
-| `<MenuThemeSlot />`        | Slot pour un thème (CL ou TR) dans MenusForm     |
-| `<MenuThemeInlineForm />`  | Création inline d'un thème dans un slot          |
-| `<MenusQuestionInlineForm />`| Question ME dans un MenuThemeInlineForm        |
+| Composant                     | Description                                  |
+| ----------------------------- | -------------------------------------------- |
+| `<MenuThemeSlot />`           | Slot pour un thème (CL ou TR) dans MenusForm |
+| `<MenuThemeInlineForm />`     | Création inline d'un thème dans un slot      |
+| `<MenusQuestionInlineForm />` | Question ME dans un MenuThemeInlineForm      |
 
 > **Note Menus** : `MenusForm` contient 3 `MenuThemeSlot` (2 Classique + 1 Troll). Chaque slot permet d'**attacher** un thème existant via `SearchAndSelectMenuTheme` ou de **créer** un thème via `MenuThemeInlineForm`.
 
@@ -163,32 +163,32 @@ Structure des pages et URLs du frontend.
 
 ### Composants de recherche/sélection
 
-| Composant                         | Description                            |
-| --------------------------------- | -------------------------------------- |
-| `<SearchAndSelectNuggets />`      | Recherche et sélection Nuggets         |
-| `<SearchAndSelectSaltOrPepper />` | Recherche et sélection SP              |
-| `<SearchAndSelectMenus />`        | Recherche et sélection manche Menus    |
-| `<SearchAndSelectMenuTheme />`    | Recherche thème (filtre par type CL/TR)|
-| `<SearchAndSelectAddition />`     | Recherche et sélection Addition        |
-| `<SearchAndSelectDeadlyBurger />` | Recherche et sélection DB              |
-| `<SearchAndSelectInterlude />`    | Recherche et sélection interlude       |
+| Composant                         | Description                             |
+| --------------------------------- | --------------------------------------- |
+| `<SearchAndSelectNuggets />`      | Recherche et sélection Nuggets          |
+| `<SearchAndSelectSaltOrPepper />` | Recherche et sélection SP               |
+| `<SearchAndSelectMenus />`        | Recherche et sélection manche Menus     |
+| `<SearchAndSelectMenuTheme />`    | Recherche thème (filtre par type CL/TR) |
+| `<SearchAndSelectAddition />`     | Recherche et sélection Addition         |
+| `<SearchAndSelectDeadlyBurger />` | Recherche et sélection DB               |
+| `<SearchAndSelectInterlude />`    | Recherche et sélection interlude        |
 
 ### Composants Interludes
 
-| Composant                 | Description                                     |
-| ------------------------- | ----------------------------------------------- |
-| `<InterludeForm />`       | Formulaire création/édition d'un interlude      |
-| `<InterludeCard />`       | Affichage d'un interlude (avec preview YouTube) |
-| `<YouTubePreview />`      | Miniature et aperçu d'une vidéo YouTube         |
+| Composant            | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `<InterludeForm />`  | Formulaire création/édition d'un interlude      |
+| `<InterludeCard />`  | Affichage d'un interlude (avec preview YouTube) |
+| `<YouTubePreview />` | Miniature et aperçu d'une vidéo YouTube         |
 
 ### Composants Structure (BurgerQuizDetailEdit)
 
-| Composant                    | Description                                           |
-| ---------------------------- | ----------------------------------------------------- |
-| `<QuizStructureEditor />`    | Éditeur drag & drop de la structure manches/interludes|
-| `<StructureElement />`       | Élément dans la structure (manche ou interlude)       |
-| `<AddInterludes />`          | Bouton/menu pour insérer un interlude dans la structure|
-| `<InterludeSlot />`          | Slot d'interlude dans la structure                    |
+| Composant                 | Description                                             |
+| ------------------------- | ------------------------------------------------------- |
+| `<QuizStructureEditor />` | Éditeur drag & drop de la structure manches/interludes  |
+| `<StructureElement />`    | Élément dans la structure (manche ou interlude)         |
+| `<AddInterludes />`       | Bouton/menu pour insérer un interlude dans la structure |
+| `<InterludeSlot />`       | Slot d'interlude dans la structure                      |
 
 > **Note Structure** : La structure d'un Burger Quiz est désormais une liste ordonnée d'éléments (manches et interludes). L'utilisateur peut réordonner les éléments par drag & drop et insérer des interludes entre les manches.
 

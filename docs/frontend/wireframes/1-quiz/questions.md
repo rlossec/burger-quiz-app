@@ -161,7 +161,7 @@ Les composants `InlineQuestionForm` sont utilisés **à l'intérieur** des formu
 ### États de sauvegarde (commun à tous les InlineForm)
 
 ```typescript
-type SaveStatus = 'new' | 'dirty' | 'saving' | 'saved' | 'error';
+type SaveStatus = "new" | "dirty" | "saving" | "saved" | "error";
 
 interface QuestionInlineFormState {
   status: SaveStatus;
@@ -170,13 +170,13 @@ interface QuestionInlineFormState {
 }
 ```
 
-| Statut   | Icône | Description                | Couleur | Bouton Valider |
-| -------- | ----- | -------------------------- | ------- | -------------- |
-| `new`    | 📝    | Nouvelle question          | Gris    | Activé         |
-| `dirty`  | ⏳    | Non sauvegardée            | Jaune   | Activé         |
-| `saving` | ⏳    | Sauvegarde en cours        | Bleu    | Désactivé      |
-| `saved`  | ✓     | Sauvegardée                | Vert    | Activé         |
-| `error`  | ⚠️    | Erreur de validation/save  | Rouge   | Activé         |
+| Statut   | Icône | Description               | Couleur | Bouton Valider |
+| -------- | ----- | ------------------------- | ------- | -------------- |
+| `new`    | 📝    | Nouvelle question         | Gris    | Activé         |
+| `dirty`  | ⏳    | Non sauvegardée           | Jaune   | Activé         |
+| `saving` | ⏳    | Sauvegarde en cours       | Bleu    | Désactivé      |
+| `saved`  | ✓     | Sauvegardée               | Vert    | Activé         |
+| `error`  | ⚠️    | Erreur de validation/save | Rouge   | Activé         |
 
 ### Affichage du statut
 
@@ -189,13 +189,13 @@ interface QuestionInlineFormState {
 
 ### Composants par type de manche
 
-| Manche            | Composant                            | Particularités                        |
-| ----------------- | ------------------------------------ | ------------------------------------- |
-| Nuggets           | `<NuggetsQuestionInlineForm />`      | Par paires, 4 réponses + correcte     |
-| Sel ou Poivre     | `<SaltOrPepperQuestionInlineForm />` | Réponse = dropdown des propositions   |
+| Manche            | Composant                            | Particularités                                      |
+| ----------------- | ------------------------------------ | --------------------------------------------------- |
+| Nuggets           | `<NuggetsQuestionInlineForm />`      | Par paires, 4 réponses + correcte                   |
+| Sel ou Poivre     | `<SaltOrPepperQuestionInlineForm />` | Réponse = dropdown des propositions                 |
 | Menus             | `<MenusQuestionInlineForm />`        | Dans `MenuThemeInlineForm`, énoncé + réponse courte |
-| Addition          | `<AdditionQuestionInlineForm />`     | Énoncé + réponse courte               |
-| Burger de la mort | `<DeadlyBurgerQuestionInlineForm />` | Énoncé seul (pas de réponse)          |
+| Addition          | `<AdditionQuestionInlineForm />`     | Énoncé + réponse courte                             |
+| Burger de la mort | `<DeadlyBurgerQuestionInlineForm />` | Énoncé seul (pas de réponse)                        |
 
 > **Note Menus** : Les questions Menus sont gérées au niveau du **MenuTheme**, pas de la manche Menus directement. Le `<MenusForm />` contient 3 slots de thèmes, et c'est dans chaque `<MenuThemeInlineForm />` que l'on ajoute des `<MenusQuestionInlineForm />`.
 
@@ -358,22 +358,22 @@ Statut: ⏳ Non sauvegardée (dirty)
 
 ## 6 - Validation par type de question
 
-| Type | Champs requis                              | Validation                                      |
-| ---- | ------------------------------------------ | ----------------------------------------------- |
-| NU   | Énoncé, 4 réponses, 1 correcte             | Énoncé min 10 car, toutes réponses non vides    |
-| SP   | Énoncé, réponse (dropdown)                 | Énoncé min 10 car, réponse dans les propositions|
-| ME   | Énoncé, réponse courte                     | Énoncé min 10 car, réponse non vide             |
-| AD   | Énoncé, réponse courte                     | Énoncé min 10 car, réponse non vide             |
-| DB   | Énoncé                                     | Énoncé min 10 car                               |
+| Type | Champs requis                  | Validation                                       |
+| ---- | ------------------------------ | ------------------------------------------------ |
+| NU   | Énoncé, 4 réponses, 1 correcte | Énoncé min 10 car, toutes réponses non vides     |
+| SP   | Énoncé, réponse (dropdown)     | Énoncé min 10 car, réponse dans les propositions |
+| ME   | Énoncé, réponse courte         | Énoncé min 10 car, réponse non vide              |
+| AD   | Énoncé, réponse courte         | Énoncé min 10 car, réponse non vide              |
+| DB   | Énoncé                         | Énoncé min 10 car                                |
 
 ---
 
 ## Appels API récapitulatifs
 
-| Action                       | Méthode   | Endpoint                                                         | Réf.  |
-| ---------------------------- | --------- | ---------------------------------------------------------------- | ----- |
-| Lister (recherche + filtres) | GET       | `/api/quiz/questions/?search=...&question_type=...&original=...` | §2.1  |
-| Détail                       | GET       | `/api/quiz/questions/{id}/`                                      | §2.1  |
-| Créer                        | POST      | `/api/quiz/questions/`                                           | §2.1  |
-| Modifier                     | PATCH     | `/api/quiz/questions/{id}/`                                      | §2.1  |
-| Supprimer                    | DELETE    | `/api/quiz/questions/{id}/`                                      | §2.1  |
+| Action                       | Méthode | Endpoint                                                         | Réf. |
+| ---------------------------- | ------- | ---------------------------------------------------------------- | ---- |
+| Lister (recherche + filtres) | GET     | `/api/quiz/questions/?search=...&question_type=...&original=...` | §2.1 |
+| Détail                       | GET     | `/api/quiz/questions/{id}/`                                      | §2.1 |
+| Créer                        | POST    | `/api/quiz/questions/`                                           | §2.1 |
+| Modifier                     | PATCH   | `/api/quiz/questions/{id}/`                                      | §2.1 |
+| Supprimer                    | DELETE  | `/api/quiz/questions/{id}/`                                      | §2.1 |

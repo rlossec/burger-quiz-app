@@ -13,6 +13,7 @@ L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans
 **Version :** 0.0
 
 **Fonctionne :**
+
 - Squelette app (backend Django/DRF, frontend React/Vite, Docker, PostgreSQL)
 - Modèles quiz (Questions, manches, Burger Quiz)
 - API CRUD quiz complète (tous les endpoints implémentés et documentés)
@@ -20,6 +21,7 @@ L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans
 - Fixtures et chargement de données
 
 **Manque :**
+
 - Parcours frontend complet (pages BurgerQuizList, BurgerQuizCreate, etc.)
 - Session de jeu (V0.2)
 - Animations, scores, buzzer
@@ -36,9 +38,9 @@ L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans
 
 ## 4. Docs de suivi
 
-| Doc | Rôle |
-|-----|------|
-| [ROADMAP.md](ROADMAP.md) | Étapes globales (préparation, développement) |
-| [BACKLOG.md](BACKLOG.md) | User stories, parcours, ordre API, lien spec détaillée |
-| [IDEAS.md](IDEAS.md) | Idées / améliorations non priorisées |
-| [../backend/api-reference.md](../backend/api-reference.md) | Référence API (Accounts + Quiz, corps, contraintes) |
+| Doc                                                        | Rôle                                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------ |
+| [ROADMAP.md](ROADMAP.md)                                   | Étapes globales (préparation, développement)           |
+| [BACKLOG.md](BACKLOG.md)                                   | User stories, parcours, ordre API, lien spec détaillée |
+| [IDEAS.md](IDEAS.md)                                       | Idées / améliorations non priorisées                   |
+| [../backend/api-reference.md](../backend/api-reference.md) | Référence API (Accounts + Quiz, corps, contraintes)    |

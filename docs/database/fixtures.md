@@ -33,6 +33,6 @@ docker compose exec backend uv run python manage.py dumpdata --indent 2 quiz > b
 
 ## Fichiers de fixtures
 
-| Fichier | Description |
-|---------|-------------|
+| Fichier          | Description                                 |
+| ---------------- | ------------------------------------------- |
 | `quiz_data.json` | Données du quiz (questions, réponses, etc.) |

@@ -36,10 +36,10 @@ Liste des interludes vidéo YouTube disponibles. Filtres par type (Intro, Outro,
 
 ### Appels API
 
-| Action     | Méthode | Endpoint                            | Params                   |
-| ---------- | ------- | ----------------------------------- | ------------------------ |
-| Lister     | GET     | `/api/quiz/interludes/`             | `?type=IN&search=...`    |
-| Supprimer  | DELETE  | `/api/quiz/interludes/{id}/`        | —                        |
+| Action    | Méthode | Endpoint                     | Params                |
+| --------- | ------- | ---------------------------- | --------------------- |
+| Lister    | GET     | `/api/quiz/interludes/`      | `?type=IN&search=...` |
+| Supprimer | DELETE  | `/api/quiz/interludes/{id}/` | —                     |
 
 ---
 
@@ -101,16 +101,16 @@ Formulaire de création/édition d'un interlude.
 
 Prévisualisation d'une vidéo YouTube à partir de l'URL.
 
-| Prop        | Type    | Description                      |
-| ----------- | ------- | -------------------------------- |
-| youtubeUrl  | string  | URL YouTube à prévisualiser      |
-| showPlayer? | boolean | Afficher le player intégré       |
+| Prop        | Type    | Description                 |
+| ----------- | ------- | --------------------------- |
+| youtubeUrl  | string  | URL YouTube à prévisualiser |
+| showPlayer? | boolean | Afficher le player intégré  |
 
 ### Appels API
 
-| Action | Méthode | Endpoint               | Body                                        |
-| ------ | ------- | ---------------------- | ------------------------------------------- |
-| Créer  | POST    | `/api/quiz/interludes/`| `{ title, youtube_url, interlude_type, ...}`|
+| Action | Méthode | Endpoint                | Body                                         |
+| ------ | ------- | ----------------------- | -------------------------------------------- |
+| Créer  | POST    | `/api/quiz/interludes/` | `{ title, youtube_url, interlude_type, ...}` |
 
 ---
 
@@ -196,11 +196,11 @@ Même formulaire que la création, pré-rempli avec les données existantes.
 
 ### Appels API
 
-| Action   | Méthode | Endpoint                     | Body                    |
-| -------- | ------- | ---------------------------- | ----------------------- |
-| Charger  | GET     | `/api/quiz/interludes/{id}/` | —                       |
-| Modifier | PUT     | `/api/quiz/interludes/{id}/` | `{ title, ...}`         |
-| Patch    | PATCH   | `/api/quiz/interludes/{id}/` | `{ champs modifiés }`   |
+| Action   | Méthode | Endpoint                     | Body                  |
+| -------- | ------- | ---------------------------- | --------------------- |
+| Charger  | GET     | `/api/quiz/interludes/{id}/` | —                     |
+| Modifier | PUT     | `/api/quiz/interludes/{id}/` | `{ title, ...}`       |
+| Patch    | PATCH   | `/api/quiz/interludes/{id}/` | `{ champs modifiés }` |
 
 ---
 
@@ -238,9 +238,9 @@ Pour insérer un interlude dans la structure d'un Burger Quiz.
 
 ## 6 - Types d'interludes
 
-| Code | Label      | Icône | Usage typique                        |
-| ---- | ---------- | ----- | ------------------------------------ |
-| IN   | Intro      | 🎬    | Début du quiz                        |
-| OU   | Outro      | 🎬    | Fin du quiz, crédits                 |
-| PU   | Pub        | 📺    | Pause publicitaire entre les manches |
-| IL   | Interlude  | 🎵    | Transition musicale, pause           |
+| Code | Label     | Icône | Usage typique                        |
+| ---- | --------- | ----- | ------------------------------------ |
+| IN   | Intro     | 🎬    | Début du quiz                        |
+| OU   | Outro     | 🎬    | Fin du quiz, crédits                 |
+| PU   | Pub       | 📺    | Pause publicitaire entre les manches |
+| IL   | Interlude | 🎵    | Transition musicale, pause           |

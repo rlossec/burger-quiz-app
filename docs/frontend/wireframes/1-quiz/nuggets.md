@@ -117,11 +117,11 @@ Page dédiée pour créer/modifier une manche Nuggets. Utilise `<NuggetsForm />`
 
 ### Appels API
 
-| Action                              | Méthode   | Endpoint                                           | Réf.                                                    |
-| ----------------------------------- | --------- | -------------------------------------------------- | ------------------------------------------------------- |
-| Créer                               | POST      | `/api/quiz/nuggets/`                               | [api-reference](../../../backend/api-reference.md) §2.2 |
-| Modifier                            | PUT/PATCH | `/api/quiz/nuggets/{id}/`                          | idem                                                    |
-| Questions (liste / recherche type NU) | GET     | `/api/quiz/questions/?question_type=NU&search=...` | §2.1                                                    |
+| Action                                | Méthode   | Endpoint                                           | Réf.                                                    |
+| ------------------------------------- | --------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Créer                                 | POST      | `/api/quiz/nuggets/`                               | [api-reference](../../../backend/api-reference.md) §2.2 |
+| Modifier                              | PUT/PATCH | `/api/quiz/nuggets/{id}/`                          | idem                                                    |
+| Questions (liste / recherche type NU) | GET       | `/api/quiz/questions/?question_type=NU&search=...` | §2.1                                                    |
 
 ---
 
@@ -214,8 +214,8 @@ Composant inline pour saisir une question Nuggets avec ses 4 réponses et la ré
 
 ```typescript
 interface NuggetsQuestionInlineFormProps {
-  question?: NuggetsQuestion;       // Question existante (édition)
-  index: number;                    // Position dans la paire
+  question?: NuggetsQuestion; // Question existante (édition)
+  index: number; // Position dans la paire
   onSave: (data: NuggetsQuestionData) => void;
   onRemove?: () => void;
 }
@@ -223,13 +223,13 @@ interface NuggetsQuestionInlineFormProps {
 
 ### États de sauvegarde
 
-| Statut   | Icône | Description                | Couleur |
-| -------- | ----- | -------------------------- | ------- |
-| `new`    | 📝    | Nouvelle question          | Gris    |
-| `dirty`  | ⏳    | Non sauvegardée            | Jaune   |
-| `saving` | ⏳    | Sauvegarde en cours        | Bleu    |
-| `saved`  | ✓     | Sauvegardée                | Vert    |
-| `error`  | ⚠️    | Erreur de validation/save  | Rouge   |
+| Statut   | Icône | Description               | Couleur |
+| -------- | ----- | ------------------------- | ------- |
+| `new`    | 📝    | Nouvelle question         | Gris    |
+| `dirty`  | ⏳    | Non sauvegardée           | Jaune   |
+| `saving` | ⏳    | Sauvegarde en cours       | Bleu    |
+| `saved`  | ✓     | Sauvegardée               | Vert    |
+| `error`  | ⚠️    | Erreur de validation/save | Rouge   |
 
 ### Wireframe détaillé
 
@@ -303,21 +303,21 @@ interface NuggetsQuestionInlineFormProps {
 
 ### Validation
 
-| Champ        | Règle                           |
-| ------------ | ------------------------------- |
-| Énoncé       | Requis, min 10 caractères       |
-| Réponses A-D | Toutes requises                 |
-| Correcte     | Exactement une sélectionnée     |
+| Champ        | Règle                       |
+| ------------ | --------------------------- |
+| Énoncé       | Requis, min 10 caractères   |
+| Réponses A-D | Toutes requises             |
+| Correcte     | Exactement une sélectionnée |
 
 ---
 
 ## Appels API récapitulatifs
 
-| Action                              | Méthode   | Endpoint                                           | Réf.  |
-| ----------------------------------- | --------- | -------------------------------------------------- | ----- |
-| Lister manches                      | GET       | `/api/quiz/nuggets/`                               | §2.2  |
-| Détail manche                       | GET       | `/api/quiz/nuggets/{id}/`                          | §2.2  |
-| Créer manche                        | POST      | `/api/quiz/nuggets/`                               | §2.2  |
-| Modifier manche                     | PATCH     | `/api/quiz/nuggets/{id}/`                          | §2.2  |
-| Supprimer manche                    | DELETE    | `/api/quiz/nuggets/{id}/`                          | §2.2  |
-| Rechercher questions (type NU)      | GET       | `/api/quiz/questions/?question_type=NU&search=...` | §2.1  |
+| Action                         | Méthode | Endpoint                                           | Réf. |
+| ------------------------------ | ------- | -------------------------------------------------- | ---- |
+| Lister manches                 | GET     | `/api/quiz/nuggets/`                               | §2.2 |
+| Détail manche                  | GET     | `/api/quiz/nuggets/{id}/`                          | §2.2 |
+| Créer manche                   | POST    | `/api/quiz/nuggets/`                               | §2.2 |
+| Modifier manche                | PATCH   | `/api/quiz/nuggets/{id}/`                          | §2.2 |
+| Supprimer manche               | DELETE  | `/api/quiz/nuggets/{id}/`                          | §2.2 |
+| Rechercher questions (type NU) | GET     | `/api/quiz/questions/?question_type=NU&search=...` | §2.1 |

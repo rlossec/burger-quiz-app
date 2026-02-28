@@ -51,46 +51,46 @@ Amélioration gameplay.
 
 ## État des user stories
 
-| US | Titre | Epic | Statut | Lien |
-| --- | ----- | ------ | ------ | ---- |
-| US-AUTH-01 | Inscription | 1 — Auth | To do | |
-| US-AUTH-02 | Validation email | 1 — Auth | To do | |
-| US-AUTH-03 | Renvoi email validation | 1 — Auth | To do | |
-| US-AUTH-04 | Login | 1 — Auth | To do | |
-| US-AUTH-05 | Mot de passe oublié | 1 — Auth | To do | |
-| US-AUTH-06 | Modifier email | 1 — Auth | To do | |
-| US-BQ-01 | Liste BurgerQuiz | 2 — BurgerQuiz | To do | |
-| US-BQ-02 | Créer BurgerQuiz | 2 — BurgerQuiz | To do | |
-| US-BQ-03 | Modifier BurgerQuiz | 2 — BurgerQuiz | To do | |
-| US-BQ-04 | Supprimer BurgerQuiz | 2 — BurgerQuiz | To do | |
-| US-BQ-NU-01 | Ajouter une manche Nuggets | 2 — BurgerQuiz | To do | |
-| US-BQ-NU-02 | Modifier Manche Nuggets | 2 — BurgerQuiz | To do | |
-| US-BQ-SP-01 | Créer Manche Sel ou Poivre | 2 — BurgerQuiz | To do | |
-| US-BQ-SP-02 | Modifier un Manche Sel ou Poivre | 2 — BurgerQuiz | To do | |
-| US-BQ-ME-01 | Créer Manche Menus | 2 — BurgerQuiz | To do | |
-| US-BQ-ME-02 | Modifier Manche Menus | 2 — BurgerQuiz | To do | |
-| US-BQ-ME-03 | Créer un MenuTheme | 2 — BurgerQuiz | To do | |
-| US-BQ-ME-04 | Modifier un MenuTheme | 2 — BurgerQuiz | To do | |
-| US-BQ-AD-01 | Créer une Manche Addition | 2 — BurgerQuiz | To do | |
-| US-BQ-AD-02 | Modifier une Manche Addition | 2 — BurgerQuiz | To do | |
-| US-BQ-DB-01 | Créer un Burger de la mort | 2 — BurgerQuiz | To do | |
-| US-GAME-01 | Créer session | 3 — Sessions | To do | |
-| US-GAME-02 | Rejoindre session | 3 — Sessions | To do | |
-| US-GAME-03 | Lobby | 3 — Sessions | To do | |
-| US-GAME-04 | Lancer partie | 3 — Sessions | To do | |
-| US-HOST-01 | Voir question | 4 — Interface | To do | |
-| US-HOST-02 | Navigation | 4 — Interface | To do | |
-| US-HOST-03 | Points | 4 — Interface | To do | |
-| US-HOST-04 | Afficher réponse | 4 — Interface | To do | |
-| US-PLAYER-01 | Voir question | 4 — Interface | To do | |
-| US-PLAYER-02 | Voir scores | 4 — Interface | To do | |
-| US-PLAYER-03 | Mise à jour live | 4 — Interface | To do | |
-| US-UX-01 | Navigation | 5 — UX | To do | |
-| US-UX-02 | Messages erreurs | 5 — UX | To do | |
-| US-UX-03 | Loading | 5 — UX | To do | |
-| US-RT-01 | Synchronisation live | 6 — Temps réel | To do | |
-| US-RT-BUZZ-01 | Buzzer | 6 — Temps réel | To do | |
-| US-RT-BUZZ-02 | Affichage buzzer | 6 — Temps réel | To do | |
+| US            | Titre                            | Epic           | Statut | Lien |
+| ------------- | -------------------------------- | -------------- | ------ | ---- |
+| US-AUTH-01    | Inscription                      | 1 — Auth       | To do  |      |
+| US-AUTH-02    | Validation email                 | 1 — Auth       | To do  |      |
+| US-AUTH-03    | Renvoi email validation          | 1 — Auth       | To do  |      |
+| US-AUTH-04    | Login                            | 1 — Auth       | To do  |      |
+| US-AUTH-05    | Mot de passe oublié              | 1 — Auth       | To do  |      |
+| US-AUTH-06    | Modifier email                   | 1 — Auth       | To do  |      |
+| US-BQ-01      | Liste BurgerQuiz                 | 2 — BurgerQuiz | To do  |      |
+| US-BQ-02      | Créer BurgerQuiz                 | 2 — BurgerQuiz | To do  |      |
+| US-BQ-03      | Modifier BurgerQuiz              | 2 — BurgerQuiz | To do  |      |
+| US-BQ-04      | Supprimer BurgerQuiz             | 2 — BurgerQuiz | To do  |      |
+| US-BQ-NU-01   | Ajouter une manche Nuggets       | 2 — BurgerQuiz | To do  |      |
+| US-BQ-NU-02   | Modifier Manche Nuggets          | 2 — BurgerQuiz | To do  |      |
+| US-BQ-SP-01   | Créer Manche Sel ou Poivre       | 2 — BurgerQuiz | To do  |      |
+| US-BQ-SP-02   | Modifier un Manche Sel ou Poivre | 2 — BurgerQuiz | To do  |      |
+| US-BQ-ME-01   | Créer Manche Menus               | 2 — BurgerQuiz | To do  |      |
+| US-BQ-ME-02   | Modifier Manche Menus            | 2 — BurgerQuiz | To do  |      |
+| US-BQ-ME-03   | Créer un MenuTheme               | 2 — BurgerQuiz | To do  |      |
+| US-BQ-ME-04   | Modifier un MenuTheme            | 2 — BurgerQuiz | To do  |      |
+| US-BQ-AD-01   | Créer une Manche Addition        | 2 — BurgerQuiz | To do  |      |
+| US-BQ-AD-02   | Modifier une Manche Addition     | 2 — BurgerQuiz | To do  |      |
+| US-BQ-DB-01   | Créer un Burger de la mort       | 2 — BurgerQuiz | To do  |      |
+| US-GAME-01    | Créer session                    | 3 — Sessions   | To do  |      |
+| US-GAME-02    | Rejoindre session                | 3 — Sessions   | To do  |      |
+| US-GAME-03    | Lobby                            | 3 — Sessions   | To do  |      |
+| US-GAME-04    | Lancer partie                    | 3 — Sessions   | To do  |      |
+| US-HOST-01    | Voir question                    | 4 — Interface  | To do  |      |
+| US-HOST-02    | Navigation                       | 4 — Interface  | To do  |      |
+| US-HOST-03    | Points                           | 4 — Interface  | To do  |      |
+| US-HOST-04    | Afficher réponse                 | 4 — Interface  | To do  |      |
+| US-PLAYER-01  | Voir question                    | 4 — Interface  | To do  |      |
+| US-PLAYER-02  | Voir scores                      | 4 — Interface  | To do  |      |
+| US-PLAYER-03  | Mise à jour live                 | 4 — Interface  | To do  |      |
+| US-UX-01      | Navigation                       | 5 — UX         | To do  |      |
+| US-UX-02      | Messages erreurs                 | 5 — UX         | To do  |      |
+| US-UX-03      | Loading                          | 5 — UX         | To do  |      |
+| US-RT-01      | Synchronisation live             | 6 — Temps réel | To do  |      |
+| US-RT-BUZZ-01 | Buzzer                           | 6 — Temps réel | To do  |      |
+| US-RT-BUZZ-02 | Affichage buzzer                 | 6 — Temps réel | To do  |      |
 
 _Statuts : To do | In progress | Done_
 

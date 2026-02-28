@@ -220,8 +220,8 @@ Composant inline pour saisir une question Sel ou Poivre. La réponse est un **dr
 
 ```typescript
 interface SaltOrPepperQuestionInlineFormProps {
-  question?: SaltOrPepperQuestion;   // Question existante (édition)
-  choices: string[];                 // Propositions du formulaire parent
+  question?: SaltOrPepperQuestion; // Question existante (édition)
+  choices: string[]; // Propositions du formulaire parent
   onSave: (data: SaltOrPepperQuestionData) => void;
   onRemove?: () => void;
 }
@@ -229,13 +229,13 @@ interface SaltOrPepperQuestionInlineFormProps {
 
 ### États de sauvegarde
 
-| Statut   | Icône | Description                | Couleur |
-| -------- | ----- | -------------------------- | ------- |
-| `new`    | 📝    | Nouvelle question          | Gris    |
-| `dirty`  | ⏳    | Non sauvegardée            | Jaune   |
-| `saving` | ⏳    | Sauvegarde en cours        | Bleu    |
-| `saved`  | ✓     | Sauvegardée                | Vert    |
-| `error`  | ⚠️    | Erreur de validation/save  | Rouge   |
+| Statut   | Icône | Description               | Couleur |
+| -------- | ----- | ------------------------- | ------- |
+| `new`    | 📝    | Nouvelle question         | Gris    |
+| `dirty`  | ⏳    | Non sauvegardée           | Jaune   |
+| `saving` | ⏳    | Sauvegarde en cours       | Bleu    |
+| `saved`  | ✓     | Sauvegardée               | Vert    |
+| `error`  | ⚠️    | Erreur de validation/save | Rouge   |
 
 ### Wireframe détaillé
 
@@ -324,20 +324,20 @@ interface SaltOrPepperQuestionInlineFormProps {
 
 ### Validation
 
-| Champ    | Règle                                  |
-| -------- | -------------------------------------- |
-| Énoncé   | Requis, min 10 caractères              |
-| Réponse  | Requis, doit être une des propositions |
+| Champ   | Règle                                  |
+| ------- | -------------------------------------- |
+| Énoncé  | Requis, min 10 caractères              |
+| Réponse | Requis, doit être une des propositions |
 
 ---
 
 ## Appels API récapitulatifs
 
-| Action                         | Méthode   | Endpoint                                | Réf.  |
-| ------------------------------ | --------- | --------------------------------------- | ----- |
-| Lister manches                 | GET       | `/api/quiz/salt-or-pepper/`             | §2.3  |
-| Détail manche                  | GET       | `/api/quiz/salt-or-pepper/{id}/`        | §2.3  |
-| Créer manche                   | POST      | `/api/quiz/salt-or-pepper/`             | §2.3  |
-| Modifier manche                | PATCH     | `/api/quiz/salt-or-pepper/{id}/`        | §2.3  |
-| Supprimer manche               | DELETE    | `/api/quiz/salt-or-pepper/{id}/`        | §2.3  |
-| Rechercher questions (type SP) | GET       | `/api/quiz/questions/?question_type=SP` | §2.1  |
+| Action                         | Méthode | Endpoint                                | Réf. |
+| ------------------------------ | ------- | --------------------------------------- | ---- |
+| Lister manches                 | GET     | `/api/quiz/salt-or-pepper/`             | §2.3 |
+| Détail manche                  | GET     | `/api/quiz/salt-or-pepper/{id}/`        | §2.3 |
+| Créer manche                   | POST    | `/api/quiz/salt-or-pepper/`             | §2.3 |
+| Modifier manche                | PATCH   | `/api/quiz/salt-or-pepper/{id}/`        | §2.3 |
+| Supprimer manche               | DELETE  | `/api/quiz/salt-or-pepper/{id}/`        | §2.3 |
+| Rechercher questions (type SP) | GET     | `/api/quiz/questions/?question_type=SP` | §2.1 |

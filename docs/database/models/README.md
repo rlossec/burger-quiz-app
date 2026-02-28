@@ -115,6 +115,7 @@ Chaque équipe répond l'une après l'autre à des questions comportant quatre p
 Les candidats doivent répondre le plus vite possible à une série de questions en piochant parmi une **liste restreinte de propositions** donnée en début de manche (souvent 2, 3 ou 4 ; maximum 5). Exemples : « Noir » / « Blanc », ou « Noir » / « Blanc » / « Les deux ».
 
 La manche **SaltOrPepper** possède :
+
 - un champ **`propositions`** (tableau JSON) qui définit ces propositions. Chaque question de la manche doit avoir des réponses (Answer) dont le libellé est exactement l'un de ces choix.
 - un champ **`description`** (optionnel) pour décrire la manche.
 
@@ -227,14 +228,14 @@ L'ordre est défini par le champ `order`.
 
 ### Champs
 
-| Champ         | Type              | Description                                                               |
-| ------------- | ----------------- | ------------------------------------------------------------------------- |
-| `id`          | UUID              | Identifiant unique                                                        |
-| `burger_quiz` | FK BurgerQuiz     | Quiz parent                                                               |
-| `order`       | int               | Position dans la structure (1, 2, 3...)                                   |
-| `type`        | CharField         | Type : `round` ou `interlude`                                             |
-| `round_type`  | CharField         | Si `type=round` : `NU`, `SP`, `ME`, `AD`, `DB` (nullable)                 |
-| `interlude`   | FK VideoInterlude | Si `type=interlude` : référence vers l'interlude (nullable)               |
+| Champ         | Type              | Description                                                 |
+| ------------- | ----------------- | ----------------------------------------------------------- |
+| `id`          | UUID              | Identifiant unique                                          |
+| `burger_quiz` | FK BurgerQuiz     | Quiz parent                                                 |
+| `order`       | int               | Position dans la structure (1, 2, 3...)                     |
+| `type`        | CharField         | Type : `round` ou `interlude`                               |
+| `round_type`  | CharField         | Si `type=round` : `NU`, `SP`, `ME`, `AD`, `DB` (nullable)   |
+| `interlude`   | FK VideoInterlude | Si `type=interlude` : référence vers l'interlude (nullable) |
 
 ### Contraintes
 
