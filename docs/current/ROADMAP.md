@@ -23,10 +23,10 @@
 
 #### Phase 1 – Planification fonctionnelle
 
-- [ ] Liste des pages avec routes associées
-- [ ] Définition des modèles front (types)
-- [ ] Liste des états globaux (stores)
-- [ ] Définition des flux (auth, quiz, session)
+- [x] Liste des pages avec routes associées → [page_reference.md](../frontend/page_reference.md)
+- [x] Définition des modèles front (types) → [types.md](../frontend/types.md)
+- [x] Liste des états globaux (stores) → [stores.md](../frontend/stores.md)
+- [x] Définition des flux (auth, quiz, session) → [flows/](../frontend/flows/README.md)
 
 #### Phase 2 – Setup technique
 
