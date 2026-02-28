@@ -8,7 +8,12 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from ...tests.factories import BurgerQuizFactory
+from ...tests.factories import (
+    BurgerQuizFactory,
+    VideoInterludeFactory,
+    BurgerQuizElementFactory,
+)
+from .. import QUESTION_TYPE_NU, QUESTION_TYPE_SP
 
 User = get_user_model()
 
@@ -45,3 +50,32 @@ class TestBurgerQuizDetailEndpoint(APITestCase):
         url = reverse("burger-quiz-detail", kwargs={"pk": uuid.uuid4()})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_detail_includes_structure(self):
+        """Le détail inclut la structure du quiz."""
+        bq = BurgerQuizFactory.create_full(title="Quiz avec structure")
+        intro = VideoInterludeFactory.create_intro(title="Intro")
+        
+        BurgerQuizElementFactory.create_interlude(bq, order=1, interlude=intro)
+        BurgerQuizElementFactory.create_round(bq, order=2, round_type=QUESTION_TYPE_NU)
+        BurgerQuizElementFactory.create_round(bq, order=3, round_type=QUESTION_TYPE_SP)
+        
+        url = reverse("burger-quiz-detail", kwargs={"pk": bq.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("structure", response.data)
+        self.assertEqual(len(response.data["structure"]), 3)
+        
+        self.assertEqual(response.data["structure"][0]["element_type"], "interlude")
+        self.assertIn("interlude", response.data["structure"][0])
+        self.assertEqual(response.data["structure"][0]["interlude"]["title"], "Intro")
+        
+        self.assertEqual(response.data["structure"][1]["element_type"], "round")
+        self.assertEqual(response.data["structure"][1]["round_type"], QUESTION_TYPE_NU)
+
+    def test_detail_structure_empty_if_not_configured(self):
+        """La structure est vide ou par défaut si non configurée."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("structure", response.data)

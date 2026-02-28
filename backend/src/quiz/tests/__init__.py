@@ -32,6 +32,21 @@ QUESTION_TYPE_DB = "DB"
 MENU_TYPE_CL = "CL"
 MENU_TYPE_TR = "TR"
 
+# Types d'interludes vidéo
+INTERLUDE_TYPE_IN = "IN"  # Intro
+INTERLUDE_TYPE_OU = "OU"  # Outro
+INTERLUDE_TYPE_PU = "PU"  # Pub
+INTERLUDE_TYPE_IL = "IL"  # Interlude générique
+
+# Messages d'erreur interludes
+INTERLUDE_INVALID_YOUTUBE_URL = "L'URL YouTube n'est pas valide."
+INTERLUDE_IN_USE = "Cet interlude est utilisé dans un ou plusieurs Burger Quiz."
+
+# Messages d'erreur structure
+STRUCTURE_DUPLICATE_ROUND_TYPE = "Chaque type de manche ne peut apparaître qu'une seule fois."
+STRUCTURE_ROUND_NOT_ATTACHED = "La manche référencée n'est pas attachée au Burger Quiz."
+STRUCTURE_INTERLUDE_NOT_FOUND = "L'interlude référencé n'existe pas."
+
 # Export pour tests
 __all__ = [
     "AUTHENTICATION_MISSING",
@@ -43,4 +58,13 @@ __all__ = [
     "QUESTION_TYPE_DB",
     "MENU_TYPE_CL",
     "MENU_TYPE_TR",
+    "INTERLUDE_TYPE_IN",
+    "INTERLUDE_TYPE_OU",
+    "INTERLUDE_TYPE_PU",
+    "INTERLUDE_TYPE_IL",
+    "INTERLUDE_INVALID_YOUTUBE_URL",
+    "INTERLUDE_IN_USE",
+    "STRUCTURE_DUPLICATE_ROUND_TYPE",
+    "STRUCTURE_ROUND_NOT_ATTACHED",
+    "STRUCTURE_INTERLUDE_NOT_FOUND",
 ]
