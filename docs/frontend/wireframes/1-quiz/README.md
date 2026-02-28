@@ -16,6 +16,7 @@ Maquettes liées à la création et à la gestion des Burger Quiz et des manches
 | [menus-menutheme.md](menus-menutheme.md) | Menus + MenuTheme |
 | [addition.md](addition.md) | Manches Addition |
 | [deadly-burger.md](deadly-burger.md) | Burger de la mort |
-| [burger-quiz.md](burger-quiz.md) | Burger Quiz (list, détail, create/edit) |
+| [interludes.md](interludes.md) | Interludes vidéo (intro, outro, pub) |
+| [burger-quiz.md](burger-quiz.md) | Burger Quiz (list, détail, create/edit, structure) |
 
 Composants communs (InlineForm, etc.) : [../components.md](../components.md).
