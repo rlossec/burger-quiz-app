@@ -64,8 +64,8 @@ Permet d’ajouter des questions à une manche (Nuggets, Deadly Burger, etc.) : 
 
 ### Appels API
 
-| Action | Méthode | Endpoint | Réf. |
-| ------ | ------- | -------- | ---- |
-| Recherche / liste questions | GET | `/api/quiz/questions/?question_type=...&search=...` | [api-reference](../../backend/api-reference.md) §2.1 |
+| Action                      | Méthode | Endpoint                                            | Réf.                                                 |
+| --------------------------- | ------- | --------------------------------------------------- | ---------------------------------------------------- |
+| Recherche / liste questions | GET     | `/api/quiz/questions/?question_type=...&search=...` | [api-reference](../../backend/api-reference.md) §2.1 |
 
 À la validation : la modale retourne les IDs sélectionnés au formulaire parent ; aucun appel API dans la modale. La soumission du formulaire parent envoie `question_ids` (POST/PUT manche).

@@ -60,12 +60,14 @@ docker compose --profile tools up -d
 
 ## 4. Accès aux services
 
-| Service | URL |
-|---------|-----|
-| **Frontend** | http://localhost:5173 |
-| **Backend API** | http://localhost:8000 |
-| **Django Admin** | http://localhost:8000/admin/ |
-| **pgAdmin** | http://localhost:5050 |
+| Service          | URL                            |
+| ---------------- | ------------------------------ |
+| **Frontend**     | http://localhost:5173          |
+| **Backend API**  | http://localhost:8000          |
+| **Django Admin** | http://localhost:8000/admin/   |
+| **Swagger UI**   | http://localhost:8000/swagger/ |
+| **ReDoc**        | http://localhost:8000/redoc/   |
+| **pgAdmin**      | http://localhost:5050          |
 
 ---
 

@@ -8,13 +8,13 @@ Définition des états globaux pour le frontend avec **Zustand**.
 
 ## Vue d'ensemble
 
-| Store                    | Librairie | Persistance  | Description                     |
-| ------------------------ | --------- | ------------ | ------------------------------- |
-| `useAuthStore`           | Zustand   | localStorage | Authentification utilisateur    |
-| `useThemeStore`          | Zustand   | localStorage | Thème dark/light                |
-| `useNotificationStore`   | Zustand   | Non          | Toasts et alertes               |
-| `useQuizStructureStore`  | Zustand   | Non          | Structure du quiz en édition    |
-| `useGameStore`           | Zustand   | Non          | Session de jeu en cours         |
+| Store                   | Librairie | Persistance  | Description                  |
+| ----------------------- | --------- | ------------ | ---------------------------- |
+| `useAuthStore`          | Zustand   | localStorage | Authentification utilisateur |
+| `useThemeStore`         | Zustand   | localStorage | Thème dark/light             |
+| `useNotificationStore`  | Zustand   | Non          | Toasts et alertes            |
+| `useQuizStructureStore` | Zustand   | Non          | Structure du quiz en édition |
+| `useGameStore`          | Zustand   | Non          | Session de jeu en cours      |
 
 ---
 
@@ -225,7 +225,10 @@ Gestion de la structure ordonnée d'un Burger Quiz en édition.
 // src/features/quiz/store.ts
 
 import { create } from "zustand";
-import { BurgerQuizElement, BurgerQuizElementInput } from "@/types/burger-quiz-element";
+import {
+  BurgerQuizElement,
+  BurgerQuizElementInput,
+} from "@/types/burger-quiz-element";
 import { VideoInterludeRef } from "@/types/video-interlude";
 
 interface QuizStructureState {
@@ -313,12 +316,12 @@ export const useQuizStructureStore = create<QuizStructureState>((set, get) => ({
 
 ### Données du QuizStructureStore
 
-| Propriété  | Type                  | Description                              |
-| ---------- | --------------------- | ---------------------------------------- |
-| `quizId`   | `string \| null`      | ID du quiz en cours d'édition            |
-| `elements` | `BurgerQuizElement[]` | Structure ordonnée                       |
-| `isDirty`  | `boolean`             | Modifications non sauvegardées           |
-| `isSaving` | `boolean`             | Sauvegarde en cours                      |
+| Propriété  | Type                  | Description                    |
+| ---------- | --------------------- | ------------------------------ |
+| `quizId`   | `string \| null`      | ID du quiz en cours d'édition  |
+| `elements` | `BurgerQuizElement[]` | Structure ordonnée             |
+| `isDirty`  | `boolean`             | Modifications non sauvegardées |
+| `isSaving` | `boolean`             | Sauvegarde en cours            |
 
 ---
 
@@ -452,16 +455,16 @@ export const useGameStore = create<GameState>((set, get) => ({
 
 ### Données du GameStore
 
-| Propriété              | Type                  | Description           |
-| ---------------------- | --------------------- | --------------------- |
-| `session`              | `GameSession \| null` | Session active        |
-| `currentPlayer`        | `Player \| null`      | Joueur local          |
-| `phase`                | `GamePhase`           | Phase de jeu actuelle |
-| `currentQuestion`      | `QuestionDetail \| null` | Question affichée  |
-| `currentQuestionIndex` | `number`              | Index dans la manche  |
-| `timer`                | `number`              | Secondes restantes    |
-| `isTimerRunning`       | `boolean`             | Timer actif           |
-| `scores`               | `{ ketchup, mayo }`   | Scores des équipes    |
+| Propriété              | Type                     | Description           |
+| ---------------------- | ------------------------ | --------------------- |
+| `session`              | `GameSession \| null`    | Session active        |
+| `currentPlayer`        | `Player \| null`         | Joueur local          |
+| `phase`                | `GamePhase`              | Phase de jeu actuelle |
+| `currentQuestion`      | `QuestionDetail \| null` | Question affichée     |
+| `currentQuestionIndex` | `number`                 | Index dans la manche  |
+| `timer`                | `number`                 | Secondes restantes    |
+| `isTimerRunning`       | `boolean`                | Timer actif           |
+| `scores`               | `{ ketchup, mayo }`      | Scores des équipes    |
 
 ---
 

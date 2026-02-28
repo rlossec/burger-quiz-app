@@ -27,14 +27,14 @@ Point d'entrée de la documentation du projet Burger Quiz.
 
 ## Spécifications techniques
 
-| Domaine             | Document                                                 | Rôle                                                           |
-| ------------------- | -------------------------------------------------------- | -------------------------------------------------------------- |
-| **Backend**         | [backend/api-reference.md](backend/api-reference.md)     | Référence API (Accounts + Quiz, endpoints, corps, contraintes) |
-| **Frontend**        | [frontend/page_reference.md](frontend/page_reference.md) | Pages et flux utilisateur                                      |
-| **Frontend**        | [frontend/components.md](frontend/components.md)         | Composants réutilisables (InlineForm, modales)                 |
-| **Frontend**        | [frontend/wireframes/README.md](frontend/wireframes/README.md) | Wireframes (maquettes fil de fer, index)                        |
-| **Base de données** | [database/models/README.md](database/models/README.md)   | Modèles, règles métier (original, réutilisabilité)             |
-| **Base de données** | [database/fixtures.md](database/fixtures.md)             | Fixtures Django, chargement, export                            |
+| Domaine             | Document                                                       | Rôle                                                           |
+| ------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Backend**         | [backend/api-reference.md](backend/api-reference.md)           | Référence API (Accounts + Quiz, endpoints, corps, contraintes) |
+| **Frontend**        | [frontend/page_reference.md](frontend/page_reference.md)       | Pages et flux utilisateur                                      |
+| **Frontend**        | [frontend/components.md](frontend/components.md)               | Composants réutilisables (InlineForm, modales)                 |
+| **Frontend**        | [frontend/wireframes/README.md](frontend/wireframes/README.md) | Wireframes (maquettes fil de fer, index)                       |
+| **Base de données** | [database/models/README.md](database/models/README.md)         | Modèles, règles métier (original, réutilisabilité)             |
+| **Base de données** | [database/fixtures.md](database/fixtures.md)                   | Fixtures Django, chargement, export                            |
 
 ---
 

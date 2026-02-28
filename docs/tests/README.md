@@ -14,11 +14,11 @@ Point d'entrée de la documentation des tests Burger Quiz.
 
 ## Documentation par module
 
-| Module | Document | Contenu |
-|--------|----------|---------|
-| **Quiz** | [quiz.md](quiz.md) | Tests des endpoints (questions, manches, Burger Quiz), structure, commandes |
-| **Quiz** | [quiz-factories.md](quiz-factories.md) | Factories factory_boy, méthodes, exemples d'usage |
-| **Accounts** | [accounts.md](accounts.md) | Tests auth (JWT, activation, reset), CRUD utilisateurs |
+| Module       | Document                               | Contenu                                                                     |
+| ------------ | -------------------------------------- | --------------------------------------------------------------------------- |
+| **Quiz**     | [quiz.md](quiz.md)                     | Tests des endpoints (questions, manches, Burger Quiz), structure, commandes |
+| **Quiz**     | [quiz-factories.md](quiz-factories.md) | Factories factory_boy, méthodes, exemples d'usage                           |
+| **Accounts** | [accounts.md](accounts.md)             | Tests auth (JWT, activation, reset), CRUD utilisateurs                      |
 
 ---
 
@@ -36,9 +36,9 @@ docker compose exec backend uv run python manage.py test
 
 ## Par module
 
-| Module | Commande |
-|--------|----------|
-| Quiz | `uv run manage.py test quiz.tests` |
+| Module   | Commande                               |
+| -------- | -------------------------------------- |
+| Quiz     | `uv run manage.py test quiz.tests`     |
 | Accounts | `uv run manage.py test accounts.tests` |
 
 → Détail des commandes et structure dans chaque document ci-dessus.

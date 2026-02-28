@@ -173,9 +173,9 @@ nuggets = NuggetsFactory.create(
 
 Toutes les factories supportent les paramètres suivants :
 
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `author` | `User` ou `None` | Utilisateur auteur du contenu (optionnel) |
-| `tags` | `list[str]` ou `None` | Liste de tags à associer (optionnel) |
+| Paramètre | Type                  | Description                               |
+| --------- | --------------------- | ----------------------------------------- |
+| `author`  | `User` ou `None`      | Utilisateur auteur du contenu (optionnel) |
+| `tags`    | `list[str]` ou `None` | Liste de tags à associer (optionnel)      |
 
 Ces paramètres sont gérés via `@factory.post_generation` pour les tags et directement comme attribut pour l'author (FK).
