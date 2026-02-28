@@ -30,12 +30,24 @@ quiz/tests/
 │   └── timestamps.py            # TimestampsInDetailResponseMixin, etc.
 ├── factories.py                 # Factories (factory_boy)
 ├── __init__.py                  # Constantes partagées
+├── interludes/                  # Tests interludes vidéo
+│   ├── test_list.py
+│   ├── test_detail.py
+│   ├── test_create.py
+│   ├── test_update.py
+│   └── test_delete.py
 ├── questions/
 │   ├── test_list.py
 │   ├── test_detail.py
 │   ├── test_create.py
 │   ├── test_update.py
 │   └── test_delete.py
+├── burger_quizzes/
+│   ├── test_list.py
+│   ├── test_detail.py
+│   ├── test_create.py
+│   ├── test_update.py
+│   └── test_structure.py        # Tests structure (GET/PUT)
 ├── salt_or_pepper/
 │   ├── test_list.py
 │   ├── test_detail.py
@@ -140,6 +152,27 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 
 ## Détail par ressource
 
+### Interludes vidéo (`/api/quiz/interludes/`)
+
+**Dossier** : `quiz/tests/interludes/`
+**Exécution** : `uv run manage.py test quiz.tests.interludes`
+
+| Fichier          | Tests                                                    |
+| ---------------- | -------------------------------------------------------- |
+| `test_list.py`   | Liste, filtres (interlude_type, search), champs réponse  |
+| `test_detail.py` | Détail, 404, author, timestamps                          |
+| `test_create.py` | Création, validation URL YouTube, formats URL, tags      |
+| `test_update.py` | PATCH/PUT, validation, author non modifié                |
+| `test_delete.py` | Suppression, 404, erreur si en utilisation               |
+
+**Particularités** :
+
+- Validation URL YouTube (différents formats acceptés)
+- `youtube_video_id` calculé automatiquement
+- Suppression bloquée si l'interlude est utilisé dans une structure
+
+---
+
 ### Questions (`/api/quiz/questions/`)
 
 **Dossier** : `quiz/tests/questions/`
@@ -160,6 +193,18 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 **Dossier** : `quiz/tests/nuggets/`
 **Exécution** : `uv run manage.py test quiz.tests.nuggets`
 
+| Fichier          | Tests métier                         | Tests via mixins               |
+| ---------------- | ------------------------------------ | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes incluses  | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                          | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation questions       | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH/PUT                            | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes avec leurs réponses
+- Validation : nombre pair de questions, type `NU` requis
+
 ---
 
 ### Sel ou poivre (`/api/quiz/salt-or-pepper/`)
@@ -167,12 +212,17 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 **Dossier** : `quiz/tests/salt_or_pepper/`
 **Exécution** : `uv run manage.py test quiz.tests.salt_or_pepper`
 
-| Fichier          | Tests métier                      | Tests via mixins               |
-| ---------------- | --------------------------------- | ------------------------------ |
-| `test_list.py`   | Liste                             | Auth, Author, Tags, Timestamps |
-| `test_detail.py` | Détail, 404                       | Author, Tags, Timestamps       |
-| `test_create.py` | Création, validation propositions | Author, Tags, Timestamps       |
-| `test_update.py` | PATCH titre                       | Author, Tags                   |
+| Fichier          | Tests métier                              | Tests via mixins               |
+| ---------------- | ----------------------------------------- | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes, propositions  | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                               | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation propositions         | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH titre                               | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes avec leurs réponses
+- La liste inclut les propositions de la manche
 
 ---
 
@@ -195,12 +245,36 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 **Dossier** : `quiz/tests/additions/`
 **Exécution** : `uv run manage.py test quiz.tests.additions`
 
+| Fichier          | Tests métier                         | Tests via mixins               |
+| ---------------- | ------------------------------------ | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes incluses  | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                          | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation questions       | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH/PUT                            | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes avec leurs réponses
+- Validation : questions de type `AD` requis
+
 ---
 
 ### Burger de la mort (`/api/quiz/deadly-burgers/`)
 
 **Dossier** : `quiz/tests/deadly_burgers/`
 **Exécution** : `uv run manage.py test quiz.tests.deadly_burgers`
+
+| Fichier          | Tests métier                         | Tests via mixins               |
+| ---------------- | ------------------------------------ | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes incluses  | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                          | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation 10 questions    | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH/PUT                            | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes (questions ouvertes, sans réponses)
+- Validation : exactement 10 questions de type `DB` requis
 
 ---
 
@@ -209,13 +283,61 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 **Dossier** : `quiz/tests/burger_quizzes/`
 **Exécution** : `uv run manage.py test quiz.tests.burger_quizzes`
 
+| Fichier             | Tests                                                         |
+| ------------------- | ------------------------------------------------------------- |
+| `test_list.py`      | Liste, filtres, timestamps                                    |
+| `test_detail.py`    | Détail, 404, structure incluse dans la réponse                |
+| `test_create.py`    | Création, validation IDs manches, toss                        |
+| `test_update.py`    | PATCH/PUT                                                     |
+| `test_structure.py` | GET/PUT structure (ordre manches, interludes, validations)    |
+
+---
+
+### Structure du Burger Quiz (`/api/quiz/burger-quizzes/{id}/structure/`)
+
+**Dossier** : `quiz/tests/burger_quizzes/`
+**Fichier** : `test_structure.py`
+**Exécution** : `uv run manage.py test quiz.tests.burger_quizzes.test_structure`
+
+| Classe de test                          | Tests                                           |
+| --------------------------------------- | ----------------------------------------------- |
+| `TestBurgerQuizStructureReadEndpoint`   | GET structure (vide, avec éléments, ordre)      |
+| `TestBurgerQuizStructureUpdateEndpoint` | PUT structure (remplacement, validations)       |
+
+**Validations testées** :
+
+- Chaque `round_type` ne peut apparaître qu'une seule fois
+- Les `round_type` doivent correspondre à des manches attachées au Burger Quiz
+- Les `interlude_id` doivent référencer des interludes existants
+- L'ordre est déterminé par la position dans le tableau `elements`
+- Plusieurs interludes (même type ou même instance) sont autorisés
+
 ---
 
 ## Divers
 
 ### Constantes partagées (`quiz/tests/__init__.py`)
 
-Messages d'erreur DRF et métier, types de questions, types de menus.
+Messages d'erreur DRF et métier, types de questions, types de menus, types d'interludes.
+
+**Types d'interludes** :
+
+| Constante           | Valeur | Description        |
+| ------------------- | ------ | ------------------ |
+| `INTERLUDE_TYPE_IN` | `"IN"` | Intro              |
+| `INTERLUDE_TYPE_OU` | `"OU"` | Outro              |
+| `INTERLUDE_TYPE_PU` | `"PU"` | Pub                |
+| `INTERLUDE_TYPE_IL` | `"IL"` | Interlude générique|
+
+**Messages d'erreur structure** :
+
+| Constante                       | Description                                              |
+| ------------------------------- | -------------------------------------------------------- |
+| `INTERLUDE_INVALID_YOUTUBE_URL` | URL YouTube invalide                                     |
+| `INTERLUDE_IN_USE`              | Interlude utilisé dans un Burger Quiz (suppression)      |
+| `STRUCTURE_DUPLICATE_ROUND_TYPE`| Type de manche dupliqué dans la structure                |
+| `STRUCTURE_ROUND_NOT_ATTACHED`  | Manche non attachée au Burger Quiz                       |
+| `STRUCTURE_INTERLUDE_NOT_FOUND` | Interlude référencé inexistant                           |
 
 ### URLs et vues factices
 

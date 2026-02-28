@@ -1,4 +1,4 @@
-# Référence API Burger Quiz
+﻿# Référence API Burger Quiz
 
 Ce document décrit les endpoints de l’API Burger Quiz par app Django :
 
@@ -260,7 +260,6 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
       "autoplay": true,
       "skip_allowed": true,
       "skip_after_seconds": 5,
-      "usage_count": 2,
       "created_at": "2025-01-01T12:00:00Z",
       "updated_at": "2025-01-01T12:00:00Z"
     },
@@ -274,7 +273,6 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
       "autoplay": true,
       "skip_allowed": true,
       "skip_after_seconds": null,
-      "usage_count": 5,
       "created_at": "2025-01-02T09:00:00Z",
       "updated_at": "2025-01-02T09:00:00Z"
     }
@@ -301,7 +299,6 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
   "skip_after_seconds": 5,
   "author": { "id": 1, "username": "johndoe" },
   "tags": ["intro", "officiel"],
-  "usage_count": 2,
   "created_at": "2025-01-01T12:00:00Z",
   "updated_at": "2025-01-01T12:00:00Z"
 }
@@ -328,7 +325,7 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 
 - `title` : obligatoire.
 - `youtube_url` : obligatoire, URL YouTube valide.
-- `interlude_type` : obligatoire, `IN` | `OU` | `PU` | `IL`.
+- `interlude_type` : optionnel, `IN` | `OU` | `PU` | `IL` (défaut `IL`).
 - `duration_seconds` : optionnel (peut être récupéré via API YouTube côté client).
 - `autoplay` : optionnel (défaut `true`).
 - `skip_allowed` : optionnel (défaut `true`).
@@ -574,12 +571,45 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
       "id": "uuid-nuggets-1",
       "title": "Culture générale",
       "original": false,
-      "questions_count": 4,
-      "burger_quiz_count": 0
+      "author": { "id": 1, "username": "johndoe" },
+      "tags": ["culture"],
+      "created_at": "2025-01-01T12:00:00Z",
+      "updated_at": "2025-01-01T12:00:00Z",
+      "questions": [
+        {
+          "id": "uuid-question-1",
+          "text": "Question Nuggets 1",
+          "question_type": "NU",
+          "original": false,
+          "explanations": "Optionnel",
+          "video_url": "https://video.com/q1",
+          "image_url": "https://image.com/q1",
+          "answers": [
+            { "text": "Réponse A", "is_correct": true },
+            { "text": "Réponse B", "is_correct": false },
+            { "text": "Réponse C", "is_correct": false },
+            { "text": "Réponse D", "is_correct": false }
+          ]
+        },
+        {
+          "id": "uuid-question-2",
+          "text": "Question Nuggets 2",
+          "question_type": "NU",
+          "original": true,
+          "answers": [
+            { "text": "Vrai", "is_correct": true },
+            { "text": "Faux", "is_correct": false },
+            { "text": "Peut-être", "is_correct": false },
+            { "text": "Aucune idée", "is_correct": false }
+          ]
+        }
+      ]
     }
   ]
 }
 ```
+
+> **Note** : La liste inclut les questions complètes avec leurs réponses, ce qui permet d'afficher un aperçu détaillé sans requête supplémentaire.
 
 #### 2.3.2. Détail d'une manche Nuggets
 
@@ -699,13 +729,43 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
     {
       "id": "uuid-sop-1",
       "title": "Noir, Blanc ou Les deux",
+      "description": "Optionnel",
       "original": false,
-      "questions_count": 2,
-      "burger_quiz_count": 0
+      "author": { "id": 1, "username": "johndoe" },
+      "tags": ["culture"],
+      "created_at": "2025-01-01T12:00:00Z",
+      "updated_at": "2025-01-01T12:00:00Z",
+      "propositions": ["Noir", "Blanc", "Les deux"],
+      "questions": [
+        {
+          "id": "uuid-question-1",
+          "text": "Le corbeau ?",
+          "question_type": "SP",
+          "original": false,
+          "answers": [
+            { "text": "Noir", "is_correct": true },
+            { "text": "Blanc", "is_correct": false },
+            { "text": "Les deux", "is_correct": false }
+          ]
+        },
+        {
+          "id": "uuid-question-2",
+          "text": "La neige ?",
+          "question_type": "SP",
+          "original": true,
+          "answers": [
+            { "text": "Noir", "is_correct": false },
+            { "text": "Blanc", "is_correct": true },
+            { "text": "Les deux", "is_correct": false }
+          ]
+        }
+      ]
     }
   ]
 }
 ```
+
+> **Note** : La liste inclut les questions complètes avec leurs réponses et les propositions de la manche.
 
 #### 2.4.2. Détail d'une manche Sel ou poivre
 
@@ -938,6 +998,45 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 | `PATCH` \| `PUT` | `/api/quiz/additions/{id}/` | Mise à jour                       |
 | `DELETE`         | `/api/quiz/additions/{id}/` | Suppression d’une manche Addition |
 
+#### 2.6.1. Liste des manches Addition
+
+**Endpoint** : `GET /api/quiz/additions/`
+
+**Réponse attendue** (liste paginée) :
+
+```json
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "uuid-addition-1",
+      "title": "Addition rapide",
+      "description": "Optionnel",
+      "original": false,
+      "author": { "id": 1, "username": "johndoe" },
+      "tags": ["culture"],
+      "created_at": "2025-01-01T12:00:00Z",
+      "updated_at": "2025-01-01T12:00:00Z",
+      "questions": [
+        {
+          "id": "uuid-question-1",
+          "text": "2 + 2 ?",
+          "question_type": "AD",
+          "original": false,
+          "answers": [{ "text": "4", "is_correct": true }]
+        }
+      ]
+    }
+  ]
+}
+```
+
+> **Note** : La liste inclut les questions complètes avec leurs réponses.
+
+#### 2.6.2. Création d'une manche Addition
+
 **POST /api/quiz/additions/** — Corps (exemple) :
 
 ```json
@@ -1151,14 +1250,14 @@ En **lecture**, le détail expose les **manches complètes** avec toutes leurs *
     ]
   },
   "structure": [
-    { "order": 1, "type": "interlude", "interlude": { "id": "uuid-intro", "title": "Intro", "interlude_type": "IN" } },
-    { "order": 2, "type": "round", "round_type": "NU" },
-    { "order": 3, "type": "round", "round_type": "SP" },
-    { "order": 4, "type": "interlude", "interlude": { "id": "uuid-pub-1", "title": "Pub Ketchup", "interlude_type": "PU" } },
-    { "order": 5, "type": "round", "round_type": "ME" },
-    { "order": 6, "type": "round", "round_type": "AD" },
-    { "order": 7, "type": "round", "round_type": "DB" },
-    { "order": 8, "type": "interlude", "interlude": { "id": "uuid-outro", "title": "Outro", "interlude_type": "OU" } }
+    { "order": 1, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-intro", "title": "Intro", "interlude_type": "IN", "youtube_video_id": "abc123" } },
+    { "order": 2, "element_type": "round", "round_type": "NU", "interlude": null },
+    { "order": 3, "element_type": "round", "round_type": "SP", "interlude": null },
+    { "order": 4, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-pub-1", "title": "Pub Ketchup", "interlude_type": "PU", "youtube_video_id": "def456" } },
+    { "order": 5, "element_type": "round", "round_type": "ME", "interlude": null },
+    { "order": 6, "element_type": "round", "round_type": "AD", "interlude": null },
+    { "order": 7, "element_type": "round", "round_type": "DB", "interlude": null },
+    { "order": 8, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-outro", "title": "Outro", "interlude_type": "OU", "youtube_video_id": "ghi789" } }
   ]
 }
 ```
@@ -1191,24 +1290,24 @@ La structure définit l'ordre des éléments d'un Burger Quiz : manches et inter
 {
   "burger_quiz_id": "uuid-bq-1",
   "elements": [
-    { "order": 1, "type": "interlude", "interlude_id": "uuid-intro" },
-    { "order": 2, "type": "round", "round_type": "NU" },
-    { "order": 3, "type": "round", "round_type": "SP" },
-    { "order": 4, "type": "interlude", "interlude_id": "uuid-pub-1" },
-    { "order": 5, "type": "round", "round_type": "ME" },
-    { "order": 6, "type": "round", "round_type": "AD" },
-    { "order": 7, "type": "interlude", "interlude_id": "uuid-pub-2" },
-    { "order": 8, "type": "round", "round_type": "DB" },
-    { "order": 9, "type": "interlude", "interlude_id": "uuid-outro" }
+    { "order": 1, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-intro", "title": "Intro", "interlude_type": "IN", "youtube_video_id": "abc123" } },
+    { "order": 2, "element_type": "round", "round_type": "NU", "interlude": null },
+    { "order": 3, "element_type": "round", "round_type": "SP", "interlude": null },
+    { "order": 4, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-pub-1", "title": "Pub Ketchup", "interlude_type": "PU", "youtube_video_id": "def456" } },
+    { "order": 5, "element_type": "round", "round_type": "ME", "interlude": null },
+    { "order": 6, "element_type": "round", "round_type": "AD", "interlude": null },
+    { "order": 7, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-pub-2", "title": "Pub Mayo", "interlude_type": "PU", "youtube_video_id": "jkl012" } },
+    { "order": 8, "element_type": "round", "round_type": "DB", "interlude": null },
+    { "order": 9, "element_type": "interlude", "round_type": null, "interlude": { "id": "uuid-outro", "title": "Outro", "interlude_type": "OU", "youtube_video_id": "mno345" } }
   ]
 }
 ```
 
 **Champs** :
 
-- `type` : `"round"` ou `"interlude"`.
-- `round_type` : `NU` | `SP` | `ME` | `AD` | `DB` (uniquement si `type = "round"`).
-- `interlude_id` : UUID de l'interlude existant (uniquement si `type = "interlude"`).
+- `element_type` : `"round"` ou `"interlude"`.
+- `round_type` : `NU` | `SP` | `ME` | `AD` | `DB` (uniquement si `element_type = "round"`, sinon `null`).
+- `interlude` : objet interlude avec `id`, `title`, `interlude_type`, `youtube_video_id` (uniquement si `element_type = "interlude"`, sinon `null`).
 
 > **Note** : En lecture, on peut enrichir les interludes avec leurs données complètes (titre, URL, etc.) via un paramètre `?expand=interludes`.
 
@@ -1223,14 +1322,14 @@ Remplace entièrement la structure du Burger Quiz. Les interludes référencés 
 ```json
 {
   "elements": [
-    { "type": "interlude", "interlude_id": "uuid-intro" },
-    { "type": "round", "round_type": "NU" },
-    { "type": "round", "round_type": "SP" },
-    { "type": "interlude", "interlude_id": "uuid-pub-1" },
-    { "type": "round", "round_type": "ME" },
-    { "type": "round", "round_type": "AD" },
-    { "type": "round", "round_type": "DB" },
-    { "type": "interlude", "interlude_id": "uuid-outro" }
+    { "element_type": "interlude", "interlude_id": "uuid-intro" },
+    { "element_type": "round", "round_type": "NU" },
+    { "element_type": "round", "round_type": "SP" },
+    { "element_type": "interlude", "interlude_id": "uuid-pub-1" },
+    { "element_type": "round", "round_type": "ME" },
+    { "element_type": "round", "round_type": "AD" },
+    { "element_type": "round", "round_type": "DB" },
+    { "element_type": "interlude", "interlude_id": "uuid-outro" }
   ]
 }
 ```
@@ -1238,8 +1337,10 @@ Remplace entièrement la structure du Burger Quiz. Les interludes référencés 
 **Règles de validation** :
 
 - Chaque `round_type` ne peut apparaître qu'une seule fois dans la structure.
-- Les `round_type` référencés doivent correspondre à des manches existantes sur le Burger Quiz.
+- Les `round_type` référencés doivent correspondre à des manches attachées au Burger Quiz.
 - Les `interlude_id` doivent référencer des interludes existants.
+- Pour les éléments de type `"round"`, seul `round_type` est requis.
+- Pour les éléments de type `"interlude"`, seul `interlude_id` est requis.
 - L'ordre est déterminé par la position dans le tableau `elements`.
 - Pas de création inline d'interludes : ils doivent être créés via `POST /api/quiz/interludes/` au préalable.
 
@@ -1278,7 +1379,6 @@ Pour les listes et pages front (Questions, manches, Burger Quiz), l’API peut e
 | **Nuggets**                                              | `questions_count`                                     | Nombre de questions (dérivable de la liste).               |
 | **MenuTheme**                                            | `used_in_menus_count`                                 | Nombre de manches Menus utilisant ce thème.                |
 | **MenuTheme**                                            | `questions_count`                                     | Nombre de questions du thème.                              |
-| **VideoInterlude**                                       | `usage_count`                                         | Nombre de Burger Quiz utilisant cet interlude.             |
 | **BurgerQuiz**                                           | —                                                     | `created_at` / `updated_at` en base pour tri et affichage. |
 
 ---
