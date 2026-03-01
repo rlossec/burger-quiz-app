@@ -38,15 +38,15 @@
 
 #### Phase 3 – Layout global
 
-- [ ] `<Layout>`
-- [ ] `<Header>` / `<Nav>`
-- [ ] `<Footer>`
-- [ ] Container responsive
+- [x] `<Layout>`
+- [x] `<Header>` / `<Nav>`
+- [x] `<Footer>`
+- [x] Container responsive
 
 #### Phase 4 – Thème et design system
 
-- [ ] ThemeProvider (dark/light)
-- [ ] Définition du thème (couleurs, typographie)
+- [x] ThemeProvider (dark/light)
+- [x] Définition du thème (couleurs, typographie)
 
 #### Phase 5 – Routing et pages vides
 

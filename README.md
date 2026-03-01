@@ -1,6 +1,7 @@
 # Burger Quiz 🍔
 
-Application web pour animer des soirées Burger Quiz : 
+Application web pour animer des soirées Burger Quiz :
+
 - Création des manches et émissions
 - Création de session de jeu
 - Diffusion des questions et animations
@@ -8,12 +9,12 @@ Application web pour animer des soirées Burger Quiz :
 
 ## Stack
 
-| Composant | Techno |
-|-----------|--------|
-| Backend | Django 6, Django REST Framework, Python 3.12 |
-| Frontend | React, TypeScript, Vite, Tailwind CSS |
-| Base de données | PostgreSQL 18 |
-| Infra | Docker Compose |
+| Composant       | Techno                                       |
+| --------------- | -------------------------------------------- |
+| Backend         | Django 6, Django REST Framework, Python 3.12 |
+| Frontend        | React, TypeScript, Vite, Tailwind CSS        |
+| Base de données | PostgreSQL 18                                |
+| Infra           | Docker Compose                               |
 
 ## Quick Start
 
@@ -39,12 +40,12 @@ docker compose --profile tools up -d
 
 On retrouver les élements de l'application :
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:8000 |
+| Service      | URL                          |
+| ------------ | ---------------------------- |
+| Frontend     | http://localhost:5173        |
+| Backend API  | http://localhost:8000        |
 | Django Admin | http://localhost:8000/admin/ |
-| pgAdmin | http://localhost:5050 |
+| pgAdmin      | http://localhost:5050        |
 
 ### Fixtures
 
