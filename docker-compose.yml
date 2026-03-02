@@ -54,6 +54,13 @@ services:
       db:
         condition: service_healthy
 
+  smtp:
+    image: mailhog/mailhog
+    container_name: burger-quiz-smtp
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   postgres_data:
   pgadmin_data:
