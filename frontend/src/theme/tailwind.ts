@@ -1,11 +1,7 @@
 /**
- * Configuration du thème Burger Quiz
+ * Classes Tailwind pré-composées pour les composants UI
  *
- * Structure modulaire pour faciliter les évolutions futures.
- * Les couleurs de base (ketchup, mustard, etc.) sont définies dans App.css
- * via les variables CSS et exposées à Tailwind.
- *
- * Opacités standards utilisées :
+ * Opacités standards :
  * - /10 : backgrounds très subtils
  * - /20 : hover léger, ghost buttons
  * - /30 : états actifs
@@ -59,9 +55,8 @@ export const appTheme = {
 
   // Layout - Fonds et textes principaux
   layout: {
-    headerBg: 'bg-linear-to-b from-patty via-patty/80 to-dark',
-    footerBg: 'bg-linear-to-t from-patty via-patty/80 to-dark',
-    mainBg: 'bg-linear-to-b from-dark via-onion/10 to-dark',
+    headerBg: 'bg-patty/90 backdrop-blur-md',
+    footerBg: 'bg-patty/90 backdrop-blur-md',
     mainText: 'text-cream',
   },
 
@@ -108,14 +103,16 @@ export const appTheme = {
 
   // Navigation
   nav: {
-    active: 'bg-denim/30 text-cream shadow-sm',
+    active: 'bg-onion/30 text-cream shadow-sm',
     inactive: 'text-cream/70',
-    hover: 'hover:bg-cream/10 hover:text-bun',
+    hover: 'hover:bg-cream/10 hover:text-cream',
   },
 
-  // Boutons mobile
-  mobileMenu: {
-    button: 'bg-cream/10 text-cream hover:bg-cream/20',
+  // Boutons header
+  headerButtons: {
+    profile: 'text-cream/80 hover:bg-denim/20 hover:text-denim',
+    logout: 'text-cream/80 hover:bg-ketchup/20 hover:text-ketchup',
+    menu: 'bg-cream/10 text-cream hover:bg-cream/20',
   },
 
   // Footer
@@ -127,25 +124,28 @@ export const appTheme = {
     copyright: 'text-cream/50',
   },
 
-  // Boutons
+  // Boutons - cas spéciaux (utiliser Button de Shadcn par défaut)
   buttons: {
-    primary: 'bg-denim text-cream hover:bg-denim/90',
-    secondary: 'bg-onion text-cream hover:bg-onion/90',
     outline: {
       ketchup: 'border-2 border-ketchup bg-transparent text-cream hover:bg-ketchup/20',
-      mayo: 'border-2 border-mustard bg-transparent text-cream hover:bg-mustard/20',
-      denim: 'border-2 border-denim bg-transparent text-cream hover:bg-denim/20',
-      onion: 'border-2 border-onion bg-transparent text-cream hover:bg-onion/20',
-      lettuce: 'border-2 border-lettuce bg-transparent text-cream hover:bg-lettuce/20',
-    },
-    ghost: {
-      bun: 'bg-bun/20 text-bun hover:bg-bun/30',
-      denim: 'bg-denim/20 text-denim hover:bg-denim/30',
+      mustard: 'border-2 border-mustard bg-transparent text-cream hover:bg-mustard/20',
     },
     team: {
       ketchup: 'bg-ketchup text-cream hover:bg-ketchup/90',
       mayo: 'bg-mustard text-dark ring-1 ring-dark/10 hover:bg-mustard/90',
     },
+  },
+
+  // Inputs sur fond sombre (auth, modales)
+  input: {
+    dark: 'bg-cream/5 border-cream/10 text-cream placeholder:text-cream/30',
+  },
+
+  // Liens
+  link: {
+    primary: 'text-primary hover:text-primary/80 transition-colors',
+    accent: 'text-mustard hover:text-mustard/80 font-medium transition-colors',
+    muted: 'text-cream/60 hover:text-cream transition-colors',
   },
 
   // Cards et conteneurs
