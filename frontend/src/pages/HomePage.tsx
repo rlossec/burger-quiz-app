@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Play, PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { appTheme } from '@/config/theme';
+import { appTheme } from '@/theme';
 
 export function HomePage() {
-  const { cards, text, buttons, typography, spacing } = appTheme;
+  const { cards, text, typography, spacing } = appTheme;
 
   return (
     <div className={spacing.section.gap}>
@@ -28,21 +27,23 @@ export function HomePage() {
             <span className={text.accent.mayo}>Quiz</span>
           </h1>
           <p className={cn(typography.bodyLarge, text.secondary)}>
-            L'expérience quiz ultime. Créez, jouez, gagnez.
+            Gagnez des miams et remportez le Burger de la mort !
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
-            <Button asChild size="lg" className={cn('w-full sm:w-auto', buttons.team.ketchup)}>
-              <Link to="/play">
-                <Play className="mr-2 h-5 w-5" />
-                Jouer
-              </Link>
-            </Button>
-            <Button asChild size="lg" className={cn('w-full sm:w-auto', buttons.team.mayo)}>
-              <Link to="/quiz">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                Créer un quiz
-              </Link>
-            </Button>
+            <Link
+              to="/play"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-ketchup bg-transparent px-6 text-base font-semibold text-cream transition-colors hover:bg-ketchup/20 sm:w-auto"
+            >
+              <Play className="h-5 w-5" />
+              Jouer
+            </Link>
+            <Link
+              to="/quiz"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-mustard bg-transparent px-6 text-base font-semibold text-cream transition-colors hover:bg-mustard/20 sm:w-auto"
+            >
+              <PlusCircle className="h-5 w-5" />
+              Créer un quiz
+            </Link>
           </div>
         </div>
       </section>

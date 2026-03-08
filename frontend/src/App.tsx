@@ -1,25 +1,29 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
-import { commonRoutes } from './routes/common';
-import { Layout } from './components/layout';
+import { Suspense } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Layout } from '@/components/layout';
+import { ProtectedRoute, publicRoutes, protectedRoutes } from '@/routes';
+import { PageLoader } from '@/components/common';
 
-function App() {
+const router = createBrowserRouter([
+  // Routes publiques
+  ...publicRoutes,
+
+  // Routes protégées
+  {
+    element: <Layout />,
+    children: [
+      {
+        element: <ProtectedRoute />,
+        children: protectedRoutes,
+      },
+    ],
+  },
+]);
+
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          {commonRoutes.map((route) => (
-            <Route
-              key={route.path}
-              index={route.path === '/'}
-              path={route.path === '/' ? undefined : route.path}
-              element={route.element}
-            />
-          ))}
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Suspense fallback={<PageLoader />}>
+      <RouterProvider router={router} />
+    </Suspense>
   );
 }
-
-export default App;
