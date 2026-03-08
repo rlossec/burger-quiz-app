@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Home, HelpCircle, Play, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { appTheme } from '@/config/theme';
+import { appTheme } from '@/theme';
 
 interface NavProps {
   className?: string;

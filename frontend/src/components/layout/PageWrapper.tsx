@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
-import { appTheme } from '@/config/theme';
+import { appTheme } from '@/theme';
 
-interface ContainerProps {
+interface PageWrapperProps {
   children: React.ReactNode;
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -15,7 +15,11 @@ const sizeClasses = {
   full: 'max-w-full',
 };
 
-export function Container({ children, className, size = 'xl' }: ContainerProps) {
+/**
+ * Conteneur de mise en page : largeur max, padding horizontal.
+ * Réutilisable dans layout, pages, etc.
+ */
+export function PageWrapper({ children, className, size = 'xl' }: PageWrapperProps) {
   return (
     <div
       className={cn(
