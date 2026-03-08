@@ -2,7 +2,7 @@ import { useOutlet } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { colors, fonts, ThemeBackground } from '@/theme';
 import { BurgerArtwork, ArtworkSubtitle } from '../common/artwork';
-import { StatsBadges } from '@/components/ui/custom/StatsBadges';
+import { StatsBadges } from '@/components/common';
 
 // ─── AuthLayout ──────────────────────────────────────────────────────────────
 interface AuthLayoutProps {
