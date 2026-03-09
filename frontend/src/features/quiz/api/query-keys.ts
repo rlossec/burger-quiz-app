@@ -7,6 +7,7 @@ export const queryKeys = {
     all: () => ['quiz'] as const,
     lists: () => ['quiz', 'list'] as const,
     detail: (id: string) => ['quiz', id] as const,
+    structure: (id: string) => ['quiz', id, 'structure'] as const,
   },
 
   nuggets: {
