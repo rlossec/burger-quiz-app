@@ -59,10 +59,12 @@ export function RegisterForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-cream" style={{ fontFamily: "'Syne', system-ui" }}>
+        <h2
+          className="text-2xl font-bold text-center text-cream"
+          style={{ fontFamily: "'Syne', system-ui" }}
+        >
           Créer un compte
         </h2>
-        <p className="text-sm text-cream/50">Commencez votre aventure quiz</p>
       </div>
 
       {error && (
@@ -111,6 +113,7 @@ export function RegisterForm() {
           <Input
             id="password"
             type="password"
+            placeholder="••••••••"
             autoComplete="new-password"
             aria-invalid={!!errors.password}
             className={`h-11 ${appTheme.input.dark}`}
@@ -126,6 +129,7 @@ export function RegisterForm() {
           <Input
             id="re_password"
             type="password"
+            placeholder="••••••••"
             autoComplete="new-password"
             aria-invalid={!!errors.re_password}
             className={`h-11 ${appTheme.input.dark}`}

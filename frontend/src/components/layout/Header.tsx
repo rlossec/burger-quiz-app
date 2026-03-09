@@ -5,7 +5,7 @@ import { PageWrapper } from './PageWrapper';
 import { Nav } from './Nav';
 
 import { colors } from '@/theme';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/stores';
 import { tokenStorage } from '@/lib/axios';
 import { Logo } from './header/Logo';
 import { HeaderUserActions } from './header/HeaderUserActions';

@@ -65,10 +65,12 @@ export function LoginForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-cream" style={{ fontFamily: "'Syne', system-ui" }}>
+        <h2
+          className="text-2xl font-bold text-center text-cream"
+          style={{ fontFamily: "'Syne', system-ui" }}
+        >
           Connexion
         </h2>
-        <p className="text-sm text-cream/50">Bon retour parmi nous !</p>
       </div>
 
       {error && (
@@ -95,22 +97,23 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-sm font-medium text-cream/70">
-              Mot de passe
-            </Label>
-            <Link to="/auth/forgot-password" className={`text-xs ${appTheme.link.primary}`}>
-              Mot de passe oublié ?
-            </Link>
-          </div>
+          <Label htmlFor="password" className="text-sm font-medium text-cream/70">
+            Mot de passe
+          </Label>
           <Input
             id="password"
             type="password"
+            placeholder="••••••••"
             autoComplete="current-password"
             aria-invalid={!!errors.password}
             className={`h-11 ${appTheme.input.dark}`}
             {...register('password')}
           />
+          <div className="flex justify-end">
+            <Link to="/auth/forgot-password" className={`text-xs ${appTheme.link.primary}`}>
+              Mot de passe oublié ?
+            </Link>
+          </div>
           {errors.password && <p className="text-xs text-ketchup">{errors.password.message}</p>}
         </div>
 

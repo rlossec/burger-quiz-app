@@ -23,10 +23,10 @@
 
 #### Phase 1 – Planification fonctionnelle
 
-- [x] Liste des pages avec routes associées → [page_reference.md](../frontend/page_reference.md)
+- [x] Liste des pages avec routes associées → [page_reference.md](../frontend/page_reference.md) (dans `docs/frontend/`)
 - [x] Définition des modèles front (types) → [types.md](../frontend/types.md)
-- [x] Liste des états globaux (stores) → [stores.md](../frontend/stores.md)
-- [x] Définition des flux (auth, quiz, session) → [flows/](../frontend/flows/README.md)
+- [x] Liste des états globaux (stores) → [stores.md](../frontend/stores.md) (dans `docs/frontend/`)
+- [x] Définition des flux (auth, quiz, session) → [flows/](../frontend/flows/README.md) (dans `docs/`)
 
 #### Phase 2 – Setup technique
 
@@ -50,21 +50,19 @@
 
 #### Phase 5 – Routing et pages vides
 
-- [ ] Créer les pages placeholder
-- [ ] Configurer les routes
+- [x] Créer les pages placeholder
+- [x] Configurer les routes
 
 #### Phase 6 – Auth
 
-- [ ] Login page
-- [ ] Register Page
-- [ ] Dashboard Placeholder
-- [ ] Auth store (Zustand)
-- [ ] ProtectedRoute
+- [x] Login page
+- [x] Register Page
+- [x] Auth store (Zustand)
+- [x] ProtectedRoute
 
 #### Phase 7 – Feature BurgerQuiz
 
-- [ ] Types
-- [ ] Service API
+- [x] Types
 - [ ] Hooks TanStack Query
 - [ ] Card component
 - [ ] Pages
@@ -83,55 +81,6 @@
 - [ ] Skeleton loaders
 - [ ] Error boundaries
 - [ ] Animations
-
-## 3. Structure Frontend
-
-```
-src/
-├── app/
-│   ├── router.tsx          # Configuration React Router
-│   └── providers.tsx       # Providers (Query, Theme, etc.)
-│
-├── components/
-│   ├── layout/             # Layout, Header, Footer, Nav
-│   ├── ui/                 # Composants shadcn/ui
-│   └── common/             # Composants réutilisables
-│
-├── features/
-│   ├── auth/
-│   │   ├── api/
-│   │   ├── hooks/
-│   │   ├── components/
-│   │   ├── store.ts
-│   │   └── types.ts
-│   │
-│   ├── burger-quiz/
-│   │   ├── api/
-│   │   ├── hooks/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── types.ts
-│   │
-│   └── play/
-│       ├── components/
-│       ├── hooks/
-│       └── store.ts
-│
-├── hooks/                  # Hooks globaux
-├── services/               # Client API (axios)
-├── lib/                    # Utilitaires
-├── types/                  # Types globaux
-├── styles/                 # Styles globaux
-└── main.tsx
-```
-
-## 4. Contextes globaux
-
-| Contexte            | Usage                        | Alternative          |
-| ------------------- | ---------------------------- | -------------------- |
-| AuthContext         | Authentification utilisateur | Zustand recommandé   |
-| ThemeContext        | Toggle dark/light            | shadcn ThemeProvider |
-| NotificationContext | Toasts / alertes             | Zustand ou sonner    |
 
 ## 5. Versions cibles
 

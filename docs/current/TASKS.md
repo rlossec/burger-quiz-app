@@ -4,6 +4,8 @@ Tâches techniques et éléments de documentation à traiter.
 
 ---
 
+[ ] Site frontend pré rempli via entrypoint ?
+
 ## En cours / prioritaire
 
 - [x] Compléter les user stories
