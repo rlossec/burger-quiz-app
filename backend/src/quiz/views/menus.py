@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 
 from ..models import Menus
@@ -5,6 +6,7 @@ from ..serializers import MenusSerializer
 from .base import AuthorAutoAssignMixin
 
 
+@extend_schema(tags=["Manche Menus"])
 class MenusViewSet(AuthorAutoAssignMixin, viewsets.ModelViewSet):
     """ViewSet pour le modèle Menus (manche Menus, regroupe 3 thèmes)."""
 

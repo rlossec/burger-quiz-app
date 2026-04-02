@@ -24,6 +24,10 @@ class CustomUserCreateSerializer(DjoserUserCreatePasswordRetypeSerializer):
             },
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['re_password'].write_only = True
+
     def validate_email(self, value):
         if not value:
             raise serializers.ValidationError("L'email est obligatoire.")

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, filters
 
 from ..models import Question
@@ -5,6 +6,7 @@ from ..serializers import QuestionSerializer, QuestionListSerializer
 from .base import AuthorAutoAssignMixin
 
 
+@extend_schema(tags=["Questions"])
 class QuestionViewSet(AuthorAutoAssignMixin, viewsets.ModelViewSet):
     """
     ViewSet pour le modèle Question.

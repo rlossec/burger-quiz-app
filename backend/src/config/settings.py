@@ -268,4 +268,16 @@ SPECTACULAR_SETTINGS = {
     'REDOC_DIST': 'SIDECAR',
     'COMPONENT_SPLIT_REQUEST': True,
     'SECURITY': [{'BearerAuth': []}],
+    'TAGS': [
+        {'name': 'Comptes', 'description': 'Utilisateurs et profil (Djoser).'},
+        {'name': 'Questions', 'description': 'Banque de questions réutilisables.'},
+        {'name': 'Interludes vidéo', 'description': 'Interludes YouTube réutilisables.'},
+        {'name': 'Burger Quiz', 'description': 'Sessions de quiz et structure (ordre des manches / interludes).'},
+        {'name': 'Manche Nuggets', 'description': 'Manche Nuggets.'},
+        {'name': 'Manche Sel ou poivre', 'description': 'Manche Sel ou poivre.'},
+        {'name': 'Manche Menus', 'description': 'Manche regroupant trois thèmes de menu.'},
+        {'name': 'Thèmes de menu', 'description': 'Thèmes au sein de la manche Menus.'},
+        {'name': 'Manche Addition', 'description': 'Manche Addition.'},
+        {'name': 'Manche Burger de la mort', 'description': 'Finale Burger de la mort.'},
+    ],
 }

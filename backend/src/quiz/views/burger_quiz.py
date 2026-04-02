@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,11 +13,26 @@ from ..serializers import (
 from .base import AuthorAutoAssignMixin
 
 
+@extend_schema(tags=["Burger Quiz"])
 class BurgerQuizViewSet(AuthorAutoAssignMixin, viewsets.ModelViewSet):
     """ViewSet pour le modèle BurgerQuiz."""
 
     queryset = BurgerQuiz.objects.all().order_by("-created_at")
     serializer_class = BurgerQuizSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="expand",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Valeur `full` : inclut la structure détaillée (manches et interludes complets).",
+                required=False,
+            ),
+        ],
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     @action(detail=True, methods=["get", "put"], url_path="structure", url_name="structure")
     def structure(self, request, pk=None):
