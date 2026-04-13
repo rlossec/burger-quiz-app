@@ -17,6 +17,7 @@ Point d'entrée de la documentation des tests Burger Quiz.
 | Module       | Document                               | Contenu                                                                     |
 | ------------ | -------------------------------------- | --------------------------------------------------------------------------- |
 | **Quiz**     | [quiz.md](quiz.md)                     | Tests des endpoints (questions, manches, Burger Quiz), structure, commandes |
+| **Quiz**     | [burger-quiz-structure.md](burger-quiz-structure.md) | Cas de test GET/PUT `/burger-quizzes/{id}/structure/` (matrice, auth, validations) |
 | **Quiz**     | [quiz-factories.md](quiz-factories.md) | Factories factory_boy, méthodes, exemples d'usage                           |
 | **Accounts** | [accounts.md](accounts.md)             | Tests auth (JWT, activation, reset), CRUD utilisateurs                      |
 
