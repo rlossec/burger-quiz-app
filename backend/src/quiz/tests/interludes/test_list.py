@@ -7,11 +7,6 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from ..factories import VideoInterludeFactory
-from .. import (
-    INTERLUDE_TYPE_IN,
-    INTERLUDE_TYPE_OU,
-    INTERLUDE_TYPE_PU,
-)
 
 User = get_user_model()
 
@@ -47,23 +42,23 @@ class TestInterludeListEndpoint(APITestCase):
         self.assertEqual(response.data["count"], 3)
         self.assertEqual(len(response.data["results"]), 3)
 
-    def test_list_interludes_filter_by_type_intro(self):
-        """Filtre par type d'interlude (intro)."""
+    def test_list_interludes_filter_by_tag_intro(self):
+        """Filtre par tag (intro)."""
         VideoInterludeFactory.create_intro(title="Intro 1")
         VideoInterludeFactory.create_pub(title="Pub 1")
 
-        response = self.client.get(self.url, {"interlude_type": INTERLUDE_TYPE_IN})
+        response = self.client.get(self.url, {"tag": "intro"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
-        self.assertEqual(response.data["results"][0]["interlude_type"], INTERLUDE_TYPE_IN)
+        self.assertEqual(response.data["results"][0]["title"], "Intro 1")
 
-    def test_list_interludes_filter_by_type_pub(self):
-        """Filtre par type d'interlude (pub)."""
+    def test_list_interludes_filter_by_tag_pub(self):
+        """Filtre par tag (pub)."""
         VideoInterludeFactory.create_intro(title="Intro 1")
         VideoInterludeFactory.create_pub(title="Pub 1")
         VideoInterludeFactory.create_pub(title="Pub 2")
 
-        response = self.client.get(self.url, {"interlude_type": INTERLUDE_TYPE_PU})
+        response = self.client.get(self.url, {"tag": "pub"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 2)
 
@@ -79,14 +74,14 @@ class TestInterludeListEndpoint(APITestCase):
         self.assertEqual(response.data["results"][0]["title"], "Pub Ketchup")
 
     def test_list_interludes_combined_filters(self):
-        """Combinaison de filtres (type + search)."""
+        """Combinaison tag + search."""
         VideoInterludeFactory.create_pub(title="Pub Ketchup")
         VideoInterludeFactory.create_pub(title="Pub Moutarde")
         VideoInterludeFactory.create_intro(title="Intro Ketchup")
 
         response = self.client.get(
             self.url,
-            {"interlude_type": INTERLUDE_TYPE_PU, "search": "Ketchup"},
+            {"tag": "pub", "search": "Ketchup"},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
@@ -105,13 +100,13 @@ class TestInterludeListEndpoint(APITestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         item = response.data["results"][0]
         self.assertIn("id", item)
         self.assertIn("title", item)
         self.assertIn("youtube_url", item)
         self.assertIn("youtube_video_id", item)
-        self.assertIn("interlude_type", item)
+        self.assertNotIn("interlude_type", item)
         self.assertIn("duration_seconds", item)
         self.assertIn("autoplay", item)
         self.assertIn("skip_allowed", item)

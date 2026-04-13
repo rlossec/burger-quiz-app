@@ -20,6 +20,7 @@ from ..models import (
     BurgerQuiz,
     VideoInterlude,
     BurgerQuizElement,
+    Round,
 )
 from . import (
     QUESTION_TYPE_NU,
@@ -29,10 +30,6 @@ from . import (
     QUESTION_TYPE_DB,
     MENU_TYPE_CL,
     MENU_TYPE_TR,
-    INTERLUDE_TYPE_IN,
-    INTERLUDE_TYPE_OU,
-    INTERLUDE_TYPE_PU,
-    INTERLUDE_TYPE_IL,
 )
 
 User = get_user_model()
@@ -461,7 +458,6 @@ class VideoInterludeFactory(DjangoModelFactory):
 
     title = factory.Sequence(lambda n: f"Interlude {n}")
     youtube_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    interlude_type = INTERLUDE_TYPE_IL
     duration_seconds = 30
     autoplay = True
     skip_allowed = True
@@ -477,40 +473,31 @@ class VideoInterludeFactory(DjangoModelFactory):
 
     @classmethod
     def create_intro(cls, title="Intro", author=None, tags=None, **kwargs):
-        """Crée un interlude de type Intro."""
-        return cls.create(
-            title=title,
-            interlude_type=INTERLUDE_TYPE_IN,
-            author=author,
-            tags=tags,
-            **kwargs,
-        )
+        """Crée un interlude tagué intro (convention tests)."""
+        merged = list(tags) if tags else []
+        if "intro" not in merged:
+            merged.append("intro")
+        return cls.create(title=title, author=author, tags=merged, **kwargs)
 
     @classmethod
     def create_outro(cls, title="Outro", author=None, tags=None, **kwargs):
-        """Crée un interlude de type Outro."""
-        return cls.create(
-            title=title,
-            interlude_type=INTERLUDE_TYPE_OU,
-            author=author,
-            tags=tags,
-            **kwargs,
-        )
+        """Crée un interlude tagué outro (convention tests)."""
+        merged = list(tags) if tags else []
+        if "outro" not in merged:
+            merged.append("outro")
+        return cls.create(title=title, author=author, tags=merged, **kwargs)
 
     @classmethod
     def create_pub(cls, title="Pub", author=None, tags=None, **kwargs):
-        """Crée un interlude de type Pub."""
-        return cls.create(
-            title=title,
-            interlude_type=INTERLUDE_TYPE_PU,
-            author=author,
-            tags=tags,
-            **kwargs,
-        )
+        """Crée un interlude tagué pub (convention tests)."""
+        merged = list(tags) if tags else []
+        if "pub" not in merged:
+            merged.append("pub")
+        return cls.create(title=title, author=author, tags=merged, **kwargs)
 
 
 # ---------------------------------------------------------------------------
-# BurgerQuiz (FKs optionnels)
+# BurgerQuiz (structure = BurgerQuizElement uniquement)
 # ---------------------------------------------------------------------------
 
 
@@ -521,11 +508,6 @@ class BurgerQuizFactory(DjangoModelFactory):
     title = factory.Sequence(lambda n: f"Session test {n}")
     toss = "Consigne du toss."
     author = None
-    nuggets = None
-    salt_or_pepper = None
-    menus = None
-    addition = None
-    deadly_burger = None
 
     @factory.post_generation
     def tags(obj, create, extracted, **kwargs):
@@ -536,19 +518,18 @@ class BurgerQuizFactory(DjangoModelFactory):
 
     @classmethod
     def create_full(cls, title="Session complète", toss="Toss complet", author=None, tags=None, **kwargs):
-        """Burger Quiz avec toutes les manches créées automatiquement."""
-        return cls.create(
-            title=title,
-            toss=toss,
-            author=author,
-            tags=tags,
-            nuggets=NuggetsFactory.create(),
-            salt_or_pepper=SaltOrPepperFactory.create(),
-            menus=MenusFactory.create(),
-            addition=AdditionFactory.create(),
-            deadly_burger=DeadlyBurgerFactory.create(),
-            **kwargs,
-        )
+        """Burger Quiz avec les 5 manches créées et liées via BurgerQuizElement."""
+        n = NuggetsFactory.create()
+        sp = SaltOrPepperFactory.create()
+        m = MenusFactory.create()
+        a = AdditionFactory.create()
+        db = DeadlyBurgerFactory.create()
+        bq = cls.create(title=title, toss=toss, author=author, tags=tags, **kwargs)
+        order = 1
+        for obj in (n, sp, m, a, db):
+            BurgerQuizElementFactory.create_round(burger_quiz=bq, order=order, round_obj=obj)
+            order += 1
+        return bq
 
     @classmethod
     def create_with_structure(
@@ -561,39 +542,54 @@ class BurgerQuizFactory(DjangoModelFactory):
         **kwargs,
     ):
         """
-        Burger Quiz avec toutes les manches et une structure personnalisée.
-        
+        Burger Quiz avec les 5 manches et une structure personnalisée (interludes optionnels).
+
         Args:
             interludes: dict avec clés optionnelles 'intro', 'outro', 'pubs' (liste)
-                       Si None, crée une structure par défaut sans interludes.
         """
-        bq = cls.create_full(title=title, toss=toss, author=author, tags=tags, **kwargs)
-        
+        n = NuggetsFactory.create()
+        sp = SaltOrPepperFactory.create()
+        m = MenusFactory.create()
+        a = AdditionFactory.create()
+        db = DeadlyBurgerFactory.create()
+        bq = cls.create(title=title, toss=toss, author=author, tags=tags, **kwargs)
+
+        round_objs = {
+            QUESTION_TYPE_NU: n,
+            QUESTION_TYPE_SP: sp,
+            QUESTION_TYPE_ME: m,
+            QUESTION_TYPE_AD: a,
+            QUESTION_TYPE_DB: db,
+        }
+
         elements = []
         order = 1
-        
+
         if interludes and interludes.get("intro"):
             elements.append(
                 BurgerQuizElement(
                     burger_quiz=bq,
                     order=order,
-                    element_type="interlude",
-                    interlude=interludes["intro"],
+                    element_type=BurgerQuizElement.ElementType.INTERLUDE,
+                    interlude_id=interludes["intro"].pk,
+                    round=None,
                 )
             )
             order += 1
-        
+
         for round_type in [QUESTION_TYPE_NU, QUESTION_TYPE_SP, QUESTION_TYPE_ME, QUESTION_TYPE_AD, QUESTION_TYPE_DB]:
+            obj = round_objs[round_type]
             elements.append(
                 BurgerQuizElement(
                     burger_quiz=bq,
                     order=order,
-                    element_type="round",
-                    round_type=round_type,
+                    element_type=BurgerQuizElement.ElementType.ROUND,
+                    round_id=obj.pk,
+                    interlude=None,
                 )
             )
             order += 1
-            
+
             if interludes and interludes.get("pubs"):
                 for pub in interludes["pubs"]:
                     if pub.get("after") == round_type:
@@ -601,23 +597,26 @@ class BurgerQuizFactory(DjangoModelFactory):
                             BurgerQuizElement(
                                 burger_quiz=bq,
                                 order=order,
-                                element_type="interlude",
-                                interlude=pub["interlude"],
+                                element_type=BurgerQuizElement.ElementType.INTERLUDE,
+                                interlude_id=pub["interlude"].pk,
+                                round=None,
                             )
                         )
                         order += 1
-        
+
         if interludes and interludes.get("outro"):
             elements.append(
                 BurgerQuizElement(
                     burger_quiz=bq,
                     order=order,
-                    element_type="interlude",
-                    interlude=interludes["outro"],
+                    element_type=BurgerQuizElement.ElementType.INTERLUDE,
+                    interlude_id=interludes["outro"].pk,
+                    round=None,
                 )
             )
-        
-        BurgerQuizElement.objects.bulk_create(elements)
+
+        for el in elements:
+            el.save()
         return bq
 
 
@@ -625,36 +624,41 @@ class BurgerQuizFactory(DjangoModelFactory):
 # BurgerQuizElement
 # ---------------------------------------------------------------------------
 
-class BurgerQuizElementFactory(DjangoModelFactory):
-    """Factory pour créer des éléments de structure de Burger Quiz."""
+ROUND_TYPE_TO_MODEL_ATTR = {
+    QUESTION_TYPE_NU: (Nuggets, "nuggets"),
+    QUESTION_TYPE_SP: (SaltOrPepper, "salt_or_pepper"),
+    QUESTION_TYPE_ME: (Menus, "menus"),
+    QUESTION_TYPE_AD: (Addition, "addition"),
+    QUESTION_TYPE_DB: (DeadlyBurger, "deadly_burger"),
+}
 
-    class Meta:
-        model = BurgerQuizElement
 
-    burger_quiz = factory.SubFactory(BurgerQuizFactory)
-    order = factory.Sequence(lambda n: n + 1)
-    element_type = "round"
-    round_type = QUESTION_TYPE_NU
-    interlude = None
+class BurgerQuizElementFactory:
+    """Création d'éléments de structure (Round + VideoInterlude)."""
 
     @classmethod
-    def create_round(cls, burger_quiz, order, round_type):
-        """Crée un élément de type manche."""
-        return cls.create(
+    def create_round(cls, burger_quiz, order, round_obj):
+        """Crée un élément de type manche (instance Nuggets, Menus, …). Requiert un `Round` avec le même id."""
+        Round.objects.get(pk=round_obj.pk)
+        el = BurgerQuizElement(
             burger_quiz=burger_quiz,
             order=order,
-            element_type="round",
-            round_type=round_type,
+            element_type=BurgerQuizElement.ElementType.ROUND,
+            round_id=round_obj.pk,
             interlude=None,
         )
+        el.save()
+        return el
 
     @classmethod
     def create_interlude(cls, burger_quiz, order, interlude):
         """Crée un élément de type interlude."""
-        return cls.create(
+        el = BurgerQuizElement(
             burger_quiz=burger_quiz,
             order=order,
-            element_type="interlude",
-            round_type=None,
-            interlude=interlude,
+            element_type=BurgerQuizElement.ElementType.INTERLUDE,
+            interlude_id=interlude.pk,
+            round=None,
         )
+        el.save()
+        return el

@@ -9,23 +9,73 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from ...models import BurgerQuizElement
+from ...serializers.structure import STRUCTURE_TYPE_TO_MODEL
 from ..factories import (
+    AdditionFactory,
     BurgerQuizFactory,
+    DeadlyBurgerFactory,
+    MenusFactory,
+    NuggetsFactory,
+    SaltOrPepperFactory,
     VideoInterludeFactory,
     BurgerQuizElementFactory,
 )
-from .. import (
-    QUESTION_TYPE_NU,
-    QUESTION_TYPE_SP,
-    QUESTION_TYPE_ME,
-    QUESTION_TYPE_AD,
-    QUESTION_TYPE_DB,
-    STRUCTURE_DUPLICATE_ROUND_TYPE,
-    STRUCTURE_ROUND_NOT_ATTACHED,
-    STRUCTURE_INTERLUDE_NOT_FOUND,
-)
-
 User = get_user_model()
+
+
+def _element_id_for_slug(bq, slug: str) -> str:
+    model = STRUCTURE_TYPE_TO_MODEL[slug]
+    for row in bq.structure_elements.select_related(
+        "round",
+        "interlude",
+        "round__nuggets",
+        "round__salt_or_pepper",
+        "round__menus",
+        "round__addition",
+        "round__deadly_burger",
+    ).order_by("order"):
+        c = row.content
+        if c is not None and isinstance(c, model):
+            return str(c.id)
+    raise AssertionError(f"Aucun élément de structure pour le slug {slug!r}")
+
+
+def _payload_full_order(bq, intro, pub, outro):
+    """Ordre : intro, NU, SP, pub, ME, AD, DB, outro."""
+    return {
+        "elements": [
+            {"type": "video_interlude", "id": str(intro.id)},
+            {"type": "nuggets", "id": _element_id_for_slug(bq, "nuggets")},
+            {"type": "salt_or_pepper", "id": _element_id_for_slug(bq, "salt_or_pepper")},
+            {"type": "video_interlude", "id": str(pub.id)},
+            {"type": "menus", "id": _element_id_for_slug(bq, "menus")},
+            {"type": "addition", "id": _element_id_for_slug(bq, "addition")},
+            {"type": "deadly_burger", "id": _element_id_for_slug(bq, "deadly_burger")},
+            {"type": "video_interlude", "id": str(outro.id)},
+        ]
+    }
+
+
+class TestBurgerQuizStructureAuth(APITestCase):
+    """GET/PUT structure — authentification requise (REST_FRAMEWORK default)."""
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="test_user",
+            email="test@example.com",
+            password="TestPassword123!",
+        )
+        self.bq = BurgerQuizFactory.create_full(title="Quiz complet")
+        self.url = reverse("burger-quiz-structure", kwargs={"pk": self.bq.pk})
+
+    def test_get_structure_requires_authentication(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_put_structure_requires_authentication(self):
+        response = self.client.put(self.url, {"elements": []}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class TestBurgerQuizStructureReadEndpoint(APITestCase):
@@ -42,35 +92,44 @@ class TestBurgerQuizStructureReadEndpoint(APITestCase):
         self.bq = BurgerQuizFactory.create_full(title="Quiz complet")
         self.url = reverse("burger-quiz-structure", kwargs={"pk": self.bq.pk})
 
-    def test_get_structure_empty(self):
-        """Structure vide si non configurée (retourne structure par défaut)."""
+    def test_get_structure_default_order(self):
+        """create_full : 5 BurgerQuizElement dans l'ordre NU → SP → ME → AD → DB."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["burger_quiz_id"], str(self.bq.id))
-        self.assertIn("elements", response.data)
+        elements = response.data["elements"]
+        self.assertEqual(len(elements), 5)
+        types = [e["type"] for e in elements]
+        self.assertEqual(
+            types,
+            ["nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger"],
+        )
+        self.assertEqual(elements[0]["id"], _element_id_for_slug(self.bq, "nuggets"))
 
-    def test_get_structure_with_elements(self):
-        """Structure avec éléments configurés."""
+    def test_get_structure_with_custom_rows(self):
+        """Ordre persisté (lignes BurgerQuizElement)."""
         intro = VideoInterludeFactory.create_intro(title="Intro")
         outro = VideoInterludeFactory.create_outro(title="Outro")
-        
+
+        BurgerQuizElement.objects.filter(burger_quiz=self.bq).delete()
+
         BurgerQuizElementFactory.create_interlude(self.bq, order=1, interlude=intro)
-        BurgerQuizElementFactory.create_round(self.bq, order=2, round_type=QUESTION_TYPE_NU)
-        BurgerQuizElementFactory.create_round(self.bq, order=3, round_type=QUESTION_TYPE_SP)
-        BurgerQuizElementFactory.create_round(self.bq, order=4, round_type=QUESTION_TYPE_ME)
-        BurgerQuizElementFactory.create_round(self.bq, order=5, round_type=QUESTION_TYPE_AD)
-        BurgerQuizElementFactory.create_round(self.bq, order=6, round_type=QUESTION_TYPE_DB)
+        BurgerQuizElementFactory.create_round(self.bq, order=2, round_obj=NuggetsFactory.create())
+        BurgerQuizElementFactory.create_round(self.bq, order=3, round_obj=SaltOrPepperFactory.create())
+        BurgerQuizElementFactory.create_round(self.bq, order=4, round_obj=MenusFactory.create())
+        BurgerQuizElementFactory.create_round(self.bq, order=5, round_obj=AdditionFactory.create())
+        BurgerQuizElementFactory.create_round(self.bq, order=6, round_obj=DeadlyBurgerFactory.create())
         BurgerQuizElementFactory.create_interlude(self.bq, order=7, interlude=outro)
-        
+
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["elements"]), 7)
-        
-        self.assertEqual(response.data["elements"][0]["element_type"], "interlude")
+
+        self.assertEqual(response.data["elements"][0]["type"], "video_interlude")
         self.assertEqual(response.data["elements"][0]["order"], 1)
-        
-        self.assertEqual(response.data["elements"][1]["element_type"], "round")
-        self.assertEqual(response.data["elements"][1]["round_type"], QUESTION_TYPE_NU)
+
+        self.assertEqual(response.data["elements"][1]["type"], "nuggets")
+        self.assertEqual(response.data["elements"][1]["order"], 2)
 
     def test_get_structure_not_found(self):
         """404 si le Burger Quiz n'existe pas."""
@@ -79,16 +138,33 @@ class TestBurgerQuizStructureReadEndpoint(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_structure_elements_ordered(self):
-        """Les éléments sont retournés dans l'ordre."""
-        BurgerQuizElementFactory.create_round(self.bq, order=3, round_type=QUESTION_TYPE_ME)
-        BurgerQuizElementFactory.create_round(self.bq, order=1, round_type=QUESTION_TYPE_NU)
-        BurgerQuizElementFactory.create_round(self.bq, order=2, round_type=QUESTION_TYPE_SP)
-        
-        response = self.client.get(self.url)
+        """Les éléments sont retournés dans l'ordre persisté."""
+        bq = BurgerQuizFactory.create(title="Quiz partiel")
+        me = MenusFactory.create()
+        n = NuggetsFactory.create()
+        sp = SaltOrPepperFactory.create()
+        BurgerQuizElementFactory.create_round(bq, order=3, round_obj=me)
+        BurgerQuizElementFactory.create_round(bq, order=1, round_obj=n)
+        BurgerQuizElementFactory.create_round(bq, order=2, round_obj=sp)
+
+        url = reverse("burger-quiz-structure", kwargs={"pk": bq.pk})
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         orders = [el["order"] for el in response.data["elements"]]
         self.assertEqual(orders, [1, 2, 3])
+
+    def test_get_structure_elements_include_nested_payload(self):
+        """Réponse GET : chaque élément contient order, type, id et l'objet imbriqué sous la clé du type."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        first = response.data["elements"][0]
+        self.assertIn("order", first)
+        self.assertIn("type", first)
+        self.assertIn("id", first)
+        self.assertEqual(first["type"], "nuggets")
+        self.assertIn("nuggets", first)
+        self.assertEqual(first["nuggets"]["id"], first["id"])
 
 
 class TestBurgerQuizStructureUpdateEndpoint(APITestCase):
@@ -109,109 +185,99 @@ class TestBurgerQuizStructureUpdateEndpoint(APITestCase):
         self.url = reverse("burger-quiz-structure", kwargs={"pk": self.bq.pk})
 
     def test_put_structure_success(self):
-        """Remplacement complet de la structure."""
-        payload = {
-            "elements": [
-                {"element_type": "interlude", "interlude_id": str(self.intro.id)},
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
-                {"element_type": "round", "round_type": QUESTION_TYPE_SP},
-                {"element_type": "interlude", "interlude_id": str(self.pub.id)},
-                {"element_type": "round", "round_type": QUESTION_TYPE_ME},
-                {"element_type": "round", "round_type": QUESTION_TYPE_AD},
-                {"element_type": "round", "round_type": QUESTION_TYPE_DB},
-                {"element_type": "interlude", "interlude_id": str(self.outro.id)},
-            ]
-        }
-        
+        """Remplacement complet de la structure (ordre = position dans le tableau)."""
+        payload = _payload_full_order(self.bq, self.intro, self.pub, self.outro)
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["elements"]), 8)
-        
+
         elements = BurgerQuizElement.objects.filter(burger_quiz=self.bq).order_by("order")
         self.assertEqual(elements.count(), 8)
-        self.assertEqual(elements[0].element_type, "interlude")
-        self.assertEqual(elements[0].interlude, self.intro)
-        self.assertEqual(elements[1].element_type, "round")
-        self.assertEqual(elements[1].round_type, QUESTION_TYPE_NU)
 
     def test_put_structure_replaces_existing(self):
         """PUT remplace entièrement la structure existante."""
-        BurgerQuizElementFactory.create_round(self.bq, order=1, round_type=QUESTION_TYPE_NU)
-        BurgerQuizElementFactory.create_round(self.bq, order=2, round_type=QUESTION_TYPE_SP)
-        
+        BurgerQuizElement.objects.filter(burger_quiz=self.bq).delete()
+        n = NuggetsFactory.create()
+        sp = SaltOrPepperFactory.create()
+        BurgerQuizElementFactory.create_round(self.bq, order=1, round_obj=n)
+        BurgerQuizElementFactory.create_round(self.bq, order=2, round_obj=sp)
+
         self.assertEqual(BurgerQuizElement.objects.filter(burger_quiz=self.bq).count(), 2)
-        
+
+        menus = MenusFactory.create()
         payload = {
             "elements": [
-                {"element_type": "round", "round_type": QUESTION_TYPE_ME},
+                {"type": "menus", "id": str(menus.id)},
             ]
         }
-        
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         elements = BurgerQuizElement.objects.filter(burger_quiz=self.bq)
         self.assertEqual(elements.count(), 1)
-        self.assertEqual(elements[0].round_type, QUESTION_TYPE_ME)
+        self.assertEqual(elements[0].content, menus)
 
-    def test_put_structure_order_from_position(self):
-        """L'ordre est déterminé par la position dans le tableau."""
+    def test_put_structure_order_from_array_position(self):
+        """L'ordre d'apparition suit la position dans le tableau (order 1, 2, 3…)."""
         payload = {
             "elements": [
-                {"element_type": "round", "round_type": QUESTION_TYPE_DB},
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
-                {"element_type": "round", "round_type": QUESTION_TYPE_ME},
+                {"type": "deadly_burger", "id": _element_id_for_slug(self.bq, "deadly_burger")},
+                {"type": "nuggets", "id": _element_id_for_slug(self.bq, "nuggets")},
+                {"type": "menus", "id": _element_id_for_slug(self.bq, "menus")},
             ]
         }
-        
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-        self.assertEqual(response.data["elements"][0]["order"], 1)
-        self.assertEqual(response.data["elements"][0]["round_type"], QUESTION_TYPE_DB)
-        self.assertEqual(response.data["elements"][1]["order"], 2)
-        self.assertEqual(response.data["elements"][1]["round_type"], QUESTION_TYPE_NU)
-        self.assertEqual(response.data["elements"][2]["order"], 3)
-        self.assertEqual(response.data["elements"][2]["round_type"], QUESTION_TYPE_ME)
 
-    def test_put_structure_duplicate_round_type_error(self):
-        """Erreur si un type de manche apparaît plusieurs fois."""
+        self.assertEqual(response.data["elements"][0]["order"], 1)
+        self.assertEqual(response.data["elements"][0]["type"], "deadly_burger")
+        self.assertEqual(response.data["elements"][1]["order"], 2)
+        self.assertEqual(response.data["elements"][1]["type"], "nuggets")
+        self.assertEqual(response.data["elements"][2]["order"], 3)
+        self.assertEqual(response.data["elements"][2]["type"], "menus")
+
+    def test_put_structure_duplicate_round_error(self):
+        """Erreur si le même type de manche apparaît deux fois."""
         payload = {
             "elements": [
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
+                {"type": "nuggets", "id": _element_id_for_slug(self.bq, "nuggets")},
+                {"type": "nuggets", "id": _element_id_for_slug(self.bq, "nuggets")},
             ]
         }
-        
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_put_structure_round_not_attached_error(self):
-        """Erreur si une manche référencée n'est pas attachée au Burger Quiz."""
-        bq_without_nuggets = BurgerQuizFactory.create(
-            title="Quiz sans nuggets",
-            nuggets=None,
-        )
-        url = reverse("burger-quiz-structure", kwargs={"pk": bq_without_nuggets.pk})
-        
+    def test_put_structure_any_nuggets_allowed(self):
+        """Une manche peut référencer n'importe quel Nuggets (plus de FK sur BurgerQuiz)."""
+        bq_empty = BurgerQuizFactory.create(title="Quiz vide")
+        other_bq = BurgerQuizFactory.create_full(title="Autre quiz")
         payload = {
             "elements": [
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
+                {"type": "nuggets", "id": _element_id_for_slug(other_bq, "nuggets")},
             ]
         }
-        
-        response = self.client.put(url, payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.put(
+            reverse("burger-quiz-structure", kwargs={"pk": bq_empty.pk}),
+            payload,
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(BurgerQuizElement.objects.filter(burger_quiz=bq_empty).count(), 1)
 
     def test_put_structure_interlude_not_found_error(self):
         """Erreur si un interlude référencé n'existe pas."""
         payload = {
             "elements": [
-                {"element_type": "interlude", "interlude_id": str(uuid.uuid4())},
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
+                {"type": "video_interlude", "id": str(uuid.uuid4())},
+                {"type": "nuggets", "id": _element_id_for_slug(self.bq, "nuggets")},
             ]
         }
-        
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -223,27 +289,127 @@ class TestBurgerQuizStructureUpdateEndpoint(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_structure_empty_elements(self):
-        """Structure vide est valide."""
+        """Structure vide : plus de lignes ; lecture suivante = []."""
         payload = {"elements": []}
-        
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["elements"], [])
 
+        get_response = self.client.get(self.url)
+        self.assertEqual(get_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(get_response.data["elements"]), 0)
+
     def test_put_structure_multiple_interludes_allowed(self):
-        """Plusieurs interludes du même type sont autorisés."""
+        """Le même interlude vidéo peut apparaître plusieurs fois."""
         pub2 = VideoInterludeFactory.create_pub(title="Pub 2")
-        
+
         payload = {
             "elements": [
-                {"element_type": "interlude", "interlude_id": str(self.pub.id)},
-                {"element_type": "round", "round_type": QUESTION_TYPE_NU},
-                {"element_type": "interlude", "interlude_id": str(pub2.id)},
-                {"element_type": "round", "round_type": QUESTION_TYPE_SP},
-                {"element_type": "interlude", "interlude_id": str(self.pub.id)},
+                {"type": "video_interlude", "id": str(self.pub.id)},
+                {"type": "nuggets", "id": _element_id_for_slug(self.bq, "nuggets")},
+                {"type": "video_interlude", "id": str(pub2.id)},
+                {"type": "salt_or_pepper", "id": _element_id_for_slug(self.bq, "salt_or_pepper")},
+                {"type": "video_interlude", "id": str(self.pub.id)},
             ]
         }
-        
+
         response = self.client.put(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["elements"]), 5)
+
+
+class TestBurgerQuizStructurePutValidation(APITestCase):
+    """PUT /structure/ — cas d'erreur et règles de validation (alignés sur BurgerQuizStructureSerializer)."""
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="test_user_val",
+            email="testval@example.com",
+            password="TestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
+        self.bq = BurgerQuizFactory.create_full(title="Quiz complet")
+        self.url = reverse("burger-quiz-structure", kwargs={"pk": self.bq.pk})
+
+    def test_put_structure_missing_elements_key(self):
+        """400 si le corps ne contient pas la clé `elements`."""
+        response = self.client.put(self.url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("elements", response.data)
+
+    def test_put_structure_elements_not_a_list(self):
+        """400 si `elements` n'est pas une liste."""
+        response = self.client.put(self.url, {"elements": {}}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_element_not_an_object(self):
+        """400 si un élément du tableau n'est pas un objet."""
+        response = self.client.put(self.url, {"elements": ["invalid"]}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_unknown_type(self):
+        """400 si `type` n'est pas un slug connu."""
+        response = self.client.put(
+            self.url,
+            {"elements": [{"type": "unknown_round", "id": str(uuid.uuid4())}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_missing_type(self):
+        """400 si `type` est absent."""
+        response = self.client.put(
+            self.url,
+            {"elements": [{"id": str(_element_id_for_slug(self.bq, "nuggets"))}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_missing_id(self):
+        """400 si `id` est absent pour une manche."""
+        response = self.client.put(
+            self.url,
+            {"elements": [{"type": "nuggets"}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_invalid_uuid(self):
+        """400 si `id` n'est pas un UUID valide."""
+        response = self.client.put(
+            self.url,
+            {"elements": [{"type": "nuggets", "id": "not-a-uuid"}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_id_wrong_model_for_type(self):
+        """400 si l'id existe pour une autre ressource que celle indiquée par `type`."""
+        nuggets_id = _element_id_for_slug(self.bq, "nuggets")
+        response = self.client.put(
+            self.url,
+            {"elements": [{"type": "salt_or_pepper", "id": nuggets_id}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_video_interlude_id_is_not_interlude(self):
+        """400 si type=video_interlude mais l'id n'est pas un VideoInterlude."""
+        nuggets_id = _element_id_for_slug(self.bq, "nuggets")
+        response = self.client.put(
+            self.url,
+            {"elements": [{"type": "video_interlude", "id": nuggets_id}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_structure_round_id_not_found(self):
+        """400 si aucune manche du type demandé n'existe pour cet id."""
+        response = self.client.put(
+            self.url,
+            {"elements": [{"type": "nuggets", "id": str(uuid.uuid4())}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

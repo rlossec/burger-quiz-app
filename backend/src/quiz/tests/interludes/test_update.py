@@ -9,7 +9,6 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from ..factories import VideoInterludeFactory
-from .. import INTERLUDE_TYPE_IN, INTERLUDE_TYPE_PU
 
 User = get_user_model()
 
@@ -66,22 +65,11 @@ class TestInterludeUpdateEndpoint(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["youtube_video_id"], "newvideo")
 
-    def test_patch_interlude_type(self):
-        """PATCH pour modifier le type d'interlude."""
-        response = self.client.patch(
-            self.url,
-            {"interlude_type": INTERLUDE_TYPE_PU},
-            format="json",
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["interlude_type"], INTERLUDE_TYPE_PU)
-
     def test_put_interlude_full_update(self):
         """PUT pour mise à jour complète."""
         payload = {
             "title": "Nouvelle intro",
             "youtube_url": "https://www.youtube.com/watch?v=fullupdate",
-            "interlude_type": INTERLUDE_TYPE_IN,
             "duration_seconds": 60,
             "autoplay": False,
             "skip_allowed": False,
@@ -113,7 +101,7 @@ class TestInterludeUpdateEndpoint(APITestCase):
 
     def test_patch_does_not_change_author(self):
         """PATCH ne modifie pas l'auteur."""
-        other_user = User.objects.create_user(
+        User.objects.create_user(
             username="other_user",
             email="other@example.com",
             password="OtherPassword123!",

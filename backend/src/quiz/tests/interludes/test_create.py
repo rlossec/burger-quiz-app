@@ -7,12 +7,6 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from ...models import VideoInterlude
-from .. import (
-    MANDATORY_FIELD_ERROR_MESSAGE,
-    INTERLUDE_TYPE_IN,
-    INTERLUDE_TYPE_PU,
-    INTERLUDE_INVALID_YOUTUBE_URL,
-)
 
 User = get_user_model()
 
@@ -32,7 +26,6 @@ class TestInterludeCreateEndpoint(APITestCase):
         self.valid_payload = {
             "title": "Intro Burger Quiz",
             "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            "interlude_type": INTERLUDE_TYPE_IN,
             "duration_seconds": 45,
             "autoplay": True,
             "skip_allowed": True,
@@ -47,9 +40,9 @@ class TestInterludeCreateEndpoint(APITestCase):
         self.assertEqual(response.data["title"], "Intro Burger Quiz")
         self.assertEqual(response.data["youtube_url"], "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         self.assertEqual(response.data["youtube_video_id"], "dQw4w9WgXcQ")
-        self.assertEqual(response.data["interlude_type"], INTERLUDE_TYPE_IN)
         self.assertEqual(response.data["duration_seconds"], 45)
-        
+        self.assertNotIn("interlude_type", response.data)
+
         interlude = VideoInterlude.objects.get(title="Intro Burger Quiz")
         self.assertEqual(interlude.youtube_video_id, "dQw4w9WgXcQ")
 
@@ -58,7 +51,6 @@ class TestInterludeCreateEndpoint(APITestCase):
         payload = {
             "title": "Pub simple",
             "youtube_url": "https://www.youtube.com/watch?v=abc123",
-            "interlude_type": INTERLUDE_TYPE_PU,
         }
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -82,14 +74,6 @@ class TestInterludeCreateEndpoint(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("youtube_url", response.data)
 
-    def test_create_interlude_default_interlude_type(self):
-        """Le type d'interlude a une valeur par défaut (IL) si non fourni."""
-        payload = self.valid_payload.copy()
-        payload.pop("interlude_type")
-        response = self.client.post(self.url, payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["interlude_type"], "IL")
-
     def test_create_interlude_invalid_youtube_url(self):
         """Erreur si URL YouTube invalide."""
         payload = self.valid_payload.copy()
@@ -97,14 +81,6 @@ class TestInterludeCreateEndpoint(APITestCase):
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("youtube_url", response.data)
-
-    def test_create_interlude_invalid_interlude_type(self):
-        """Erreur si type d'interlude invalide."""
-        payload = self.valid_payload.copy()
-        payload["interlude_type"] = "XX"
-        response = self.client.post(self.url, payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("interlude_type", response.data)
 
     def test_create_interlude_youtube_url_formats(self):
         """Différents formats d'URL YouTube sont acceptés."""
@@ -114,12 +90,11 @@ class TestInterludeCreateEndpoint(APITestCase):
             ("https://youtu.be/ghi789", "ghi789"),
             ("https://www.youtube.com/embed/jkl012", "jkl012"),
         ]
-        
+
         for url, expected_id in youtube_urls:
             payload = {
                 "title": f"Test {expected_id}",
                 "youtube_url": url,
-                "interlude_type": INTERLUDE_TYPE_IN,
             }
             response = self.client.post(self.url, payload, format="json")
             self.assertEqual(
@@ -137,19 +112,20 @@ class TestInterludeCreateEndpoint(APITestCase):
         """L'auteur est automatiquement assigné à l'utilisateur connecté."""
         response = self.client.post(self.url, self.valid_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
         interlude = VideoInterlude.objects.get(id=response.data["id"])
         self.assertEqual(interlude.author, self.user)
 
     def test_create_interlude_with_tags(self):
         """Création avec tags."""
         from taggit.models import Tag
+
         Tag.objects.create(name="intro")
         Tag.objects.create(name="officiel")
-        
+
         payload = {**self.valid_payload, "tags": ["intro", "officiel"]}
         response = self.client.post(self.url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
         interlude = VideoInterlude.objects.get(id=response.data["id"])
         self.assertEqual(interlude.tags.count(), 2)

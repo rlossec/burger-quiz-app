@@ -44,11 +44,11 @@ class TestInterludeDetailEndpoint(APITestCase):
         self.assertEqual(response.data["title"], "Intro Burger Quiz")
         self.assertEqual(response.data["youtube_url"], "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         self.assertEqual(response.data["youtube_video_id"], "dQw4w9WgXcQ")
-        self.assertEqual(response.data["interlude_type"], "IN")
         self.assertEqual(response.data["duration_seconds"], 45)
         self.assertEqual(response.data["autoplay"], True)
         self.assertEqual(response.data["skip_allowed"], True)
         self.assertEqual(response.data["skip_after_seconds"], 5)
+        self.assertNotIn("interlude_type", response.data)
 
     def test_detail_interlude_includes_author(self):
         """Le détail inclut l'auteur."""

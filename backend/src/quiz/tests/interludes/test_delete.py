@@ -51,7 +51,7 @@ class TestInterludeDeleteEndpoint(APITestCase):
         Note: Ce test dépend de la politique de suppression choisie.
         Si on autorise la suppression en cascade, ce test devra être adapté.
         """
-        bq = BurgerQuizFactory.create_full(title="Quiz avec interlude")
+        bq = BurgerQuizFactory.create(title="Quiz avec interlude", toss="Toss")
         BurgerQuizElementFactory.create_interlude(
             burger_quiz=bq,
             order=1,

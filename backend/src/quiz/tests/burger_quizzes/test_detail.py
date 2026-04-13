@@ -11,9 +11,10 @@ from rest_framework.test import APITestCase
 from ...tests.factories import (
     BurgerQuizFactory,
     VideoInterludeFactory,
+    NuggetsFactory,
+    SaltOrPepperFactory,
     BurgerQuizElementFactory,
 )
-from .. import QUESTION_TYPE_NU, QUESTION_TYPE_SP
 
 User = get_user_model()
 
@@ -51,31 +52,48 @@ class TestBurgerQuizDetailEndpoint(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_detail_includes_structure(self):
-        """Le détail inclut la structure du quiz."""
-        bq = BurgerQuizFactory.create_full(title="Quiz avec structure")
+    def test_detail_includes_structure_light_by_default(self):
+        """Sans expand : structure = order, type, id (léger)."""
+        bq = BurgerQuizFactory.create(title="Quiz avec structure", toss="Toss")
         intro = VideoInterludeFactory.create_intro(title="Intro")
-        
+
         BurgerQuizElementFactory.create_interlude(bq, order=1, interlude=intro)
-        BurgerQuizElementFactory.create_round(bq, order=2, round_type=QUESTION_TYPE_NU)
-        BurgerQuizElementFactory.create_round(bq, order=3, round_type=QUESTION_TYPE_SP)
-        
+        BurgerQuizElementFactory.create_round(bq, order=2, round_obj=NuggetsFactory.create())
+        BurgerQuizElementFactory.create_round(bq, order=3, round_obj=SaltOrPepperFactory.create())
+
         url = reverse("burger-quiz-detail", kwargs={"pk": bq.pk})
         response = self.client.get(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("structure", response.data)
         self.assertEqual(len(response.data["structure"]), 3)
-        
-        self.assertEqual(response.data["structure"][0]["element_type"], "interlude")
-        self.assertIn("interlude", response.data["structure"][0])
-        self.assertEqual(response.data["structure"][0]["interlude"]["title"], "Intro")
-        
-        self.assertEqual(response.data["structure"][1]["element_type"], "round")
-        self.assertEqual(response.data["structure"][1]["round_type"], QUESTION_TYPE_NU)
+
+        self.assertEqual(response.data["structure"][0]["type"], "video_interlude")
+        self.assertNotIn("video_interlude", response.data["structure"][0])
+
+        self.assertEqual(response.data["structure"][1]["type"], "nuggets")
+        self.assertEqual(response.data["structure"][1]["order"], 2)
+
+    def test_detail_structure_expand_full(self):
+        """?expand=full : détail des manches dans la structure."""
+        bq = BurgerQuizFactory.create(title="Quiz avec structure", toss="Toss")
+        intro = VideoInterludeFactory.create_intro(title="Intro")
+
+        BurgerQuizElementFactory.create_interlude(bq, order=1, interlude=intro)
+        BurgerQuizElementFactory.create_round(bq, order=2, round_obj=NuggetsFactory.create())
+        BurgerQuizElementFactory.create_round(bq, order=3, round_obj=SaltOrPepperFactory.create())
+
+        url = reverse("burger-quiz-detail", kwargs={"pk": bq.pk})
+        response = self.client.get(url, {"expand": "full"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["structure"][0]["type"], "video_interlude")
+        self.assertIn("video_interlude", response.data["structure"][0])
+        self.assertEqual(response.data["structure"][0]["video_interlude"]["title"], "Intro")
 
     def test_detail_structure_empty_if_not_configured(self):
-        """La structure est vide ou par défaut si non configurée."""
+        """Sans BurgerQuizElement : structure vide."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("structure", response.data)
+        self.assertEqual(response.data["structure"], [])
