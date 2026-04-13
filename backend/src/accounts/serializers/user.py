@@ -1,4 +1,3 @@
-
 from django.contrib.auth import get_user_model
 from django.core.validators import EmailValidator
 
@@ -37,7 +36,6 @@ class CustomUserCreateSerializer(DjoserUserCreatePasswordRetypeSerializer):
 
 
 class CustomUserSerializer(DjoserUserSerializer):
-
     class Meta(DjoserUserSerializer.Meta):
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name', 'avatar')
@@ -52,7 +50,6 @@ class CustomUserSerializer(DjoserUserSerializer):
     def validate_email(self, value):
         if not value:
             raise serializers.ValidationError("L'email est obligatoire.")
-        # Exclure l'utilisateur courant lors de la mise à jour
         queryset = User.objects.filter(email__iexact=value)
         if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
