@@ -4,13 +4,11 @@ import uuid
 from django.db import models
 
 from .base import QuizContentMixin
-from .enums import InterludeType
 
 
 class VideoInterlude(QuizContentMixin, models.Model):
     """
-    Interlude vidéo (intro, outro, pub) intégrable dans un Burger Quiz.
-    Les interludes sont des entités réutilisables.
+    Video interlude insertable in a Burger Quiz (reusable).
     """
 
     class Meta:
@@ -26,12 +24,6 @@ class VideoInterlude(QuizContentMixin, models.Model):
         blank=True,
         editable=False,
         verbose_name="ID vidéo YouTube",
-    )
-    interlude_type = models.CharField(
-        max_length=2,
-        choices=InterludeType.choices,
-        default=InterludeType.IL,
-        verbose_name="Type d'interlude",
     )
     duration_seconds = models.PositiveIntegerField(
         null=True,
@@ -65,7 +57,7 @@ class VideoInterlude(QuizContentMixin, models.Model):
         return ""
 
     def __str__(self):
-        return f"{self.get_interlude_type_display()}: {self.title}"
+        return self.title
 
     def __repr__(self):
-        return f"<VideoInterlude {self.interlude_type}: {self.title}>"
+        return f"<VideoInterlude {self.title!r}>"

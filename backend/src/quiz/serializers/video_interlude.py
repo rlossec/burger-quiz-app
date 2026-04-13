@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
-from ..models import VideoInterlude, InterludeType
+from ..models import VideoInterlude
 from .base import AuthorSerializer
 
 
@@ -18,7 +18,6 @@ class VideoInterludeListSerializer(ModelSerializer):
             "title",
             "youtube_url",
             "youtube_video_id",
-            "interlude_type",
             "duration_seconds",
             "autoplay",
             "skip_allowed",
@@ -42,7 +41,6 @@ class VideoInterludeSerializer(TaggitSerializer, ModelSerializer):
             "title",
             "youtube_url",
             "youtube_video_id",
-            "interlude_type",
             "duration_seconds",
             "autoplay",
             "skip_allowed",
@@ -71,9 +69,6 @@ class VideoInterludeSerializer(TaggitSerializer, ModelSerializer):
                     "required": "Ce champ est obligatoire.",
                     "blank": "Ce champ ne peut pas être vide.",
                 }
-            },
-            "interlude_type": {
-                "required": False,
             },
         }
 
@@ -120,7 +115,6 @@ class VideoInterludeMinimalSerializer(ModelSerializer):
         fields = [
             "id",
             "title",
-            "interlude_type",
             "youtube_video_id",
         ]
         read_only_fields = fields

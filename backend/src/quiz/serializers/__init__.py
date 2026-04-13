@@ -16,8 +16,6 @@ from .video_interlude import (
     VideoInterludeMinimalSerializer,
 )
 from .burger_quiz_element import (
-    BurgerQuizElementReadSerializer,
-    BurgerQuizElementWriteSerializer,
     BurgerQuizStructureSerializer,
     BurgerQuizStructureReadSerializer,
 )
@@ -36,8 +34,6 @@ __all__ = [
     "VideoInterludeSerializer",
     "VideoInterludeListSerializer",
     "VideoInterludeMinimalSerializer",
-    "BurgerQuizElementReadSerializer",
-    "BurgerQuizElementWriteSerializer",
     "BurgerQuizStructureSerializer",
     "BurgerQuizStructureReadSerializer",
     "BurgerQuizSerializer",

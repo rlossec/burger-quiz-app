@@ -1,15 +1,18 @@
 import uuid
 
 from django.db import models
-
-from .enums import ElementType, QuestionType
+from django.core.exceptions import ValidationError
 
 
 class BurgerQuizElement(models.Model):
     """
-    Élément ordonné dans la structure d'un Burger Quiz.
-    Peut être une manche (round) ou un interlude vidéo.
+    Ordered position of a content in the Burger Quiz structure.
+    Either a round or a video interlude.
     """
+
+    class ElementType(models.TextChoices):
+        ROUND = "round", "Manche"
+        INTERLUDE = "interlude", "Interlude vidéo"
 
     class Meta:
         verbose_name = "Élément de Burger Quiz"
@@ -28,56 +31,59 @@ class BurgerQuizElement(models.Model):
     )
     order = models.PositiveIntegerField(verbose_name="Ordre")
     element_type = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=ElementType.choices,
         verbose_name="Type d'élément",
     )
-    round_type = models.CharField(
-        max_length=2,
-        choices=QuestionType.choices,
+    round = models.ForeignKey(
+        "Round",
         null=True,
         blank=True,
-        verbose_name="Type de manche",
+        on_delete=models.CASCADE,
+        related_name="structure_usages",
+        verbose_name="Manche (registre)",
     )
     interlude = models.ForeignKey(
         "VideoInterlude",
-        on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="burger_quiz_elements",
-        verbose_name="Interlude",
+        on_delete=models.CASCADE,
+        related_name="structure_usages",
+        verbose_name="Interlude vidéo",
     )
-
-    def clean(self):
-        from django.core.exceptions import ValidationError
-
-        if self.element_type == ElementType.ROUND:
-            if not self.round_type:
-                raise ValidationError(
-                    {"round_type": "Le type de manche est requis pour un élément de type 'round'."}
-                )
-            if self.interlude:
-                raise ValidationError(
-                    {"interlude": "Un élément de type 'round' ne peut pas avoir d'interlude."}
-                )
-        elif self.element_type == ElementType.INTERLUDE:
-            if not self.interlude:
-                raise ValidationError(
-                    {"interlude": "Un interlude est requis pour un élément de type 'interlude'."}
-                )
-            if self.round_type:
-                raise ValidationError(
-                    {"round_type": "Un élément de type 'interlude' ne peut pas avoir de type de manche."}
-                )
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        if self.element_type == ElementType.ROUND:
-            return f"#{self.order} Manche {self.round_type}"
-        return f"#{self.order} Interlude: {self.interlude}"
+        return f"#{self.order} {self.content}"
 
     def __repr__(self):
-        return f"<BurgerQuizElement {self.burger_quiz_id} #{self.order} {self.element_type}>"
+        return f"<BurgerQuizElement {self.burger_quiz_id} #{self.order}>"
+
+    def clean(self):
+        super().clean()
+        if self.element_type == self.ElementType.ROUND:
+            if self.round_id is None or self.interlude_id is not None:
+                raise ValidationError(
+                    "Pour une manche, `round` est requis et `interlude` doit être vide."
+                )
+        elif self.element_type == self.ElementType.INTERLUDE:
+            if self.interlude_id is None or self.round_id is not None:
+                raise ValidationError(
+                    "Pour un interlude, `interlude` est requis et `round` doit être vide."
+                )
+
+    @property
+    def content(self):
+        """Concrete round or video interlude. Uses already loaded FKs (select_related), without additional query."""
+        if self.element_type == self.ElementType.INTERLUDE:
+            return self.interlude
+        if self.element_type == self.ElementType.ROUND and self.round_id and self.round:
+            r = self.round
+            return (
+                r.nuggets
+                or r.salt_or_pepper
+                or r.menus
+                or r.addition
+                or r.deadly_burger
+            )
+        return None
