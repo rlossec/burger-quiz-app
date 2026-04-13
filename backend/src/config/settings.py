@@ -1,9 +1,10 @@
-from datetime import timedelta
-from django.contrib.auth import password_validation
 
 import os
 import sys
 from pathlib import Path
+from datetime import timedelta
+
+from django.contrib.auth import password_validation
 
 from dotenv import load_dotenv
 
@@ -38,9 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+
     'drf_spectacular',
     'drf_spectacular_sidecar',
-
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -174,7 +175,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # drf-spectacular ignore les requestBody sur DELETE ; Djoser envoie current_password.
+    'DEFAULT_SCHEMA_CLASS': 'config.schema.DeleteBodyAwareSchema',
 }
 
 # Simple JWT (authentification par username/password par défaut via Django authenticate)
@@ -189,7 +191,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# Djoser - authentification JWT avec username
+# Djoser - authentication JWT with username
 DJOSER = {
     'TOKEN_MODEL': None,
     'PASSWORD_RESET_CONFIRM_URL': 'auth/password/reset/confirm/{uid}/{token}',
@@ -197,17 +199,18 @@ DJOSER = {
     'ACTIVATION_URL': 'auth/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'PERMISSIONS': {
-        'user': ['rest_framework.permissions.IsAuthenticated'],
-        'user_list': ['rest_framework.permissions.IsAdminUser'],
+        # `CurrentUserOrAdmin` ensures has_object_permission (404 if HIDE_USERS, not 200 / illegal deletion).
+        'user': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user_list': ['djoser.permissions.CurrentUserOrAdmin'],
         'user_create': ['rest_framework.permissions.AllowAny'],
-        'user_delete': ['rest_framework.permissions.IsAuthenticated'],
+        'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
         'activation': ['rest_framework.permissions.AllowAny'],
         'password_reset': ['rest_framework.permissions.AllowAny'],
         'password_reset_confirm': ['rest_framework.permissions.AllowAny'],
         'username_reset': ['rest_framework.permissions.AllowAny'],
         'username_reset_confirm': ['rest_framework.permissions.AllowAny'],
-        'set_password': ['rest_framework.permissions.IsAuthenticated'],
-        'set_username': ['rest_framework.permissions.IsAuthenticated'],
+        'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+        'set_username': ['djoser.permissions.CurrentUserOrAdmin'],
     },
     'SERIALIZERS': {
         'user_create': 'accounts.serializers.CustomUserCreateSerializer',
@@ -269,15 +272,23 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
     'SECURITY': [{'BearerAuth': []}],
     'TAGS': [
-        {'name': 'Comptes', 'description': 'Utilisateurs et profil (Djoser).'},
-        {'name': 'Questions', 'description': 'Banque de questions réutilisables.'},
-        {'name': 'Interludes vidéo', 'description': 'Interludes YouTube réutilisables.'},
-        {'name': 'Burger Quiz', 'description': 'Sessions de quiz et structure (ordre des manches / interludes).'},
-        {'name': 'Manche Nuggets', 'description': 'Manche Nuggets.'},
-        {'name': 'Manche Sel ou poivre', 'description': 'Manche Sel ou poivre.'},
-        {'name': 'Manche Menus', 'description': 'Manche regroupant trois thèmes de menu.'},
-        {'name': 'Thèmes de menu', 'description': 'Thèmes au sein de la manche Menus.'},
-        {'name': 'Manche Addition', 'description': 'Manche Addition.'},
-        {'name': 'Manche Burger de la mort', 'description': 'Finale Burger de la mort.'},
+        {
+            'name': 'Authentification',
+        },
+        {
+            'name': 'Compte personnel',
+        },
+        {
+            'name': 'Utilisateurs — administration',
+        },
+        {'name': 'Questions'},
+        {'name': 'Manche Nuggets'},
+        {'name': 'Manche Sel ou poivre'},
+        {'name': 'Manche Menus'},
+        {'name': 'Thèmes de menu'},
+        {'name': 'Manche Addition'},
+        {'name': 'Manche Burger de la mort'},
+        {'name': 'Interludes vidéo'},
+        {'name': 'Burger Quiz'},
     ],
 }
