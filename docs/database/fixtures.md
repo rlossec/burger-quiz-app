@@ -20,7 +20,7 @@ Utilisez `docker compose exec backend` pour lancer une commande dans le conteneu
 ### Charger les fixtures (loaddata)
 
 ```bash
-docker compose exec backend uv run python manage.py loaddata fixtures/quiz_data.json
+docker compose exec backend python manage.py loaddata fixtures/quiz_data.json
 ```
 
 ### Exporter les données (dumpdata)
@@ -28,7 +28,7 @@ docker compose exec backend uv run python manage.py loaddata fixtures/quiz_data.
 À exécuter depuis la racine du projet (la redirection `>` est interprétée par le shell hôte) :
 
 ```bash
-docker compose exec backend uv run python manage.py dumpdata --indent 2 quiz > backend/src/fixtures/quiz_data.json
+docker compose exec backend python manage.py dumpdata --indent 2 quiz > backend/src/fixtures/quiz_data.json
 ```
 
 ## Fichiers de fixtures

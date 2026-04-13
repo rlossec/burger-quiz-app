@@ -283,6 +283,9 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 **Dossier** : `quiz/tests/burger_quizzes/`
 **Exécution** : `uv run manage.py test quiz.tests.burger_quizzes`
 
+Suite logique d'appels API (création end-to-end d'un Burger Quiz) :
+→ `docs/backend/api-reference.md`, section **`3.0.1 End-to-end call sequence (from scratch)`**
+
 | Fichier             | Tests                                                      |
 | ------------------- | ---------------------------------------------------------- |
 | `test_list.py`      | Liste, filtres, timestamps                                 |
@@ -295,22 +298,28 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 
 ### Structure du Burger Quiz (`/api/quiz/burger-quizzes/{id}/structure/`)
 
-**Dossier** : `quiz/tests/burger_quizzes/`
-**Fichier** : `test_structure.py`
+**Dossier** : `quiz/tests/burger_quizzes/`  
+**Fichier** : `test_structure.py`  
 **Exécution** : `uv run manage.py test quiz.tests.burger_quizzes.test_structure`
 
-| Classe de test                          | Tests                                      |
-| --------------------------------------- | ------------------------------------------ |
-| `TestBurgerQuizStructureReadEndpoint`   | GET structure (vide, avec éléments, ordre) |
-| `TestBurgerQuizStructureUpdateEndpoint` | PUT structure (remplacement, validations)  |
+Documentation détaillée des cas (matrice GET/PUT, auth, erreurs 400) :
 
-**Validations testées** :
+→ **[burger-quiz-structure.md](burger-quiz-structure.md)** (aligné sur [api-reference.md § 3.9](../backend/api-reference.md#39-burger-quiz-structure))
 
-- Chaque `round_type` ne peut apparaître qu'une seule fois
-- Les `round_type` doivent correspondre à des manches attachées au Burger Quiz
-- Les `interlude_id` doivent référencer des interludes existants
-- L'ordre est déterminé par la position dans le tableau `elements`
-- Plusieurs interludes (même type ou même instance) sont autorisés
+| Classe de test | Rôle |
+| -------------- | ---- |
+| `TestBurgerQuizStructureAuth` | GET/PUT sans authentification → 401 |
+| `TestBurgerQuizStructureReadEndpoint` | GET : ordre par défaut, interludes, 404, forme de la réponse (objets imbriqués) |
+| `TestBurgerQuizStructureUpdateEndpoint` | PUT : succès, remplacement total, ordre implicite, doublons de manche, interludes, structure vide |
+| `TestBurgerQuizStructurePutValidation` | PUT : corps invalide (`elements` manquant, type/id/UUID, mauvais modèle pour `type`) |
+
+**Règles couvertes par les tests** :
+
+- Ordre = position dans `elements` ; `PUT` remplace toute la structure
+- Chaque slug de manche au plus une fois ; pas de doublon d’UUID de manche
+- Références aux manches et interludes : objets existants et cohérents avec `type`
+- Une manche peut être réutilisée depuis un autre quiz (ex. Nuggets d’un autre `BurgerQuiz`) — pas d’exigence d’« attache » au quiz courant
+- Plusieurs lignes `video_interlude` avec le même `VideoInterlude` autorisées
 
 ---
 

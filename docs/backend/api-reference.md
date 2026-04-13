@@ -1,69 +1,123 @@
-﻿# Référence API Burger Quiz
+# Burger Quiz API reference
 
-Ce document décrit les endpoints de l’API Burger Quiz par app Django :
+Welcome to the API documentation for the Burger Quiz backend. This API provides the infrastructure for user management and the core "Burger Quiz" game logic.
 
-- **Accounts** (authentification et utilisateurs)
-- **Quiz** (manches, questions, Burger Quiz).
+## 1. General Information
 
-## 0. Général
+### 🏛 1.1. Architecture Overview
 
-### 0.1. Bases
+The backend is built with **Django REST Framework**, organized into two primary modules:
 
-**Base URL** : `/api/`
+- **Accounts**: Handles identity management, including JWT authentication, user registration, and profile management.
+- **Quiz**: Manages the game engine, including the various rounds, question banks, and quiz.
 
-### 0.2. Authentification
+### 📡 1.2. Response Format
 
-**Authentification** : JWT Bearer. En-tête : `Authorization: Bearer <access_token>`.  
-Pour obtenir un token : `POST /api/auth/jwt/create/`.
+- **Transport**: All responses are delivered in **JSON** with the `Content-Type: application/json` header.
+- **Single Resources**: The response body contains the serialized object directly.
+- **Paginated Lists**: Endpoints returning lists use DRF's `PageNumberPagination` (default size: **20**).
 
-### 0.3. Permissions
+**Pagination Schema:**
 
-TODO
+JSON
 
-## 1. Accounts
+```json
+{
+  "count": 42,
+  "next": "https://example.com/api/quiz/.../?page=2",
+  "previous": null,
+  "results": []
+}
+```
 
-Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
+### 🔑 1.3. Authentication & Permissions
 
-### 1.1 JWT
+**JWT**
 
-| Méthode | Endpoint                 | Description                                            |
-| ------- | ------------------------ | ------------------------------------------------------ |
-| `POST`  | `/api/auth/jwt/create/`  | Créer un couple access/refresh à partir d’identifiants |
-| `POST`  | `/api/auth/jwt/refresh/` | Rafraîchir l’access token avec le refresh token        |
-| `POST`  | `/api/auth/jwt/verify/`  | Vérifier la validité d’un token                        |
+All requests to **protected** endpoints must include a valid **access** token:
 
-#### 1.1.1. Login
+- **Header**: `Authorization: Bearer <your_access_token>`
+
+**Default permissions (Django REST Framework)**
+
+- **`IsAuthenticated`** is the **default** for the API: without a valid JWT, these routes return **401**.
+- **Exceptions (`AllowAny`)** — no JWT required, used for:
+  - JWT endpoints: `POST /api/auth/jwt/create/`, `POST /api/auth/jwt/refresh/`, `POST /api/auth/jwt/verify/`
+  - User registration: `POST /api/auth/users/`
+  - Djoser e-mail flows: activation, resend activation, password/username reset and confirm (see § 2.1)
+
+**Quiz vs accounts**
+
+- **`/api/quiz/...`**: all routes require authentication by default (JWT).
+- **`/api/auth/...`**: follows the mix above; authenticated routes include `/api/auth/users/me/`, `set_password`, `set_username`, and user list/detail/update/delete where Djoser applies **`CurrentUserOrAdmin`** (non-staff users are typically limited to their own user record).
+
+### ⚠️ 1.4. Typical Errors
+
+The API uses standard **Django REST Framework** exception handling.
+
+| **Code** | **Use Case**                    | **Typical JSON Body**                                                                                                                                                         |
+| -------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **400**  | Validation/Business Logic error | Object where keys are **field names** and values are **lists of error strings**. Global errors use the **`non_field_errors`** key.                                            |
+| **401**  | Missing or expired JWT          | `{"detail": "Authentication credentials were not provided."}`                                                                                                                 |
+| **403**  | Permission denied               | `{"detail": "You do not have permission to perform this action."}`                                                                                                            |
+| **404**  | Resource not found              | `{"detail": "Not found."}`                                                                                                                                                    |
+| **405**  | Method Not Allowed              | `{"detail": "Method \"POST\" not allowed."}`                                                                                                                                  |
+| **429**  | Rate limiting (Throttling)      | **TODO** — throttling is not configured in `REST_FRAMEWORK`; this row documents the **expected** DRF shape once rate limits are added: `{"detail": "Request was throttled."}` |
+| **500**  | Server Error                    | Standard Django error response.                                                                                                                                               |
+
+## 2. Accounts
+
+All Accounts endpoints are prefixed with **`/api/auth/`**.
+
+There is 3 section :
+
+1. **Authentification** — JWT (login, refresh, verify), **sign up**, and e-mail flows (activation, resend, password/username reset).
+2. **Users Profile** — profile `/me/`, `set_password`, `set_username` (authenticated).
+3. **Users — administration** — list and `{id}` routes (staff-oriented; non-staff users only see themselves where Djoser's `CurrentUserOrAdmin` applies).
+
+### 2.1 Authentication
+
+| Method | Endpoint                                  | Description                                       |
+| ------ | ----------------------------------------- | ------------------------------------------------- |
+| `POST` | `/api/auth/jwt/create/`                   | Create access/refresh pair from credentials       |
+| `POST` | `/api/auth/jwt/refresh/`                  | Refresh access token with refresh token           |
+| `POST` | `/api/auth/jwt/verify/`                   | Verify token validity                             |
+| `POST` | `/api/auth/users/`                        | Sign up                                           |
+| `POST` | `/api/auth/users/activation/`             | Activate account (uid + token)                    |
+| `POST` | `/api/auth/users/resend_activation/`      | Resend activation e-mail                          |
+| `POST` | `/api/auth/users/reset_password/`         | Request password reset (e-mail)                   |
+| `POST` | `/api/auth/users/reset_password_confirm/` | Confirm password reset (uid, token, new password) |
+| `POST` | `/api/auth/users/reset_username/`         | Request username reset (e-mail)                   |
+| `POST` | `/api/auth/users/reset_username_confirm/` | Confirm username reset (uid, token, new username) |
+
+#### 2.1.1. Login
 
 **Endpoint** : `POST /api/auth/jwt/create/`
-**Authentification**: AllowAny
-**Body** :
+**Permissions** : `AllowAny`
+**Request Body :**
 
 ```json
 {
   "username": "string",
-  "password": "string"
+  "password": "securePassword123"
 }
 ```
 
-- `username` : obligatoire
-- `password` : obligatoire
+**Response** :
 
-**Réponse Attendue** : 200
+- 200
+  ```json
+  {
+    "access": "string",
+    "refresh": "string"
+  }
+  ```
 
-```json
-{
-  "access": "string",
-  "refresh": "string"
-}
-```
-
-> Utiliser `access` dans l’en-tête `Authorization: Bearer <access>` pour les requêtes authentifiées.
-
-#### 1.1.2. Refresh de token
+#### 2.1.2. Token refresh
 
 **Endpoint**: `POST /api/auth/jwt/refresh/`
-**Authentification**: AllowAny
-**Body** :
+**Permissions**: `AllowAny`
+**Body**:
 
 ```json
 {
@@ -71,20 +125,21 @@ Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
 }
 ```
 
-**Réponse Attendue** : Status 200
+**Response**:
 
-```json
-{
-  "access": "string",
-  "refresh": "string"
-}
-```
+- **200** — with the current **SimpleJWT** settings (`ROTATE_REFRESH_TOKENS`: `false`), the body contains **only a new access token** (no new refresh token):
 
-#### 1.1.3. Vérification de token
+  ```json
+  {
+    "access": "string"
+  }
+  ```
 
-**Endpoint**: `POST /api/auth/jwt/verify/`
-**Authentification**: AllowAny
-**Body** :
+#### 2.1.3. Token verification
+
+**Endpoint**: `POST /api/auth/jwt/verify/`  
+**Authentication**: AllowAny  
+**Body**:
 
 ```json
 {
@@ -92,28 +147,38 @@ Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
 }
 ```
 
-**Réponse Attendue** : Status 200 `{}` si le token est valide.
+**Response**:
 
----
+- 200 `{}`
+  if the token is valid.
+- 401
+  ```json
+  {
+    "detail": "Token is invalid",
+    "code": "token_not_valid"
+  }
+  ```
 
-### 1.2 Utilisateurs
+#### 2.1.4. Sign up
 
-| Méthode  | Endpoint                | Description                                                       |
-| -------- | ----------------------- | ----------------------------------------------------------------- |
-| `POST`   | `/api/auth/users/`      | Inscription                                                       |
-| `GET`    | `/api/auth/users/`      | Liste des utilisateurs                                            |
-| `GET`    | `/api/auth/users/me/`   | Utilisateur connecté (authentifié)                                |
-| `PATCH`  | `/api/auth/users/me/`   | Mise à jour partielle du profil (dont avatar)                     |
-| `GET`    | `/api/auth/users/{id}/` | Détail d’un utilisateur (soi-même ou staff/superuser)             |
-| `PUT`    | `/api/auth/users/{id}/` | Mise à jour complète (propriétaire du compte)                     |
-| `PATCH`  | `/api/auth/users/{id}/` | Mise à jour partielle (propriétaire du compte)                    |
-| `DELETE` | `/api/auth/users/{id}/` | Suppression du compte (propriétaire ou staff selon règles métier) |
+`POST /api/auth/users/`
 
-#### 1.2.1. Inscription
+Registers a new user in the system.
 
-**Endpoint** : `POST /api/auth/users/`
-**Authentification**: AllowAny
-**Body** :
+**Permissions & Headers**
+
+- **Authentication**: `AllowAny`
+- **Content-Type**: `application/json`
+
+**Request Body**
+| Field | Type | Constraints |
+| ---------- |------- | ---------------------------------------------- |
+| email | string | Required. Unique, valid email format. |
+| username | string | Required. Unique, max 150 chars. |
+| password | string | Required. Must follow Django complexity rules. |
+| re_password| string | Required. Must match password. |
+
+**Example Request**:
 
 ```json
 {
@@ -124,267 +189,553 @@ Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
 }
 ```
 
-- `email` : obligatoire, unique, format email valide
-- `username` : obligatoire, unique, 150 caractères max, caractères autorisés : lettres, chiffres, @/./+/-/\_
-- `password` : obligatoire (règles de complexité Django)
-- `re_password` : obligatoire, doit être égal à `password`
+**Responses**
 
-**Réponse 201** : représentation de l’utilisateur (champs exposés selon le serializer, sans mot de passe). Le compte peut être inactif jusqu’à activation par email.
+- **201 Created**: User successfully created.
+  ```json
+  {
+    "id": 2,
+    "email": "user@example.com",
+    "username": "johndoe"
+  }
+  ```
+- **400 Bad Request**: Validation failed
+  ```json
+  {
+    "password": ["The two password fields didn't match."],
+    "email": ["user with this email already exists."]
+  }
+  ```
 
-#### Liste des utilisateurs
+#### 2.1.5. Activation
 
-**Endpoint** : `GET /api/auth/users/`
-**Authentification** : isStaff
-**Pagination** : 10 éléments par page (paramètres `page`, `page_size` si supportés).
+Implemented by **Djoser** (`ActivationSerializer`). **`SEND_ACTIVATION_EMAIL`** is enabled in settings: new users are **inactive** until they activate via e-mail.
 
-**Réponse attendue** : liste paginée d’utilisateurs avec champs : `id`, `email`, `username`, `first_name`, `last_name`, `avatar`.
+**Activate account** — `POST /api/auth/users/activation/`
 
-#### Avoir ses informations
+- **Permissions**: `AllowAny`
+- **Body** (JSON):
 
-**Endpoint** : `GET /api/auth/users/me/`
-**Authentification** : IsAuthenticated
+| Field   | Type   | Description                                      |
+| ------- | ------ | ------------------------------------------------ |
+| `uid`   | string | User id encoded by Djoser (from the e-mail link) |
+| `token` | string | Token from the e-mail link                       |
 
-**Réponse attendue** : 200, info utilisateur connecté (même schéma que détail utilisateur).
+**Success**: **204 No Content** (empty body).
 
-#### Mise à jour de ses informations
+**Typical errors**: **400** if `uid` / `token` missing, invalid, expired, or account already active (field-level messages on `uid` / `token` as returned by Djoser).
 
-**Endpoint** : `PATCH /api/auth/users/me/`
+**Resend activation e-mail** — `POST /api/auth/users/resend_activation/`
 
-Mise à jour partielle du profil (dont avatar).
-Champs modifiables : `email`, `first_name`, `last_name`, `avatar`.  
-`id` et `username` sont en lecture seule.
+- **Permissions**: `AllowAny`
+- **Body**: `{ "email": "<registered_email>" }`
+- **Success**: **204 No Content** (even if the e-mail is unknown — avoids e-mail enumeration; aligned with Djoser behaviour).
 
-#### Detail d'un utilisateur
+#### 2.1.7. Reset password
 
-**Endpoint** : `GET /api/auth/users/{id}/`
+Implemented by Djoser: **`SendEmailResetSerializer`** (request) and **`PasswordResetConfirmSerializer`** (confirm) — **no** `re_new_password` in this project (`accounts/serializers/docs.py`).
 
-- **Authentification** : isStaffOrOwner.
+**Request reset e-mail** — `POST /api/auth/users/reset_password/`
 
-**Réponse attendue** :
+- **Permissions**: `AllowAny`
+- **Body**: `{ "email": "user@example.com" }`
+- **Success**: **204 No Content**
+
+**Confirm new password** — `POST /api/auth/users/reset_password_confirm/`
+
+- **Permissions**: `AllowAny`
+- **Body**:
 
 ```json
 {
-  "id": 1,
+  "uid": "<from_email_link>",
+  "token": "<from_email_link>",
+  "new_password": "newSecurePassword123"
+}
+```
+
+- **Success**: **204 No Content** — password is updated; validators from Django / `DJOSER['PASSWORD_VALIDATORS']` apply.
+- **Typical errors**: **400** for missing fields, invalid `uid`/`token`, or weak `new_password` (see `accounts/tests/test_reset_password.py`).
+
+#### 2.1.8. Reset username
+
+Same pattern as password reset: e-mail request, then confirm with `uid` / `token` from the link.
+
+**Request reset e-mail** — `POST /api/auth/users/reset_username/`
+
+- **Permissions**: `AllowAny`
+- **Body**: `{ "email": "user@example.com" }`
+- **Success**: **204 No Content**
+
+**Confirm new username** — `POST /api/auth/users/reset_username_confirm/`
+
+- **Permissions**: `AllowAny`
+- **Body**:
+
+```json
+{
+  "uid": "<from_email_link>",
+  "token": "<from_email_link>",
+  "new_username": "new_username"
+}
+```
+
+- **Success**: **204 No Content**
+- **Typical errors**: **400** for validation (see `accounts/tests/test_reset_username.py`).
+
+### 2.2 User Profile
+
+Endpoints for reading or updating the **authenticated** user's profile, changing password or username while logged in, and deleting one's own account.
+
+| Method   | Endpoint                        | Description                                     |
+| -------- | ------------------------------- | ----------------------------------------------- |
+| `GET`    | `/api/auth/users/me/`           | Current user                                    |
+| `PUT`    | `/api/auth/users/me/`           | Full update own profile                         |
+| `PATCH`  | `/api/auth/users/me/`           | Partial update own profile                      |
+| `DELETE` | `/api/auth/users/me/`           | Delete own account (`current_password` in body) |
+| `POST`   | `/api/auth/users/set_password/` | Change password (logged in)                     |
+| `POST`   | `/api/auth/users/set_username/` | Change username (logged in)                     |
+
+**Permissions (overview)** — Djoser `CurrentUserOrAdmin` for `set_password` and `set_username`: in practice these actions apply to the authenticated user (same idea as `/me/`). Unauthenticated clients receive **401**.
+
+#### 2.2.1. Retrieve current user
+
+**Endpoint**: `GET /api/auth/users/me/`
+
+Retrieves the profile of the currently authenticated user.
+
+**Permissions & Headers**
+
+- Authentication: IsAuthenticated
+- Header: Authorization: Bearer <token>
+
+**Responses**:
+
+- **200 OK**:
+  ```json
+  {
+    "id": 1,
+    "email": "user@example.com",
+    "username": "johndoe",
+    "first_name": "John",
+    "last_name": "Doe",
+    "avatar": "https://cdn.example.com/media/avatars/johndoe.png"
+  }
+  ```
+- **401 Unauthorized**: Missing or invalid token.
+
+#### 2.2.2. Update current user
+
+**Endpoint**: PUT / PATCH /api/auth/users/me/
+
+Updates the profile of the authenticated user (`PUT` replaces writable fields; `PATCH` only the fields sent).
+
+**Permissions & Headers**
+
+- **Authentication**: `IsAuthenticated`
+- **Content-Type**: `multipart/form-data` or `application/json`.
+
+**Request Body**
+
+- `first_name`: `string` (max 150)
+- `last_name`: `string` (max 150)
+- `email`: `string` (unique)
+- `avatar`: `file` (image format)
+
+#### 2.2.3. Delete current user
+
+**Endpoint**: `DELETE /api/auth/users/me/`
+
+Deletes the authenticated account.
+
+**Body**: **`current_password`**
+
+**Responses**:
+
+- **204** on success;
+- **400** if `current_password` is missing or invalid; **401** if not authenticated.
+
+#### 2.2.4. Change password (authenticated)
+
+**Endpoint**: `POST /api/auth/users/set_password/`
+
+Changes the password for the logged-in user.
+
+**Permissions & Headers**
+
+- **Authentication**: `IsAuthenticated` (via `CurrentUserOrAdmin` in `DJOSER['PERMISSIONS']`)
+- **Content-Type**: `application/json`
+
+**Request body**
+
+| Field              | Type   | Description      |
+| ------------------ | ------ | ---------------- |
+| `current_password` | string | Current password |
+| `new_password`     | string | New password     |
+
+**Responses**
+
+- **204 No Content** on success (empty body).
+- **400** validation errors (weak password, wrong `current_password`, etc.).
+- **401** if not authenticated.
+
+#### 2.2.5. Change username (authenticated)
+
+**Endpoint**: `POST /api/auth/users/set_username/`
+
+Changes the username for the logged-in user (Djoser `SetUsernameSerializer`).
+
+**Permissions & Headers**
+
+- **Authentication**: `IsAuthenticated` (via `CurrentUserOrAdmin`)
+- **Content-Type**: `application/json`
+
+**Request body**
+
+| Field              | Type   | Description         |
+| ------------------ | ------ | ------------------- |
+| `current_password` | string | Current password    |
+| `new_username`     | string | New unique username |
+
+**Responses**
+
+- **204 No Content** on success.
+- **400** validation errors.
+- **401** if not authenticated.
+
+### 2.3. Users — administration
+
+| Method   | Endpoint                | Description    |
+| -------- | ----------------------- | -------------- |
+| `GET`    | `/api/auth/users/`      | User list      |
+| `GET`    | `/api/auth/users/{id}/` | User detail    |
+| `PUT`    | `/api/auth/users/{id}/` | Full update    |
+| `PATCH`  | `/api/auth/users/{id}/` | Partial update |
+| `DELETE` | `/api/auth/users/{id}/` | Delete account |
+
+#### 2.3.1. User list
+
+**Endpoint**: `GET /api/auth/users/`
+
+- **Staff / superuser**: returns all users (see project tests: `test_user_list.py`).
+- **Simple user**: results contain **only their own** row.
+
+**Responses**:
+
+- **200 OK**:
+  ```json
+  {
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "email": "user@example.com",
+        "username": "johndoe",
+        "first_name": "John",
+        "last_name": "Doe",
+        "avatar": "https://cdn.example.com/media/avatars/johndoe.png"
+      }
+    ]
+  }
+  ```
+- **401 Unauthorized**: missing or invalid token.
+
+#### 2.3.2. User detail
+
+**Endpoint**: `GET /api/auth/users/{id}/`
+
+**Permissions**: same visibility rules as above: only **owner or staff** can load the object; otherwise **404**.
+
+**Response**:
+
+- 200 OK
+  ```json
+  {
+    "id": 1,
+    "email": "user@example.com",
+    "username": "johndoe",
+    "first_name": "John",
+    "last_name": "Doe",
+    "avatar": "url_or_null"
+  }
+  ```
+
+#### 2.3.3. Update user (by id) — `PUT` and `PATCH`
+
+| Method  | Endpoint                | Role                                                                    |
+| ------- | ----------------------- | ----------------------------------------------------------------------- |
+| `PUT`   | `/api/auth/users/{id}/` | **Full update** — replaces writable profile fields for the user `{id}`. |
+| `PATCH` | `/api/auth/users/{id}/` | **Partial update** — only the keys you send are applied.                |
+
+**Permissions & Headers**
+
+- **Authentication**: `IsAuthenticated`
+- **Header**: `Authorization: Bearer <token>`
+- **Content-Type**: `multipart/form-data` (e.g. avatar upload) or `application/json`
+
+**Request body**
+
+| Field        | Type   | Constraints                                                                                                                              |
+| ------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `email`      | string | Unique. With **PUT**, follow your “full resource” contract; with **PATCH**, omit if unchanged. Changing email may require re-activation. |
+| `first_name` | string | Optional on **PUT**; max 150 characters. On **PATCH**, include only if updating.                                                         |
+| `last_name`  | string | Same as `first_name`.                                                                                                                    |
+| `avatar`     | file   | Optional image when using `multipart/form-data`.                                                                                         |
+
+**Example — `PUT`** (`application/json`):
+
+```json
+{
   "email": "user@example.com",
-  "username": "johndoe",
   "first_name": "John",
-  "last_name": "Doe",
-  "avatar": "url_or_null"
+  "last_name": "Doe"
 }
 ```
 
-#### PUT /api/auth/users/{id}/ et PATCH /api/auth/users/{id}/
-
-Mise à jour (complète ou partielle) du compte. Réservé au propriétaire du compte. Champs modifiables : `email`, `first_name`, `last_name`, `avatar`. `id` et `username` en lecture seule. Changement d’email peut désactiver le compte jusqu’à confirmation.
-
-#### DELETE /api/auth/users/{id}/
-
-Suppression du compte.
-Authentication : IsStaffOrOwner
-
----
-
-### 1.3 Activation et réinitialisation (Djoser)
-
-| Méthode | Endpoint                                  | Description                                              |
-| ------- | ----------------------------------------- | -------------------------------------------------------- |
-| `POST`  | `/api/auth/users/activation/`             | Activer un compte (uid + token)                          |
-| `POST`  | `/api/auth/users/resend_activation/`      | Renvoyer l’email d’activation                            |
-| `POST`  | `/api/auth/users/reset_password/`         | Demande de réinitialisation du mot de passe (email)      |
-| `POST`  | `/api/auth/users/reset_password_confirm/` | Confirmation (uid, token, new_password)                  |
-| `POST`  | `/api/auth/users/reset_username/`         | Demande de réinitialisation du nom d’utilisateur (email) |
-| `POST`  | `/api/auth/users/reset_username_confirm/` | Confirmation (uid, token, new_username)                  |
-
-Les schémas exacts (corps, réponses) suivent la documentation Djoser ; les tests dans `docs/tests/accounts.md` décrivent les cas de succès et d’erreur.
-
----
-
-## 2. Quiz
-
-Tous les endpoints Quiz sont préfixés par **`/api/quiz/`**.
-
-**Vue d'ensemble du flux (création d’un Burger Quiz)**
-
-1. Créer les interludes vidéo (optionnel) : intro, pubs, outro.
-2. Créer les manches : Nuggets, Sel ou poivre, Menus, Addition, Burger de la mort.
-3. Créer un Burger Quiz en fournissant un **toss** et les **IDs des manches** déjà créées.
-4. Configurer la structure ordonnée du quiz (ordre des manches + interludes).
-
-Les manches et interludes sont des entités indépendantes ; le Burger Quiz les référence par clé étrangère.
-
-**Ordre recommandé des appels API**
-
-1. **Interludes** (optionnel) : créer les VideoInterlude avec `POST /api/quiz/interludes/`.
-2. **Questions et réponses** : créer les Questions avec `question_type`, `original` (optionnel), Answers conformes au type, et optionnellement `video_url` / `image_url`.
-3. **Manches** : Nuggets (`POST /api/quiz/nuggets/`), Sel ou poivre (`POST /api/quiz/salt-or-pepper/`), Menus (3 MenuTheme puis `POST /api/quiz/menus/`), Addition (`POST /api/quiz/additions/`), Burger de la mort (`POST /api/quiz/deadly-burgers/`).
-4. **Burger Quiz** : `POST /api/quiz/burger-quizzes/` avec `title`, `toss`, et les IDs des manches (`nuggets_id`, `salt_or_pepper_id`, `menus_id`, `addition_id`, `deadly_burger_id`).
-5. **Structure** (optionnel) : `PUT /api/quiz/burger-quizzes/{id}/structure/` pour définir l'ordre des manches et insérer des interludes.
-
----
-
-### 2.1 Interludes vidéo
-
-| Méthode  | Endpoint                     | Description                |
-| -------- | ---------------------------- | -------------------------- |
-| `GET`    | `/api/quiz/interludes/`      | Liste des interludes       |
-| `GET`    | `/api/quiz/interludes/{id}/` | Détail d'un interlude      |
-| `POST`   | `/api/quiz/interludes/`      | Création d'un interlude    |
-| `PUT`    | `/api/quiz/interludes/{id}/` | Mise à jour complète       |
-| `PATCH`  | `/api/quiz/interludes/{id}/` | Mise à jour partielle      |
-| `DELETE` | `/api/quiz/interludes/{id}/` | Suppression d'un interlude |
-
-#### 2.1.1. Liste des interludes
-
-**Endpoint** : `GET /api/quiz/interludes/`
-
-**Filtres** :
-
-- `interlude_type` : `IN` (intro) | `OU` (outro) | `PU` (pub) | `IL` (interlude)
-- `search` : recherche textuelle sur le titre
-
-**Réponse attendue** :
+**Example — `PATCH`** (only fields to change):
 
 ```json
 {
-  "count": 3,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": "uuid-interlude-1",
-      "title": "Intro Burger Quiz",
-      "youtube_url": "https://www.youtube.com/watch?v=xxx",
-      "youtube_video_id": "xxx",
-      "interlude_type": "IN",
-      "duration_seconds": 45,
-      "autoplay": true,
-      "skip_allowed": true,
-      "skip_after_seconds": 5,
-      "created_at": "2025-01-01T12:00:00Z",
-      "updated_at": "2025-01-01T12:00:00Z"
-    },
-    {
-      "id": "uuid-interlude-2",
-      "title": "Pub Ketchup",
-      "youtube_url": "https://www.youtube.com/watch?v=yyy",
-      "youtube_video_id": "yyy",
-      "interlude_type": "PU",
-      "duration_seconds": 30,
-      "autoplay": true,
-      "skip_allowed": true,
-      "skip_after_seconds": null,
-      "created_at": "2025-01-02T09:00:00Z",
-      "updated_at": "2025-01-02T09:00:00Z"
-    }
-  ]
+  "first_name": "Jane"
 }
 ```
 
-#### 2.1.2. Détail d'un interlude
+**Responses** (both methods)
 
-**Endpoint** : `GET /api/quiz/interludes/{id}/`
+- **200 OK**: Updated user.
+  ```json
+  {
+    "id": 1,
+    "email": "user@example.com",
+    "username": "johndoe",
+    "first_name": "John",
+    "last_name": "Doe",
+    "avatar": "https://cdn.example.com/media/avatars/johndoe.png"
+  }
+  ```
+- **400 Bad Request**: Validation error (e.g. duplicate email, invalid email).
+  ```json
+  {
+    "email": ["user with this email already exists."]
+  }
+  ```
+- **401 Unauthorized**: Missing or invalid token.
+- **404 Not Found**: No user with this `id`, or you are not allowed to target that user.
 
-**Réponse attendue** :
+#### 2.3.4. Delete user (by id)
+
+**Endpoint**: `DELETE /api/auth/users/{id}/`
+
+Permanently deletes the user `{id}`.
+
+**Permissions & Headers**
+
+- **Authentication**: `IsAuthenticated`
+- **Header**: `Authorization: Bearer <token>`
+- **Content-Type**: `application/json` (request body with `current_password`)
+
+**Request body**
+
+| Field              | Type   | Constraints                                                                                                |
+| ------------------ | ------ | ---------------------------------------------------------------------------------------------------------- |
+| `current_password` | string | Required for successful deletion when the server validates it; omission yields **400** with a field error. |
+
+**Example request**:
 
 ```json
 {
-  "id": "uuid-interlude-1",
-  "title": "Intro Burger Quiz",
-  "youtube_url": "https://www.youtube.com/watch?v=xxx",
-  "youtube_video_id": "xxx",
-  "interlude_type": "IN",
-  "duration_seconds": 45,
-  "autoplay": true,
-  "skip_allowed": true,
-  "skip_after_seconds": 5,
-  "author": { "id": 1, "username": "johndoe" },
-  "tags": ["intro", "officiel"],
-  "created_at": "2025-01-01T12:00:00Z",
-  "updated_at": "2025-01-01T12:00:00Z"
+  "current_password": "securePassword123"
 }
 ```
 
-#### 2.1.3. Création d'un interlude
+**Responses**
 
-**Endpoint** : `POST /api/quiz/interludes/`
+- **204 No Content**: User deleted; empty body.
+- **400 Bad Request**: e.g. missing `current_password`.
+  ```json
+  {
+    "current_password": ["This field is required."]
+  }
+  ```
+- **401 Unauthorized**: Not authenticated.
+- **403 Forbidden**: Authenticated but not allowed to delete this user (e.g. simple user deleting another user).
+  ```json
+  {
+    "detail": "You do not have permission to perform this action."
+  }
+  ```
+- **404 Not Found**: No user with this `id`.
 
-**Body** :
+## 3. Quiz
 
-```json
-{
-  "title": "Intro Burger Quiz",
+All Quiz endpoints are prefixed with **`/api/quiz/`**.
+
+**Flow overview (creating a Burger Quiz)**
+
+1. Create rounds: Nuggets, Salt or pepper, Menus, Addition, Deadly burger.
+2. Create video interludes (optional): as many as needed.
+3. Create a Burger Quiz with **`title`**, **`toss`**, and optional **`tags`**
+4. Configure **structure**: `PUT …/structure/` with an `elements` array of `{ "type", "id" }` in the desired order (implicit order).
+
+Rounds and interludes are **independent** resources; the run is wired to a quiz **only** through **`BurgerQuizElement`** rows created by the structure `PUT`.
+
+**Recommended API call order**
+
+1. **Questions and answers**: create Questions with `question_type`, `original`, type-conforming Answers, and optionally `video_url` / `image_url`.
+2. **Rounds**: Nuggets (`POST /api/quiz/nuggets/`), Salt or pepper (`POST /api/quiz/salt-or-pepper/`), Menus (three `POST /api/quiz/menu-theme/` then `POST /api/quiz/menus/`), Addition (`POST /api/quiz/additions/`), Deadly burger (`POST /api/quiz/deadly-burgers/`).
+3. **Interludes**: create `VideoInterlude` resources with `POST /api/quiz/interludes/`.
+4. **Burger Quiz**: `POST /api/quiz/burger-quizzes/` with **`title`**, **`toss`**, optional **`tags`** (no `nuggets_id` / … in the current serializer).
+5. **Structure**: `PUT /api/quiz/burger-quizzes/{id}/structure/` — ordered list of **`type` + `id`** (`nuggets`, `video_interlude`, …); rank follows **array position**.
+
+### 3.0.1 End-to-end call sequence (from scratch)
+
+Use this sequence to build one complete Burger Quiz with rounds and interludes.
+Replace `BASE_URL` and `TOKEN` with your environment values.
+
+```bash
+BASE_URL="http://localhost:8000/api/quiz"
+AUTH="Authorization: Bearer <TOKEN>"
+JSON="Content-Type: application/json"
+```
+
+1. Create Questions (minimum required set):
+
+- NU: 4 questions (or any even number)
+- SP: 2+ questions
+- ME: enough questions for 3 menu themes
+- AD: 1+ questions
+- DB: exactly 10 questions
+
+Example (one NU question):
+
+```bash
+curl -s -X POST "$BASE_URL/questions/" \
+  -H "$AUTH" -H "$JSON" \
+  -d '{
+    "text": "Capitale de la France ?",
+    "question_type": "NU",
+    "original": true,
+    "answers": [
+      {"text": "Paris", "is_correct": true},
+      {"text": "Lyon", "is_correct": false},
+      {"text": "Marseille", "is_correct": false},
+      {"text": "Toulouse", "is_correct": false}
+    ]
+  }'
+```
+
+2. Create rounds:
+
+- `POST /nuggets/` with NU `question_ids`
+- `POST /salt-or-pepper/` with `propositions` + SP `question_ids`
+- `POST /menu-theme/` three times (2x `CL`, 1x `TR`), then `POST /menus/`
+- `POST /additions/` with AD `question_ids`
+- `POST /deadly-burgers/` with exactly 10 DB `question_ids`
+
+Examples:
+
+```bash
+# Nuggets
+curl -s -X POST "$BASE_URL/nuggets/" -H "$AUTH" -H "$JSON" -d '{
+  "title": "Nuggets Culture G",
+  "question_ids": ["<NU_Q1>", "<NU_Q2>", "<NU_Q3>", "<NU_Q4>"]
+}'
+
+# Salt or pepper
+curl -s -X POST "$BASE_URL/salt-or-pepper/" -H "$AUTH" -H "$JSON" -d '{
+  "title": "Noir, Blanc ou Les deux",
+  "propositions": ["Noir", "Blanc", "Les deux"],
+  "question_ids": ["<SP_Q1>", "<SP_Q2>"]
+}'
+
+# Menus (after creating 3 menu themes)
+curl -s -X POST "$BASE_URL/menus/" -H "$AUTH" -H "$JSON" -d '{
+  "title": "Menus du jour",
+  "menu_1_id": "<THEME_CL_1>",
+  "menu_2_id": "<THEME_CL_2>",
+  "menu_troll_id": "<THEME_TR_1>"
+}'
+```
+
+3. Create interludes (optional but typical):
+
+```bash
+curl -s -X POST "$BASE_URL/interludes/" -H "$AUTH" -H "$JSON" -d '{
+  "title": "Intro Episode 1",
   "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  "interlude_type": "IN",
-  "duration_seconds": 45,
   "autoplay": true,
-  "skip_allowed": true,
-  "skip_after_seconds": 5,
-  "tags": ["intro", "officiel"]
-}
+  "skip_allowed": true
+}'
 ```
 
-- `title` : obligatoire.
-- `youtube_url` : obligatoire, URL YouTube valide.
-- `interlude_type` : optionnel, `IN` | `OU` | `PU` | `IL` (défaut `IL`).
-- `duration_seconds` : optionnel (peut être récupéré via API YouTube côté client).
-- `autoplay` : optionnel (défaut `true`).
-- `skip_allowed` : optionnel (défaut `true`).
-- `skip_after_seconds` : optionnel (temps avant de pouvoir skip).
-- `tags` : optionnel.
+4. Create Burger Quiz shell:
 
-**Réponse 201** : même forme que le détail (cf. 2.1.2).
-
-**Note** : Le champ `youtube_video_id` est calculé automatiquement à partir de `youtube_url`.
-
-#### 2.1.4. Mise à jour d'un interlude
-
-**Endpoint** : `PUT /api/quiz/interludes/{id}/` ou `PATCH /api/quiz/interludes/{id}/`
-
-**Body PATCH** (exemple) :
-
-```json
-{
-  "title": "Intro Burger Quiz v2",
-  "skip_after_seconds": 10
-}
+```bash
+curl -s -X POST "$BASE_URL/burger-quizzes/" -H "$AUTH" -H "$JSON" -d '{
+  "title": "Burger Quiz Episode 1",
+  "toss": "Presentation and game rules.",
+  "tags": ["episode-1", "culture"]
+}'
 ```
 
-**Réponse 200** : même forme que le détail.
+Save returned IDs: `<BQ_ID>`, `<NUGGETS_ID>`, `<SP_ID>`, `<MENUS_ID>`, `<ADDITION_ID>`, `<DB_ID>`, and optional `<INTRO_ID>`, `<PUB_ID>`, `<OUTRO_ID>`.
 
-#### 2.1.5. Suppression d'un interlude
+5. Attach everything through structure:
 
-**Endpoint** : `DELETE /api/quiz/interludes/{id}/`
+```bash
+curl -s -X PUT "$BASE_URL/burger-quizzes/<BQ_ID>/structure/" \
+  -H "$AUTH" -H "$JSON" \
+  -d '{
+    "elements": [
+      {"type": "video_interlude", "id": "<INTRO_ID>"},
+      {"type": "nuggets", "id": "<NUGGETS_ID>"},
+      {"type": "salt_or_pepper", "id": "<SP_ID>"},
+      {"type": "video_interlude", "id": "<PUB_ID>"},
+      {"type": "menus", "id": "<MENUS_ID>"},
+      {"type": "addition", "id": "<ADDITION_ID>"},
+      {"type": "deadly_burger", "id": "<DB_ID>"},
+      {"type": "video_interlude", "id": "<OUTRO_ID>"}
+    ]
+  }'
+```
 
-- **204 No Content** si la suppression réussit.
-- **400 Bad Request** si l'interlude est utilisé dans un ou plusieurs Burger Quiz (selon la politique de suppression choisie).
-- **404 Not Found** si l'`id` n'existe pas.
+6. Verify final result:
 
----
+```bash
+curl -s -H "$AUTH" "$BASE_URL/burger-quizzes/<BQ_ID>/?expand=full"
+curl -s -H "$AUTH" "$BASE_URL/burger-quizzes/<BQ_ID>/structure/"
+```
 
-### 2.2 Questions et réponses
+Notes:
 
-| Méthode  | Endpoint                    | Description                                         |
-| -------- | --------------------------- | --------------------------------------------------- |
-| `GET`    | `/api/quiz/questions/`      | Liste des questions                                 |
-| `GET`    | `/api/quiz/questions/{id}/` | Détail d’une question                               |
-| `POST`   | `/api/quiz/questions/`      | Création d’une question avec réponses selon le type |
-| `PUT`    | `/api/quiz/questions/{id}/` | Remplacement complet d’une question (idempotent)    |
-| `PATCH`  | `/api/quiz/questions/{id}/` | Mise à jour partielle d’une question                |
-| `DELETE` | `/api/quiz/questions/{id}/` | Suppression d’une question                          |
+- Structure order is implicit: array position = `order`.
+- Round slugs (`nuggets`, `menus`, etc.) may appear at most once in one structure.
+- Interludes may appear multiple times (same UUID reused is allowed).
 
-#### 2.2.1. Liste des questions
+### 3.1 Questions and answers
 
-**Endpoint** : `GET /api/quiz/questions/`
+| Method   | Endpoint                    | Description                           |
+| -------- | --------------------------- | ------------------------------------- |
+| `GET`    | `/api/quiz/questions/`      | Question list                         |
+| `GET`    | `/api/quiz/questions/{id}/` | Question detail                       |
+| `POST`   | `/api/quiz/questions/`      | Create question with answers per type |
+| `PUT`    | `/api/quiz/questions/{id}/` | Full replace (idempotent)             |
+| `PATCH`  | `/api/quiz/questions/{id}/` | Partial update                        |
+| `DELETE` | `/api/quiz/questions/{id}/` | Delete question                       |
 
-**Filtres** :
+#### 3.1.1. Question list
 
-- `original` : `true` \| `false`
-- `question_type` : `NU` \| `SP` \| `ME` \| `AD` \| `DB`
-- `search` : chaîne de caractères ; recherche textuelle sur l’énoncé de la question (usage : page liste questions, modale d’ajout de questions). Combinable avec les autres filtres.
+**Endpoint**: `GET /api/quiz/questions/`
 
-**Champs calculés (lecture seule)** : TODO
+**Filters**:
 
-**Réponse attendue** :
+- `original`: `true` | `false`
+- `question_type`: `NU` | `SP` | `ME` | `AD` | `DB`
+- `search`: string; full-text on question text (question list, add-question modal). Combinable with other filters.
+
+**Expected response**:
 
 ```json
 {
@@ -418,13 +769,11 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 }
 ```
 
-#### 2.2.2. Détail d'une question
+#### 3.1.2. Question detail
 
-**Endpoint** : `GET /api/quiz/questions/{id}/`
+**Endpoint**: `GET /api/quiz/questions/{id}/`
 
-**Paramètres** : aucun (ressource identifiée par `id`). Les filtres `original` et `question_type` s’appliquent à la liste (GET /api/quiz/questions/), pas au détail.
-
-**Réponse attendue** :
+**Expected response**:
 
 ```json
 {
@@ -446,21 +795,19 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 }
 ```
 
-> **Note** : Le champ `image_url` sur les réponses est optionnel et permet d'associer une image à une proposition de réponse.
+#### 3.1.3. Create question
 
-#### 2.2.3. Création de question
+**Endpoint**: `POST /api/quiz/questions/`
 
-**Endpoint** : `POST /api/quiz/questions/`
+**Body**:
 
-**Body** :
-
-- **Obligatoire** : `text`, **`question_type`** (NU | SP | ME | AD | DB) pour toutes les questions.
-- **Requis selon le type** : `answers` obligatoire pour NU, SP, ME, AD ; absent ou tableau vide pour DB. Contraintes par type (nombre de réponses, une seule ou plusieurs correctes, pas de piège pour SP/ME/AD) — voir `docs/tests/quiz.md` et la section Quiz ci-dessous.
-- **Optionnel** : `original` (booléen, défaut **`true`** = créée directement ; `false` = issue d’une émission diffusée), `video_url`, `image_url` (URLs valides), `explanations`.
+- **Required**: `text`, **`question_type`** (NU | SP | ME | AD | DB) for all questions.
+- **Per type**: `answers` required for NU, SP, ME, AD; omitted or empty array for DB. Per-type constraints (answer count, single vs multiple correct, no trick answers for SP/ME/AD) — see `docs/tests/quiz.md` and the Quiz section below.
+- **Optional**: `original` (boolean, default **`true`** = authored directly; `false` = from a broadcast), `video_url`, `image_url` (valid URLs), `explanations`.
 
 ```json
 {
-  "text": "intitulé de la question",
+  "text": "Question wording",
   "question_type": "NU",
   "original": true,
   "answers": [
@@ -478,7 +825,9 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 }
 ```
 
-**Réponse attendue** :
+**Expected response**:
+
+- 201
 
 ```json
 {
@@ -500,15 +849,15 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 }
 ```
 
-#### 2.2.4. Mise à jour complète d'une question
+#### 3.1.4. Full question update
 
-**Endpoint** : `PUT /api/quiz/questions/{id}/`
+**Endpoint**: `PUT /api/quiz/questions/{id}/`
 
-**Body** (exemple) :
+**Body** (example):
 
 ```json
 {
-  "text": "Question NU mise à jour",
+  "text": "Updated NU question",
   "question_type": "NU",
   "answers": [
     { "text": "Paris", "is_correct": true },
@@ -516,20 +865,20 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
     { "text": "Marseille", "is_correct": false },
     { "text": "Toulouse", "is_correct": false }
   ],
-  "video_url": "https://video.com/mise-a-jour",
-  "image_url": "https://image.com/mise-a-jour",
+  "video_url": "https://video.com/updated",
+  "image_url": "https://image.com/updated",
   "original": true,
-  "explanations": "Explications mises à jour"
+  "explanations": "Updated explanations"
 }
 ```
 
-**Réponse attendue (200)** : même forme que le détail (cf. 2.1.2), avec les champs mis à jour.
+**Expected response (200)**: same shape as detail (see § 3.2.2), with updated fields.
 
-#### 2.2.5. Mise à jour partielle d'une question
+#### 3.1.5. Partial question update
 
-**Endpoint** : `PATCH /api/quiz/questions/{id}/`
+**Endpoint**: `PATCH /api/quiz/questions/{id}/`
 
-**Body** (exemple) :
+**Body** (example):
 
 ```json
 {
@@ -538,32 +887,32 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 }
 ```
 
-**Réponse attendue (200)** : ressource complète de la question, avec les champs modifiés, même forme que 2.1.2.
+**Expected response (200)**: full question resource with changes; same shape as § 3.2.2.
 
-#### 2.2.6. Suppression d'une question
+#### 3.1.6. Delete question
 
-**Endpoint** : `DELETE /api/quiz/questions/{id}/`
+**Endpoint**: `DELETE /api/quiz/questions/{id}/`
 
-- **204 No Content** si la suppression réussit.
-- **404 Not Found** si l’`id` n’existe pas.
+- **204 No Content** on success.
+- **404 Not Found** si l'`id` n'existe pas.
 
 ---
 
-### 2.3 Manches — Nuggets
+### 3.2 Rounds — Nuggets
 
-| Méthode         | Endpoint                  | Description                      |
+| Method          | Endpoint                  | Description                      |
 | --------------- | ------------------------- | -------------------------------- |
-| `GET`           | `/api/quiz/nuggets/`      | Liste des manches Nuggets        |
-| `GET`           | `/api/quiz/nuggets/{id}/` | Détail d’une manche Nuggets      |
-| `POST`          | `/api/quiz/nuggets/`      | Création                         |
-| `PATCH`\| `PUT` | `/api/quiz/nuggets/{id}/` | Mise à jour                      |
-| `DELETE`        | `/api/quiz/nuggets/{id}/` | Suppression d’une manche Nuggets |
+| `GET`           | `/api/quiz/nuggets/`      | Nuggets round list               |
+| `GET`           | `/api/quiz/nuggets/{id}/` | Détail d'une manche Nuggets      |
+| `POST`          | `/api/quiz/nuggets/`      | Create                           |
+| `PATCH`\| `PUT` | `/api/quiz/nuggets/{id}/` | Update                           |
+| `DELETE`        | `/api/quiz/nuggets/{id}/` | Suppression d'une manche Nuggets |
 
-#### 2.3.1. Liste des manches Nuggets
+#### 3.2.1. Nuggets round list
 
-**Endpoint** : `GET /api/quiz/nuggets/`
+**Endpoint**: `GET /api/quiz/nuggets/`
 
-**Réponse attendue** :
+**Expected response**:
 
 ```json
 {
@@ -613,15 +962,13 @@ Les manches et interludes sont des entités indépendantes ; le Burger Quiz les 
 }
 ```
 
-> **Note** : La liste inclut les questions complètes avec leurs réponses, ce qui permet d'afficher un aperçu détaillé sans requête supplémentaire.
+#### 3.2.2. Nuggets round detail
 
-#### 2.3.2. Détail d'une manche Nuggets
+**Endpoint**: `GET /api/quiz/nuggets/{id}/`
 
-**Endpoint** : `GET /api/quiz/nuggets/{id}/`
+On **read**, detail returns **full questions** (and answers), not only `question_ids`:
 
-En **lecture**, le détail expose les **questions complètes** (et leurs réponses), et non seulement les `question_ids` :
-
-**Réponse attendue** :
+**Expected response**:
 
 ```json
 {
@@ -650,10 +997,10 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
 }
 ```
 
-#### 2.3.3. Création de manche Nuggets
+#### 3.2.3. Create Nuggets round
 
 **Endpoint**: `POST /api/quiz/nuggets/`
-**Body** :
+**Body**:
 
 ```json
 {
@@ -663,22 +1010,22 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
 }
 ```
 
-- `title` : obligatoire.
-- `question_ids` : liste d’UUID de questions existantes, ordre = ordre d’affichage.
+- `title`: required.
+- `question_ids` : liste d'UUID de questions existantes, ordre = ordre d'affichage.
 - `original` : optionnel (défaut `false`).
 
-**Contraintes** : nombre de questions **pair** ; toutes les questions doivent avoir `question_type = NU` ; pas de doublon dans `question_ids`.
+**Constraints**: **even** number of questions; all questions must have `question_type = NU`; no duplicates in `question_ids`.
 
-**Champs en réponse** : id, title, questions ordonnées, `original`. Champs calculés possibles : `questions_count`, `burger_quiz_count` (ou `used_in_burger_quizzes_count`).
+**Response fields**: id, title, ordered questions, `original`. Possible computed fields: `questions_count`, `burger_quiz_count` (or `used_in_burger_quizzes_count`).
 
-#### 2.3.4. Mise à jour d'une manche Nuggets
+#### 3.2.4. Update Nuggets round
 
-**Endpoint** :
+**Endpoint**:
 
-- `PATCH /api/quiz/nuggets/{id}/` pour modifier partiellement (ex. titre, original).
-- `PUT /api/quiz/nuggets/{id}/` pour remplacer complètement la liste de questions.
+- `PATCH /api/quiz/nuggets/{id}/` for partial update (e.g. title, original).
+- `PUT /api/quiz/nuggets/{id}/` to fully replace the question list.
 
-**Body PATCH** (exemple) :
+**PATCH body** (example):
 
 ```json
 {
@@ -687,7 +1034,7 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
 }
 ```
 
-**Body PUT** (exemple) :
+**PUT body** (example):
 
 ```json
 {
@@ -697,32 +1044,30 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
 }
 ```
 
-**Réponse attendue (200)** : même forme que le détail (cf. 2.2.2), avec les questions complètes.
+**Expected response (200)**: same shape as detail (see § 3.3.2), with full questions.
 
-#### 2.3.5. Suppression d'une manche Nuggets
+#### 3.2.5. Delete Nuggets round
 
-**Endpoint** : `DELETE /api/quiz/nuggets/{id}/`
+**Endpoint**: `DELETE /api/quiz/nuggets/{id}/`
 
-- **204 No Content** si la suppression réussit.
-- **404 Not Found** si l’`id` n’existe pas.
+- **204 No Content** on success.
+- **404 Not Found** si l'`id` n'existe pas.
 
----
+### 3.3 Rounds — Salt or pepper
 
-### 2.4 Manches — Sel ou poivre
-
-| Méthode          | Endpoint                         | Description                            |
+| Method           | Endpoint                         | Description                            |
 | ---------------- | -------------------------------- | -------------------------------------- |
-| `GET`            | `/api/quiz/salt-or-pepper/`      | Liste                                  |
-| `GET`            | `/api/quiz/salt-or-pepper/{id}/` | Détail                                 |
-| `POST`           | `/api/quiz/salt-or-pepper/`      | Création                               |
-| `PATCH` \| `PUT` | `/api/quiz/salt-or-pepper/{id}/` | Mise à jour                            |
-| `DELETE`         | `/api/quiz/salt-or-pepper/{id}/` | Suppression d’une manche Sel ou poivre |
+| `GET`            | `/api/quiz/salt-or-pepper/`      | List                                   |
+| `GET`            | `/api/quiz/salt-or-pepper/{id}/` | Detail                                 |
+| `POST`           | `/api/quiz/salt-or-pepper/`      | Create                                 |
+| `PATCH` \| `PUT` | `/api/quiz/salt-or-pepper/{id}/` | Update                                 |
+| `DELETE`         | `/api/quiz/salt-or-pepper/{id}/` | Suppression d'une manche Sel ou poivre |
 
-#### 2.4.1. Liste des manches Sel ou poivre
+#### 3.3.1. Salt or pepper round list
 
-**Endpoint** : `GET /api/quiz/salt-or-pepper/`
+**Endpoint**: `GET /api/quiz/salt-or-pepper/`
 
-**Réponse attendue** (liste paginée) :
+**Expected response**:
 
 ```json
 {
@@ -735,7 +1080,10 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
       "title": "Noir, Blanc ou Les deux",
       "description": "Optionnel",
       "original": false,
-      "author": { "id": 1, "username": "johndoe" },
+      "author": {
+        "id": 1,
+        "username": "johndoe"
+      },
       "tags": ["culture"],
       "created_at": "2025-01-01T12:00:00Z",
       "updated_at": "2025-01-01T12:00:00Z",
@@ -746,22 +1094,14 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
           "text": "Le corbeau ?",
           "question_type": "SP",
           "original": false,
-          "answers": [
-            { "text": "Noir", "is_correct": true },
-            { "text": "Blanc", "is_correct": false },
-            { "text": "Les deux", "is_correct": false }
-          ]
+          "answers": [{ "text": "Noir", "is_correct": true }]
         },
         {
           "id": "uuid-question-2",
           "text": "La neige ?",
           "question_type": "SP",
           "original": true,
-          "answers": [
-            { "text": "Noir", "is_correct": false },
-            { "text": "Blanc", "is_correct": true },
-            { "text": "Les deux", "is_correct": false }
-          ]
+          "answers": [{ "text": "Noir", "is_correct": false }]
         }
       ]
     }
@@ -769,15 +1109,13 @@ En **lecture**, le détail expose les **questions complètes** (et leurs répons
 }
 ```
 
-> **Note** : La liste inclut les questions complètes avec leurs réponses et les propositions de la manche.
+#### 3.3.2. Salt or pepper round detail
 
-#### 2.4.2. Détail d'une manche Sel ou poivre
+**Endpoint**: `GET /api/quiz/salt-or-pepper/{id}/`
 
-**Endpoint** : `GET /api/quiz/salt-or-pepper/{id}/`
+On **read**, detail returns **full questions** and answers, consistent with the choices:
 
-En **lecture**, le détail expose les **questions complètes** et leurs réponses, cohérentes avec les propositions :
-
-**Réponse attendue** :
+**Expected response**:
 
 ```json
 {
@@ -800,7 +1138,7 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 }
 ```
 
-#### 2.4.3. Création Sel ou poivre
+#### 3.3.3. Create Salt or pepper round
 
 **Endpoint**: `POST /api/quiz/salt-or-pepper/`
 **Body** :
@@ -808,28 +1146,30 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 ```json
 {
   "title": "Noir, Blanc ou Les deux",
-  "original": false,
   "description": "Optionnel",
+  "original": false,
+  "tags": ["string"],
   "propositions": ["Noir", "Blanc", "Les deux"],
   "question_ids": ["uuid-1", "uuid-2"]
 }
 ```
 
-- `title` : obligatoire.
-- `propositions` (stocké `choice_labels`) : obligatoire, 2 à 5 libellés, sans doublon.
-- `question_ids` : liste ordonnée d’UUID de questions.
-- `original` : optionnel.
+- `title` : m.
+- `propositions` (stored as `choice_labels`): required, 2–5 labels, no duplicates.
+- `question_ids` : ordered list of questions UUID.
+- `tags` : optionnal.
+- `original` : optionnal.
 
-**Contraintes** : questions de type `SP` ; pour chaque question, les réponses doivent correspondre exactement aux libellés de `propositions`, avec une et une seule réponse correcte.
+**Constraints**: `SP` questions; for each question, 1 correct answer who match one of `propositions` labels exactly.
 
-**Réponse** : ressource avec `propositions` / `choice_labels`. Champs calculés possibles : `burger_quiz_count`, `questions_count`.
+**Response**: resource with `propositions` / `choice_labels`. Possible computed fields: `burger_quiz_count`, `questions_count`.
 
-#### 2.4.4. Mise à jour d'une manche Sel ou poivre
+#### 3.3.4. Update Salt or pepper round
 
-**Endpoint** :
+**Endpoint**:
 
-- `PATCH /api/quiz/salt-or-pepper/{id}/` pour modifier, par exemple, le titre.
-- `PUT /api/quiz/salt-or-pepper/{id}/` pour remplacer entièrement la manche.
+- `PATCH /api/quiz/salt-or-pepper/{id}/` to change e.g. title.
+- `PUT /api/quiz/salt-or-pepper/{id}/` to fully replace the round.
 
 **Body PATCH** (exemple) :
 
@@ -851,30 +1191,28 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 }
 ```
 
-**Réponse attendue (200)** : même forme que le détail (cf. 2.3.2), avec les questions complètes.
+**Expected response (200)**: same shape as detail (see § 3.4.2), with full questions.
 
-#### 2.4.5. Suppression d'une manche Sel ou poivre
+#### 3.3.5. Delete Salt or pepper round
 
-**Endpoint** : `DELETE /api/quiz/salt-or-pepper/{id}/`
+**Endpoint**: `DELETE /api/quiz/salt-or-pepper/{id}/`
 
-- **204 No Content** si la suppression réussit.
-- **404 Not Found** si l’`id` n’existe pas.
+- **204 No Content** on success.
+- **404 Not Found** si l'`id` n'existe pas.
 
----
+### 3.4 Rounds — Menus
 
-### 2.5 Manches — Menus
+#### 3.4.1. Menu themes
 
-#### 2.5.1. Thèmes de menu
+| Method           | Endpoint                     | Description                    |
+| ---------------- | ---------------------------- | ------------------------------ |
+| `GET`            | `/api/quiz/menu-theme/`      | Theme list                     |
+| `GET`            | `/api/quiz/menu-theme/{id}/` | Detail                         |
+| `POST`           | `/api/quiz/menu-theme/`      | Create                         |
+| `PATCH` \| `PUT` | `/api/quiz/menu-theme/{id}/` | Update                         |
+| `DELETE`         | `/api/quiz/menu-theme/{id}/` | Suppression d'un thème de menu |
 
-| Méthode          | Endpoint                      | Description                    |
-| ---------------- | ----------------------------- | ------------------------------ |
-| `GET`            | `/api/quiz/menu-themes/`      | Liste des thèmes               |
-| `GET`            | `/api/quiz/menu-themes/{id}/` | Détail                         |
-| `POST`           | `/api/quiz/menu-themes/`      | Création                       |
-| `PATCH` \| `PUT` | `/api/quiz/menu-themes/{id}/` | Mise à jour                    |
-| `DELETE`         | `/api/quiz/menu-themes/{id}/` | Suppression d’un thème de menu |
-
-**POST /api/quiz/menu-themes/** — Corps (exemple) :
+**POST /api/quiz/menu-theme/** — **Body** (example):
 
 ```json
 {
@@ -885,13 +1223,13 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 }
 ```
 
-- `type` : `"CL"` (Classique) ou `"TR"` (Troll).
-- `original` : optionnel (défaut **`true`** = créé directement).
-- Questions : type `ME` ; ordre via `question_ids`.
+- `type`: `"CL"` (Classic) or `"TR"` (Troll).
+- `original`: optional (default **`true`** = authored directly).
+- Questions: type `ME`; order via `question_ids`.
 
-**Champs calculés** : `questions_count`, `used_in_menus_count`.
+**Computed fields**: `questions_count`, `used_in_menus_count`.
 
-**GET /api/quiz/menu-themes/{id}/** — Détail (exemple de réponse) :
+**GET /api/quiz/menu-theme/{id}/** — Detail (example response):
 
 ```json
 {
@@ -912,20 +1250,20 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 }
 ```
 
-**PUT / PATCH /api/quiz/menu-themes/{id}/** — même corps que le POST, réponse 200 avec le thème complet (comme ci‑dessus).  
-**DELETE /api/quiz/menu-themes/{id}/** — 204 No Content en cas de succès.
+**PUT / PATCH /api/quiz/menu-theme/{id}/** — same body as POST, 200 response with full theme (as above).  
+**DELETE /api/quiz/menu-theme/{id}/** — 204 No Content on success.
 
-#### 2.5.2. Manche Menus (regroupe 3 thèmes)
+#### 3.4.2. Menus round (three themes)
 
-| Méthode          | Endpoint                | Description                    |
+| Method           | Endpoint                | Description                    |
 | ---------------- | ----------------------- | ------------------------------ |
-| `GET`            | `/api/quiz/menus/`      | Liste                          |
+| `GET`            | `/api/quiz/menus/`      | List                           |
 | `GET`            | `/api/quiz/menus/{id}/` | Détail                         |
 | `POST`           | `/api/quiz/menus/`      | Création                       |
 | `PATCH` \| `PUT` | `/api/quiz/menus/{id}/` | Mise à jour                    |
-| `DELETE`         | `/api/quiz/menus/{id}/` | Suppression d’une manche Menus |
+| `DELETE`         | `/api/quiz/menus/{id}/` | Suppression d'une manche Menus |
 
-**POST /api/quiz/menus/** — Corps (exemple) :
+**POST /api/quiz/menus/** — **Body** (example):
 
 ```json
 {
@@ -938,11 +1276,11 @@ En **lecture**, le détail expose les **questions complètes** et leurs réponse
 }
 ```
 
-**Contraintes** : exactement 2 menus classiques (`menu_1`, `menu_2` avec `type = "CL"`) et 1 menu troll (`menu_troll` avec `type = "TR"`) ; les trois IDs distincts et existants.
+**Constraints**: exactly 2 classic menus (`menu_1`, `menu_2` with `type = "CL"`) and 1 troll menu (`menu_troll` with `type = "TR"`); the three IDs must be distinct and exist.
 
-**GET /api/quiz/menus/{id}/** — Détail (exemple de réponse) :
+**GET /api/quiz/menus/{id}/** — Detail (example response):
 
-En **lecture**, le détail expose les **thèmes complets** avec leurs **questions désérialisées** :
+On **read**, detail returns **full themes** with **deserialized questions**:
 
 ```json
 {
@@ -987,26 +1325,26 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 }
 ```
 
-**PUT / PATCH /api/quiz/menus/{id}/** — même corps que le POST (avec les IDs des thèmes), réponse 200 avec la manche complète incluant les thèmes et questions désérialisées.  
-**DELETE /api/quiz/menus/{id}/** — 204 No Content en cas de succès.
+**PUT / PATCH /api/quiz/menus/{id}/** — same body as POST (with theme IDs), 200 response with full round including themes and deserialized questions.  
+**DELETE /api/quiz/menus/{id}/** — 204 No Content on success.
 
 ---
 
-### 2.6 Manches — Addition
+### 3.5 Rounds — Addition
 
-| Méthode          | Endpoint                    | Description                       |
-| ---------------- | --------------------------- | --------------------------------- |
-| `GET`            | `/api/quiz/additions/`      | Liste                             |
-| `GET`            | `/api/quiz/additions/{id}/` | Détail                            |
-| `POST`           | `/api/quiz/additions/`      | Création                          |
-| `PATCH` \| `PUT` | `/api/quiz/additions/{id}/` | Mise à jour                       |
-| `DELETE`         | `/api/quiz/additions/{id}/` | Suppression d’une manche Addition |
+| Method           | Endpoint                    | Description              |
+| ---------------- | --------------------------- | ------------------------ |
+| `GET`            | `/api/quiz/additions/`      | List                     |
+| `GET`            | `/api/quiz/additions/{id}/` | Détail                   |
+| `POST`           | `/api/quiz/additions/`      | Création                 |
+| `PATCH` \| `PUT` | `/api/quiz/additions/{id}/` | Update                   |
+| `DELETE`         | `/api/quiz/additions/{id}/` | Delete an Addition round |
 
-#### 2.6.1. Liste des manches Addition
+#### 3.5.1. Addition round list
 
-**Endpoint** : `GET /api/quiz/additions/`
+**Endpoint**: `GET /api/quiz/additions/`
 
-**Réponse attendue** (liste paginée) :
+**Expected response** (paginated list):
 
 ```json
 {
@@ -1037,11 +1375,9 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 }
 ```
 
-> **Note** : La liste inclut les questions complètes avec leurs réponses.
+#### 3.5.2. Create Addition round
 
-#### 2.6.2. Création d'une manche Addition
-
-**POST /api/quiz/additions/** — Corps (exemple) :
+**POST /api/quiz/additions/** — **Body** (example):
 
 ```json
 {
@@ -1052,9 +1388,11 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 }
 ```
 
-**Contraintes** : questions de type `AD` ; pas de doublon dans `question_ids`. Champs calculés possibles : `burger_quiz_count`, `questions_count`.
+**Constraints**: `AD` questions; no duplicates in `question_ids`. Possible computed fields: `burger_quiz_count`, `questions_count`.
 
-**GET /api/quiz/additions/{id}/** — Détail (exemple de réponse) :
+#### 3.5.3. Retrieve Addition round
+
+**GET /api/quiz/additions/{id}/** — Detail (example response):
 
 ```json
 {
@@ -1075,22 +1413,27 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 }
 ```
 
-**PUT / PATCH /api/quiz/additions/{id}/** — même corps que le POST, réponse 200 avec la manche complète (comme ci‑dessus).  
-**DELETE /api/quiz/additions/{id}/** — 204 No Content en cas de succès.
+#### 3.5.4. Update Addition round
+
+**PUT / PATCH /api/quiz/additions/{id}/** — same body as POST, 200 response with full round (as above).
+
+#### 3.5.5. Delete Addition round
+
+**DELETE /api/quiz/additions/{id}/** — 204 No Content on success.
 
 ---
 
-### 2.7 Manches — Burger de la mort
+### 3.6 Rounds — Deadly burger
 
-| Méthode          | Endpoint                         | Description                                |
+| Method           | Endpoint                         | Description                                |
 | ---------------- | -------------------------------- | ------------------------------------------ |
-| `GET`            | `/api/quiz/deadly-burgers/`      | Liste                                      |
+| `GET`            | `/api/quiz/deadly-burgers/`      | List                                       |
 | `GET`            | `/api/quiz/deadly-burgers/{id}/` | Détail                                     |
 | `POST`           | `/api/quiz/deadly-burgers/`      | Création                                   |
 | `PATCH` \| `PUT` | `/api/quiz/deadly-burgers/{id}/` | Mise à jour                                |
-| `DELETE`         | `/api/quiz/deadly-burgers/{id}/` | Suppression d’une manche Burger de la mort |
+| `DELETE`         | `/api/quiz/deadly-burgers/{id}/` | Suppression d'une manche Burger de la mort |
 
-**POST /api/quiz/deadly-burgers/** — Corps (exemple) :
+**POST /api/quiz/deadly-burgers/** — **Body** (example):
 
 ```json
 {
@@ -1100,9 +1443,9 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 }
 ```
 
-**Contraintes** : **10 questions** exactement ; toutes de type `DB`. Champs calculés possibles : `burger_quiz_count`.
+**Constraints**: exactly **10** questions; all type `DB`. Possible computed fields: `burger_quiz_count`.
 
-**GET /api/quiz/deadly-burgers/{id}/** — Détail (exemple de réponse) :
+**GET /api/quiz/deadly-burgers/{id}/** — Detail (example response):
 
 ```json
 {
@@ -1120,44 +1463,178 @@ En **lecture**, le détail expose les **thèmes complets** avec leurs **question
 }
 ```
 
-**PUT / PATCH /api/quiz/deadly-burgers/{id}/** — même corps que le POST, réponse 200 avec la manche complète (comme ci‑dessus).  
-**DELETE /api/quiz/deadly-burgers/{id}/** — 204 No Content en cas de succès.
+**PUT / PATCH /api/quiz/deadly-burgers/{id}/** — same body as POST, 200 response with full round (as above).  
+**DELETE /api/quiz/deadly-burgers/{id}/** — 204 No Content on success.
+
+### 3.7 Video interludes
+
+An interlude is a **standalone** resource (title, YouTube URL, playback options). There is no catalog “type” field (intro / ad / …): role follows from the title, **tags**, and especially **position** in the Burger Quiz structure.
+
+| Method   | Endpoint                     | Description      |
+| -------- | ---------------------------- | ---------------- |
+| `GET`    | `/api/quiz/interludes/`      | Interlude list   |
+| `GET`    | `/api/quiz/interludes/{id}/` | Interlude detail |
+| `POST`   | `/api/quiz/interludes/`      | Create interlude |
+| `PUT`    | `/api/quiz/interludes/{id}/` | Full update      |
+| `PATCH`  | `/api/quiz/interludes/{id}/` | Partial update   |
+| `DELETE` | `/api/quiz/interludes/{id}/` | Delete interlude |
+
+#### 3.7.1. Interlude list
+
+**Endpoint**: `GET /api/quiz/interludes/`
+
+**Filters**:
+
+- `search`: text search on title
+- `tags`: tag filter (per API conventions)
+
+**Expected response**:
+
+```json
+{
+  "count": 3,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "uuid-interlude-1",
+      "title": "Intro Burger Quiz",
+      "youtube_url": "https://www.youtube.com/watch?v=xxx",
+      "youtube_video_id": "xxx",
+      "duration_seconds": 45,
+      "autoplay": true,
+      "skip_allowed": true,
+      "skip_after_seconds": 5,
+      "created_at": "2025-01-01T12:00:00Z",
+      "updated_at": "2025-01-01T12:00:00Z"
+    },
+    {
+      "id": "uuid-interlude-2",
+      "title": "Pub Ketchup",
+      "youtube_url": "https://www.youtube.com/watch?v=yyy",
+      "youtube_video_id": "yyy",
+      "duration_seconds": 30,
+      "autoplay": true,
+      "skip_allowed": true,
+      "skip_after_seconds": null,
+      "created_at": "2025-01-02T09:00:00Z",
+      "updated_at": "2025-01-02T09:00:00Z"
+    }
+  ]
+}
+```
+
+#### 3.7.2. Interlude detail
+
+**Endpoint**: `GET /api/quiz/interludes/{id}/`
+
+**Expected response**:
+
+```json
+{
+  "id": "uuid-interlude-1",
+  "title": "Intro Burger Quiz",
+  "youtube_url": "https://www.youtube.com/watch?v=xxx",
+  "youtube_video_id": "xxx",
+  "duration_seconds": 45,
+  "autoplay": true,
+  "skip_allowed": true,
+  "skip_after_seconds": 5,
+  "author": { "id": 1, "username": "johndoe" },
+  "tags": ["intro", "officiel"],
+  "created_at": "2025-01-01T12:00:00Z",
+  "updated_at": "2025-01-01T12:00:00Z"
+}
+```
+
+#### 3.7.3. Create interlude
+
+**Endpoint**: `POST /api/quiz/interludes/`
+
+**Body**:
+
+```json
+{
+  "title": "Intro Burger Quiz",
+  "youtube_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "duration_seconds": 45,
+  "autoplay": true,
+  "skip_allowed": true,
+  "skip_after_seconds": 5,
+  "tags": ["intro", "officiel"]
+}
+```
+
+- `title`: required.
+- `youtube_url`: required, valid YouTube URL.
+- `duration_seconds`: optional (may be fetched via YouTube API on the client).
+- `autoplay`: optional (default `true`).
+- `skip_allowed`: optional (default `true`).
+- `skip_after_seconds`: optional (seconds before skip is allowed).
+- `tags`: optional.
+
+**201 response**: same shape as detail (see § 3.1.2).
+
+**Note**: `youtube_video_id` is derived automatically from `youtube_url`.
+
+#### 3.7.4. Update interlude
+
+**Endpoint**: `PUT /api/quiz/interludes/{id}/` or `PATCH /api/quiz/interludes/{id}/`
+
+**PATCH body** (example):
+
+```json
+{
+  "title": "Intro Burger Quiz v2",
+  "skip_after_seconds": 10
+}
+```
+
+**200 response**: same shape as detail.
+
+#### 3.7.5. Delete interlude
+
+**Endpoint**: `DELETE /api/quiz/interludes/{id}/`
+
+- **204 No Content** on success.
+- **400 Bad Request** if the interlude is used by one or more Burger Quizzes (per deletion policy).
+- **404 Not Found** if `id` does not exist.
 
 ---
 
-### 2.8 Burger Quiz
+### 3.8 Burger Quiz
 
-| Méthode          | Endpoint                         | Description                                                |
-| ---------------- | -------------------------------- | ---------------------------------------------------------- |
-| `GET`            | `/api/quiz/burger-quizzes/`      | Liste (avec `created_at`, `updated_at` pour tri/affichage) |
-| `GET`            | `/api/quiz/burger-quizzes/{id}/` | Détail                                                     |
-| `POST`           | `/api/quiz/burger-quizzes/`      | Création                                                   |
-| `PATCH` \| `PUT` | `/api/quiz/burger-quizzes/{id}/` | Mise à jour                                                |
-| `DELETE`         | `/api/quiz/burger-quizzes/{id}/` | Suppression d’un Burger Quiz                               |
+| Method           | Endpoint                         | Description                                             |
+| ---------------- | -------------------------------- | ------------------------------------------------------- |
+| `GET`            | `/api/quiz/burger-quizzes/`      | List (with `created_at`, `updated_at` for sort/display) |
+| `GET`            | `/api/quiz/burger-quizzes/{id}/` | Détail                                                  |
+| `POST`           | `/api/quiz/burger-quizzes/`      | Création                                                |
+| `PATCH` \| `PUT` | `/api/quiz/burger-quizzes/{id}/` | Update                                                  |
+| `DELETE`         | `/api/quiz/burger-quizzes/{id}/` | Delete a Burger Quiz                                    |
 
-**POST /api/quiz/burger-quizzes/** — Corps (exemple) :
+#### 3.8.1. Create Burger quiz
+
+**POST /api/quiz/burger-quizzes/** — **Body**
 
 ```json
 {
   "title": "Burger PCaT Episode 1",
-  "toss": "Description ou consigne du toss.",
-  "nuggets_id": "uuid-nuggets",
-  "salt_or_pepper_id": "uuid-sop",
-  "menus_id": "uuid-menus",
-  "addition_id": "uuid-addition",
-  "deadly_burger_id": "uuid-db"
+  "toss": "Toss description or instructions.",
+  "tags": ["humour", "culture"]
 }
 ```
 
-- `toss` : texte décrivant la manche Toss (à trancher : obligatoire ou optionnel — voir brouillon).
-- IDs des manches : optionnels (null/omis si la manche n’est pas utilisée). Si fournis, doivent référencer des ressources existantes du bon type.
-- Au moins une manche recommandée.
+- **`toss`**: required.
+- **`title`**, **`tags`**: optional.
 
-**Réponse 201** : id, title, toss, `created_at`, `updated_at`, manches liées avec leurs questions complètes.
+**201 response**: `id`, `title`, `toss`, `author`, `tags`, `created_at`, `updated_at`, **`structure`** (see below).
 
-**GET /api/quiz/burger-quizzes/{id}/** — Détail (exemple de réponse) :
+#### 3.8.2. Retrieve Burger quiz
 
-En **lecture**, le détail expose les **manches complètes** avec toutes leurs **questions désérialisées** (intitulé, réponses, métadonnées). Cela permet d'afficher un Burger Quiz complet en une seule requête :
+**GET /api/quiz/burger-quizzes/{id}/**
+
+- **`structure`**: built from **`BurgerQuizElement`** rows. **Empty array `[]`** until the first successful **`PUT …/structure/`**.
+- **`?expand=full`**: each structure item includes the nested object under the type key (`nuggets`, `video_interlude`, …), same helper as **`GET …/structure/`**.
 
 ```json
 {
@@ -1168,182 +1645,64 @@ En **lecture**, le détail expose les **manches complètes** avec toutes leurs *
   "tags": ["humour", "culture"],
   "created_at": "2025-01-02T09:30:00Z",
   "updated_at": "2025-01-02T09:30:00Z",
-  "nuggets": {
-    "id": "uuid-nuggets",
-    "title": "Culture générale",
-    "original": false,
-    "author": { "id": 1, "username": "johndoe" },
-    "tags": ["culture"],
-    "questions": [
-      {
-        "id": "uuid-q1",
-        "text": "Quelle est la capitale de la France ?",
-        "question_type": "NU",
-        "original": false,
-        "answers": [
-          { "id": "uuid-a1", "text": "Paris", "is_correct": true },
-          { "id": "uuid-a2", "text": "Lyon", "is_correct": false },
-          { "id": "uuid-a3", "text": "Marseille", "is_correct": false },
-          { "id": "uuid-a4", "text": "Toulouse", "is_correct": false }
-        ]
-      }
-    ]
-  },
-  "salt_or_pepper": {
-    "id": "uuid-sop",
-    "title": "Noir ou Blanc",
-    "propositions": ["Noir", "Blanc"],
-    "questions": [
-      {
-        "id": "uuid-q2",
-        "text": "La nuit ?",
-        "question_type": "SP",
-        "answers": [{ "id": "uuid-a5", "text": "Noir", "is_correct": true }]
-      }
-    ]
-  },
-  "menus": {
-    "id": "uuid-menus",
-    "title": "Menus du jour",
-    "menu_1": {
-      "id": "uuid-theme-1",
-      "title": "Cinéma",
-      "type": "CL",
-      "questions": [
-        {
-          "id": "uuid-q3",
-          "text": "Qui a réalisé Pulp Fiction ?",
-          "question_type": "ME",
-          "answers": [
-            { "id": "uuid-a6", "text": "Quentin Tarantino", "is_correct": true }
-          ]
-        }
-      ]
-    },
-    "menu_2": {
-      "id": "uuid-theme-2",
-      "title": "Musique",
-      "type": "CL",
-      "questions": []
-    },
-    "menu_troll": {
-      "id": "uuid-theme-troll",
-      "title": "Piège",
-      "type": "TR",
-      "questions": []
-    }
-  },
-  "addition": {
-    "id": "uuid-addition",
-    "title": "Addition rapide",
-    "questions": [
-      {
-        "id": "uuid-q4",
-        "text": "2 + 2 ?",
-        "question_type": "AD",
-        "answers": [{ "id": "uuid-a7", "text": "4", "is_correct": true }]
-      }
-    ]
-  },
-  "deadly_burger": {
-    "id": "uuid-db",
-    "title": "Burger de la mort - Finale",
-    "questions": [
-      { "id": "uuid-q5", "text": "Question DB 1", "question_type": "DB" },
-      { "id": "uuid-q6", "text": "Question DB 2", "question_type": "DB" }
-    ]
-  },
+  "structure": []
+}
+```
+
+Example **after** `PUT …/structure/` with **`?expand=full`** (shape only; payloads mirror `/structure/`):
+
+```json
+{
+  "id": "uuid-bq-1",
+  "title": "Burger PCaT Episode 1",
+  "toss": "…",
+  "author": { "id": 1, "username": "johndoe" },
+  "tags": [],
+  "created_at": "…",
+  "updated_at": "…",
   "structure": [
     {
       "order": 1,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
+      "type": "video_interlude",
+      "id": "uuid-intro",
+      "video_interlude": {
         "id": "uuid-intro",
         "title": "Intro",
-        "interlude_type": "IN",
         "youtube_video_id": "abc123"
       }
     },
     {
       "order": 2,
-      "element_type": "round",
-      "round_type": "NU",
-      "interlude": null
-    },
-    {
-      "order": 3,
-      "element_type": "round",
-      "round_type": "SP",
-      "interlude": null
-    },
-    {
-      "order": 4,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
-        "id": "uuid-pub-1",
-        "title": "Pub Ketchup",
-        "interlude_type": "PU",
-        "youtube_video_id": "def456"
-      }
-    },
-    {
-      "order": 5,
-      "element_type": "round",
-      "round_type": "ME",
-      "interlude": null
-    },
-    {
-      "order": 6,
-      "element_type": "round",
-      "round_type": "AD",
-      "interlude": null
-    },
-    {
-      "order": 7,
-      "element_type": "round",
-      "round_type": "DB",
-      "interlude": null
-    },
-    {
-      "order": 8,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
-        "id": "uuid-outro",
-        "title": "Outro",
-        "interlude_type": "OU",
-        "youtube_video_id": "ghi789"
-      }
+      "type": "nuggets",
+      "id": "uuid-nuggets",
+      "nuggets": { "id": "uuid-nuggets", "title": "Culture G" }
     }
   ]
 }
 ```
 
-> **Note** : L'exemple ci-dessus est simplifié. En pratique, chaque manche contient tous ses champs (`created_at`, `updated_at`, `author`, `tags`, etc.) et chaque question contient également ses champs complets (`explanations`, `video_url`, `image_url`, etc.).
+#### 3.8.3. Update Burger quiz
 
-> **Note structure** : Le champ `structure` contient la liste ordonnée des éléments (manches et interludes). Les interludes sont inclus en lecture avec leurs informations de base. Si la structure n'a pas été configurée, une structure par défaut (manches dans l'ordre classique, sans interludes) est retournée.
+**PUT / PATCH /api/quiz/burger-quizzes/{id}/** — Body: **`title`**, **`toss`**, **`tags`** (same rules as POST); response shape as **GET** detail.
 
-**PUT / PATCH /api/quiz/burger-quizzes/{id}/** — même corps que le POST (avec les IDs des manches), réponse 200 avec le Burger Quiz complet incluant les manches et questions désérialisées.  
-**DELETE /api/quiz/burger-quizzes/{id}/** — 204 No Content en cas de succès.
+#### 3.8.4. Delete Burger quiz
 
----
+**DELETE /api/quiz/burger-quizzes/{id}/** — 204 No Content on success.
 
-### 2.9 Structure du Burger Quiz
+### 3.9 Burger Quiz structure
 
-| Méthode | Endpoint                                   | Description                  |
-| ------- | ------------------------------------------ | ---------------------------- |
-| `GET`   | `/api/quiz/burger-quizzes/{id}/structure/` | Lecture de la structure      |
-| `PUT`   | `/api/quiz/burger-quizzes/{id}/structure/` | Remplacement de la structure |
+| Method | Endpoint                                   | Description       |
+| ------ | ------------------------------------------ | ----------------- |
+| `GET`  | `/api/quiz/burger-quizzes/{id}/structure/` | Read structure    |
+| `PUT`  | `/api/quiz/burger-quizzes/{id}/structure/` | Replace structure |
 
-La structure définit l'ordre des éléments d'un Burger Quiz : manches et interludes. Les interludes doivent exister au préalable (pas de création inline).
+#### 3.9.1. Read structure
 
-#### 2.9.1. Lecture de la structure
+**Endpoint**: `GET /api/quiz/burger-quizzes/{id}/structure/`
 
-**Endpoint** : `GET /api/quiz/burger-quizzes/{id}/structure/`
+**Description**: Retrieve quiz structure.
 
-**Réponse attendue** :
+**Expected response**:
 
 ```json
 {
@@ -1351,158 +1710,94 @@ La structure définit l'ordre des éléments d'un Burger Quiz : manches et inter
   "elements": [
     {
       "order": 1,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
+      "type": "video_interlude",
+      "id": "uuid-intro",
+      "video_interlude": {
         "id": "uuid-intro",
         "title": "Intro",
-        "interlude_type": "IN",
         "youtube_video_id": "abc123"
       }
     },
     {
       "order": 2,
-      "element_type": "round",
-      "round_type": "NU",
-      "interlude": null
+      "type": "nuggets",
+      "id": "uuid-nuggets",
+      "nuggets": { "id": "uuid-nuggets", "title": "Culture G" }
     },
     {
       "order": 3,
-      "element_type": "round",
-      "round_type": "SP",
-      "interlude": null
-    },
-    {
-      "order": 4,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
+      "type": "video_interlude",
+      "id": "uuid-pub-1",
+      "video_interlude": {
         "id": "uuid-pub-1",
         "title": "Pub Ketchup",
-        "interlude_type": "PU",
         "youtube_video_id": "def456"
       }
     },
     {
-      "order": 5,
-      "element_type": "round",
-      "round_type": "ME",
-      "interlude": null
-    },
-    {
-      "order": 6,
-      "element_type": "round",
-      "round_type": "AD",
-      "interlude": null
-    },
-    {
-      "order": 7,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
-        "id": "uuid-pub-2",
-        "title": "Pub Mayo",
-        "interlude_type": "PU",
-        "youtube_video_id": "jkl012"
-      }
-    },
-    {
-      "order": 8,
-      "element_type": "round",
-      "round_type": "DB",
-      "interlude": null
-    },
-    {
-      "order": 9,
-      "element_type": "interlude",
-      "round_type": null,
-      "interlude": {
-        "id": "uuid-outro",
-        "title": "Outro",
-        "interlude_type": "OU",
-        "youtube_video_id": "mno345"
-      }
+      "order": 4,
+      "type": "addition",
+      "id": "uuid-addition",
+      "addition": { "id": "uuid-addition", "title": "Addition rapide" }
     }
   ]
 }
 ```
 
-**Champs** :
+**Fields**:
 
-- `element_type` : `"round"` ou `"interlude"`.
-- `round_type` : `NU` | `SP` | `ME` | `AD` | `DB` (uniquement si `element_type = "round"`, sinon `null`).
-- `interlude` : objet interlude avec `id`, `title`, `interlude_type`, `youtube_video_id` (uniquement si `element_type = "interlude"`, sinon `null`).
+- `order`: rank 1…n.
+- `type` : `nuggets` | `salt_or_pepper` | `menus` | `addition` | `deadly_burger` | `video_interlude`.
+- `id`: UUID of referenced object.
+- Key matching `type` (for a round) or `video_interlude`: minimal read object.
 
-> **Note** : En lecture, on peut enrichir les interludes avec leurs données complètes (titre, URL, etc.) via un paramètre `?expand=interludes`.
+#### 3.9.2. Update structure
 
-#### 2.9.2. Mise à jour de la structure
+**Endpoint**: `PUT /api/quiz/burger-quizzes/{id}/structure/`
 
-**Endpoint** : `PUT /api/quiz/burger-quizzes/{id}/structure/` ou `PATCH /api/quiz/burger-quizzes/{id}/structure/`
+**Description**: Replace the structure of rounds and interludes.
 
-Remplace entièrement la structure du Burger Quiz. Les interludes référencés doivent exister.
+**Order** is **implicit**: **array position** in `elements` sets `order` (1 = first item).
 
-**Body** :
+**Body** (shape supported by the API):
 
 ```json
 {
   "elements": [
-    { "element_type": "interlude", "interlude_id": "uuid-intro" },
-    { "element_type": "round", "round_type": "NU" },
-    { "element_type": "round", "round_type": "SP" },
-    { "element_type": "interlude", "interlude_id": "uuid-pub-1" },
-    { "element_type": "round", "round_type": "ME" },
-    { "element_type": "round", "round_type": "AD" },
-    { "element_type": "round", "round_type": "DB" },
-    { "element_type": "interlude", "interlude_id": "uuid-outro" }
+    { "type": "video_interlude", "id": "uuid-intro" },
+    { "type": "nuggets", "id": "uuid-nuggets" },
+    { "type": "salt_or_pepper", "id": "uuid-sp" },
+    { "type": "video_interlude", "id": "uuid-pub" }
   ]
 }
 ```
 
-**Règles de validation** :
+- Each item must be **`{ "type": "<slug>", "id": "<uuid>" }`** where **`type`** is one of: `nuggets`, `salt_or_pepper`, `menus`, `addition`, `deadly_burger`, `video_interlude`.
+- For a **round**, **`id`** is the UUID of the **concrete** round object (Nuggets, SaltOrPepper, …), which matches **`Round.id`** and the corresponding **`Round`** row.
 
-- Chaque `round_type` ne peut apparaître qu'une seule fois dans la structure.
-- Les `round_type` référencés doivent correspondre à des manches attachées au Burger Quiz.
-- Les `interlude_id` doivent référencer des interludes existants.
-- Pour les éléments de type `"round"`, seul `round_type` est requis.
-- Pour les éléments de type `"interlude"`, seul `interlude_id` est requis.
-- L'ordre est déterminé par la position dans le tableau `elements`.
-- Pas de création inline d'interludes : ils doivent être créés via `POST /api/quiz/interludes/` au préalable.
+**Validation rules** (current `BurgerQuizStructureSerializer`):
 
-**Réponse 200** : même forme que la lecture (cf. 2.9.1).
+- Each **round slug** (`nuggets`, `menus`, …) may appear **at most once**; the same round **UUID** cannot appear twice.
+- Each **`id`** must refer to an **existing** object of the given **`type`** (Nuggets row, `VideoInterlude`, …).
+- **Interludes**: only **`{ "type": "video_interlude", "id": "<uuid>" }`** is accepted
 
-**Erreurs** :
+**200 response**: same shape as read (see § 3.9.1).
 
-- **400 Bad Request** :
-  - `round_type` dupliqué.
-  - `interlude_id` inexistant.
-  - Manche référencée non attachée au Burger Quiz.
-- **404 Not Found** : Burger Quiz inexistant.
+**Errors**:
+
+- **400 Bad Request**: duplicate round slug/UUID, unknown `id` / `type`, malformed payload, missing `elements`.
+- **404 Not Found**: Burger Quiz not found.
 
 ---
 
-### 2.10 Récapitulatif Quiz — Contraintes par manche
+### 3.10 Quiz recap — Constraints per round
 
-| Manche                | Contrainte                                                                |
-| --------------------- | ------------------------------------------------------------------------- |
-| **Nuggets**           | Nombre **pair** de questions ; type `NU`. 4 réponses avec 1 seul correcte |
-| **Sel ou poivre**     | 2 à 5 propositions ; réponses cohérentes ; type `SP`.                     |
-| **Menus**             | 2 menus classiques + 1 menu troll ; questions des thèmes type `ME`.       |
-| **Addition**          | Questions type `AD`.                                                      |
-| **Burger de la mort** | **10 questions** exactement ; type `DB`.                                  |
-
----
-
-### 2.11 Champs calculés en lecture seule (listes / détail)
-
-Pour les listes et pages front (Questions, manches, Burger Quiz), l’API peut exposer en lecture seule :
-
-| Ressource                                                | Champ calculé                                         | Description                                                |
-| -------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
-| **Question**                                             | `usage_count`                                         | Nombre de manches où la question est utilisée.             |
-| **Nuggets, SaltOrPepper, Menus, Addition, DeadlyBurger** | `burger_quiz_count` ou `used_in_burger_quizzes_count` | Nombre de Burger Quiz qui référencent la manche.           |
-| **Nuggets**                                              | `questions_count`                                     | Nombre de questions (dérivable de la liste).               |
-| **MenuTheme**                                            | `used_in_menus_count`                                 | Nombre de manches Menus utilisant ce thème.                |
-| **MenuTheme**                                            | `questions_count`                                     | Nombre de questions du thème.                              |
-| **BurgerQuiz**                                           | —                                                     | `created_at` / `updated_at` en base pour tri et affichage. |
+| Round              | Constraint                                                                |
+| ------------------ | ------------------------------------------------------------------------- |
+| **Nuggets**        | Nombre **pair** de questions ; type `NU`. 4 réponses avec 1 seul correcte |
+| **Salt or pepper** | 2–5 choices; consistent answers; type `SP`.                               |
+| **Menus**          | 2 menus classiques + 1 menu troll ; questions des thèmes type `ME`.       |
+| **Addition**       | Questions type `AD`.                                                      |
+| **Deadly burger**  | Exactly **10** questions; type `DB`.                                      |
 
 ---

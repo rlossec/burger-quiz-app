@@ -1,7 +1,7 @@
 %%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ff6b35', 'primaryTextColor': '#fff', 'primaryBorderColor': '#c44d34', 'lineColor': '#2d3436', 'secondaryColor': '#fdcb6e', 'tertiaryColor': '#dfe6e9'}}}%%
 classDiagram
 
-    %% ========== MODÈLES QUIZ (CONTENU) ==========
+    %% ========== QUIZ MODELS ==========
 
     class Question {
         +UUID id
@@ -25,15 +25,22 @@ classDiagram
         +URL image_url
     }
 
-    class BurgerQuiz {
-        +UUID id
-        +string title
-        +string toss
-        +User author
-        +TaggableManager tags
-        +datetime created_at
-        +datetime updated_at
+    class Tag {
+        <<taggit>>
+        +int id
+        +string name
+        +string slug
     }
+
+    class TaggedItem {
+        <<taggit - through>>
+        +int id
+        +Tag tag
+        +ContentType content_type
+        +int object_id
+    }
+
+    %% ========== MANCHES ==========
 
     class Nuggets {
         +UUID id
@@ -51,27 +58,6 @@ classDiagram
         +string description
         +bool original
         +JSON propositions
-        +User author
-        +TaggableManager tags
-        +datetime created_at
-        +datetime updated_at
-    }
-
-    class Addition {
-        +UUID id
-        +string title
-        +string description
-        +bool original
-        +User author
-        +TaggableManager tags
-        +datetime created_at
-        +datetime updated_at
-    }
-
-    class DeadlyBurger {
-        +UUID id
-        +string title
-        +bool original
         +User author
         +TaggableManager tags
         +datetime created_at
@@ -100,12 +86,64 @@ classDiagram
         +datetime updated_at
     }
 
+    class Addition {
+        +UUID id
+        +string title
+        +string description
+        +bool original
+        +User author
+        +TaggableManager tags
+        +datetime created_at
+        +datetime updated_at
+    }
+
+    class DeadlyBurger {
+        +UUID id
+        +string title
+        +bool original
+        +User author
+        +TaggableManager tags
+        +datetime created_at
+        +datetime updated_at
+    }
+
+    %% ========== MANCHES QUESTIONS ==========
+
+    class RoundQuestion {
+        <<pattern conceptuel UML seulement>>
+        +int order
+        +FK question
+    }
+
+    class NuggetQuestion {
+        <<through Django>>
+    }
+    class SaltOrPepperQuestion {
+        <<through Django>>
+    }
+    class MenuThemeQuestion {
+        <<through Django>>
+    }
+    class AdditionQuestion {
+        <<through Django>>
+    }
+    class DeadlyBurgerQuestion {
+        <<through Django>>
+    }
+
+    NuggetQuestion --|> RoundQuestion
+    SaltOrPepperQuestion --|> RoundQuestion
+    MenuThemeQuestion --|> RoundQuestion
+    AdditionQuestion --|> RoundQuestion
+    DeadlyBurgerQuestion --|> RoundQuestion
+
+    %% ========== INTERLUDES ==========
+
     class VideoInterlude {
         +UUID id
         +string title
         +URL youtube_url
         +string youtube_video_id
-        +CharField interlude_type
         +int duration_seconds
         +bool autoplay
         +bool skip_allowed
@@ -116,48 +154,52 @@ classDiagram
         +datetime updated_at
     }
 
+    %% ========== Burger Quiz structure ==========
+
+    class ELEMENT_TYPES {
+        <<enumeration>>
+        interlude
+        round
+    }
+
+    class RoundType {
+        <<enumeration / ROUND_SPECS en code>>
+        nuggets
+        salt_or_pepper
+        menus
+        addition
+        deadly_burger
+    }
+
+    class Round {
+        <<registre manche>>
+        +UUID id
+        +RoundType round_type
+        +OneToOne nuggets
+        +OneToOne salt_or_pepper
+        +OneToOne menus
+        +OneToOne addition
+        +OneToOne deadly_burger
+    }
+
+    class BurgerQuiz {
+        +UUID id
+        +string title
+        +string toss
+        +User author
+        +TaggableManager tags
+        +datetime created_at
+        +datetime updated_at
+    }
+
     class BurgerQuizElement {
-        <<through>>
+        <<structure>>
         +UUID id
         +int order
-        +CharField type
-        +CharField round_type
-    }
-
-    class Tag {
-        <<taggit>>
-        +int id
-        +string name
-        +string slug
-    }
-
-    class TaggedItem {
-        <<taggit - through>>
-        +int id
-        +Tag tag
-        +ContentType content_type
-        +int object_id
-    }
-
-    class NuggetQuestion {
-        <<through>>
-        +int order
-    }
-    class SaltOrPepperQuestion {
-        <<through>>
-        +int order
-    }
-    class MenuThemeQuestion {
-        <<through>>
-        +int order
-    }
-    class AdditionQuestion {
-        <<through>>
-        +int order
-    }
-    class DeadlyBurgerQuestion {
-        <<through>>
-        +int order
+        +ELEMENT_TYPES element_type
+        +FK round
+        +FK interlude
+        +datetime created_at
     }
 
     %% ========== MODÈLES SESSION / JEU ==========
@@ -195,50 +237,60 @@ classDiagram
     Question "*" --> "0..1" User : author
     Question "*" ..> "*" Tag : tags
 
-    BurgerQuiz "1" --> "0..1" Nuggets
-    BurgerQuiz "1" --> "0..1" SaltOrPepper
-    BurgerQuiz "1" --> "0..1" Menus
-    BurgerQuiz "1" --> "0..1" Addition
-    BurgerQuiz "1" --> "0..1" DeadlyBurger
-    BurgerQuiz "1" --> "*" BurgerQuizElement : structure
+    %% Manches liees au quiz via BurgerQuizElement + Round uniquement (pas de FK directes sur BurgerQuiz).
+    BurgerQuiz "1" --> "*" BurgerQuizElement : structure_elements
     BurgerQuiz "*" --> "0..1" User : author
     BurgerQuiz "*" ..> "*" Tag : tags
 
+    BurgerQuizElement "*" --> "1" ELEMENT_TYPES : element_type
     BurgerQuizElement "*" --> "0..1" VideoInterlude : interlude
+    BurgerQuizElement "*" --> "0..1" Round : round
+
+    Round "1" --> "1" RoundType : round_type
+    Round "0..1" --> "0..1" Nuggets : nuggets
+    Round "0..1" --> "0..1" SaltOrPepper : salt_or_pepper
+    Round "0..1" --> "0..1" Menus : menus
+    Round "0..1" --> "0..1" Addition : addition
+    Round "0..1" --> "0..1" DeadlyBurger : deadly_burger
 
     VideoInterlude "*" --> "0..1" User : author
     VideoInterlude "*" ..> "*" Tag : tags
 
-    Nuggets "1" --> "*" NuggetQuestion
     Nuggets "*" --> "0..1" User : author
     Nuggets "*" ..> "*" Tag : tags
-    NuggetQuestion "*" --> "1" Question
 
-    SaltOrPepper "1" --> "*" SaltOrPepperQuestion
     SaltOrPepper "*" --> "0..1" User : author
     SaltOrPepper "*" ..> "*" Tag : tags
-    SaltOrPepperQuestion "*" --> "1" Question
 
-    MenuTheme "1" --> "*" MenuThemeQuestion
     MenuTheme "*" --> "0..1" User : author
     MenuTheme "*" ..> "*" Tag : tags
-    MenuThemeQuestion "*" --> "1" Question
 
-    Addition "1" --> "*" AdditionQuestion
     Addition "*" --> "0..1" User : author
     Addition "*" ..> "*" Tag : tags
-    AdditionQuestion "*" --> "1" Question
 
-    DeadlyBurger "1" --> "*" DeadlyBurgerQuestion
     DeadlyBurger "*" --> "0..1" User : author
     DeadlyBurger "*" ..> "*" Tag : tags
-    DeadlyBurgerQuestion "*" --> "1" Question
 
     Menus "1" --> "0..1" MenuTheme : menu_1
     Menus "1" --> "0..1" MenuTheme : menu_2
     Menus "1" --> "0..1" MenuTheme : menu_troll
     Menus "*" --> "0..1" User : author
     Menus "*" ..> "*" Tag : tags
+
+    Nuggets "1" --> "*" NuggetQuestion
+    NuggetQuestion "*" --> "1" Question
+
+    SaltOrPepper "1" --> "*" SaltOrPepperQuestion
+    SaltOrPepperQuestion "*" --> "1" Question
+
+    MenuTheme "1" --> "*" MenuThemeQuestion
+    MenuThemeQuestion "*" --> "1" Question
+
+    Addition "1" --> "*" AdditionQuestion
+    AdditionQuestion "*" --> "1" Question
+
+    DeadlyBurger "1" --> "*" DeadlyBurgerQuestion
+    DeadlyBurgerQuestion "*" --> "1" Question
 
     Tag "1" --> "*" TaggedItem
     TaggedItem "*" ..> "1" Question : via GenericFK
