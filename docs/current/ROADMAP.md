@@ -15,7 +15,7 @@
 
 - [x] Squelette projet → README.md
 - [x] Base données
-- [x] API REFERENCE
+- [x] API REFERENCE Quiz
 - [x] Tests Quiz
 - [x] Endpoints Quiz
 

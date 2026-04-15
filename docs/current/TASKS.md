@@ -5,6 +5,7 @@ Tâches techniques et éléments de documentation à traiter.
 ---
 
 [ ] Site frontend pré rempli via entrypoint ?
+[ ] AutoCompleteTags
 
 ## En cours / prioritaire
 

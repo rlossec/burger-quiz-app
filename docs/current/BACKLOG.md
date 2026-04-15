@@ -18,8 +18,6 @@ Un animateur peut :
 - Créer un BurgerQuiz
 - Créer les manches
 
----
-
 ## 📦 Versions
 
 ### V0.1 — Auteur (MVP)
@@ -27,9 +25,10 @@ Un animateur peut :
 Créer un BurgerQuiz.
 
 - Authentification
-- CRUD BurgerQuiz
-- CRUD manches
 - CRUD questions
+- CRUD manches
+- CRUD interludes
+- CRUD BurgerQuiz
 
 ### V1.0 — Jeu
 
@@ -51,61 +50,56 @@ Amélioration gameplay.
 
 ## État des user stories
 
-| US            | Titre                            | Epic           | Statut | Lien |
-| ------------- | -------------------------------- | -------------- | ------ | ---- |
-| US-AUTH-01    | Inscription                      | 1 — Auth       | To do  |      |
-| US-AUTH-02    | Validation email                 | 1 — Auth       | To do  |      |
-| US-AUTH-03    | Renvoi email validation          | 1 — Auth       | To do  |      |
-| US-AUTH-04    | Login                            | 1 — Auth       | To do  |      |
-| US-AUTH-05    | Mot de passe oublié              | 1 — Auth       | To do  |      |
-| US-AUTH-06    | Modifier email                   | 1 — Auth       | To do  |      |
-| US-BQ-01      | Liste BurgerQuiz                 | 2 — BurgerQuiz | To do  |      |
-| US-BQ-02      | Créer BurgerQuiz                 | 2 — BurgerQuiz | To do  |      |
-| US-BQ-03      | Modifier BurgerQuiz              | 2 — BurgerQuiz | To do  |      |
-| US-BQ-04      | Supprimer BurgerQuiz             | 2 — BurgerQuiz | To do  |      |
-| US-BQ-NU-01   | Ajouter une manche Nuggets       | 2 — BurgerQuiz | To do  |      |
-| US-BQ-NU-02   | Modifier Manche Nuggets          | 2 — BurgerQuiz | To do  |      |
-| US-BQ-SP-01   | Créer Manche Sel ou Poivre       | 2 — BurgerQuiz | To do  |      |
-| US-BQ-SP-02   | Modifier un Manche Sel ou Poivre | 2 — BurgerQuiz | To do  |      |
-| US-BQ-ME-01   | Créer Manche Menus               | 2 — BurgerQuiz | To do  |      |
-| US-BQ-ME-02   | Modifier Manche Menus            | 2 — BurgerQuiz | To do  |      |
-| US-BQ-ME-03   | Créer un MenuTheme               | 2 — BurgerQuiz | To do  |      |
-| US-BQ-ME-04   | Modifier un MenuTheme            | 2 — BurgerQuiz | To do  |      |
-| US-BQ-AD-01   | Créer une Manche Addition        | 2 — BurgerQuiz | To do  |      |
-| US-BQ-AD-02   | Modifier une Manche Addition     | 2 — BurgerQuiz | To do  |      |
-| US-BQ-DB-01   | Créer un Burger de la mort       | 2 — BurgerQuiz | To do  |      |
-| US-GAME-01    | Créer session                    | 3 — Sessions   | To do  |      |
-| US-GAME-02    | Rejoindre session                | 3 — Sessions   | To do  |      |
-| US-GAME-03    | Lobby                            | 3 — Sessions   | To do  |      |
-| US-GAME-04    | Lancer partie                    | 3 — Sessions   | To do  |      |
-| US-HOST-01    | Voir question                    | 4 — Interface  | To do  |      |
-| US-HOST-02    | Navigation                       | 4 — Interface  | To do  |      |
-| US-HOST-03    | Points                           | 4 — Interface  | To do  |      |
-| US-HOST-04    | Afficher réponse                 | 4 — Interface  | To do  |      |
-| US-PLAYER-01  | Voir question                    | 4 — Interface  | To do  |      |
-| US-PLAYER-02  | Voir scores                      | 4 — Interface  | To do  |      |
-| US-PLAYER-03  | Mise à jour live                 | 4 — Interface  | To do  |      |
-| US-UX-01      | Navigation                       | 5 — UX         | To do  |      |
-| US-UX-02      | Messages erreurs                 | 5 — UX         | To do  |      |
-| US-UX-03      | Loading                          | 5 — UX         | To do  |      |
-| US-RT-01      | Synchronisation live             | 6 — Temps réel | To do  |      |
-| US-RT-BUZZ-01 | Buzzer                           | 6 — Temps réel | To do  |      |
-| US-RT-BUZZ-02 | Affichage buzzer                 | 6 — Temps réel | To do  |      |
-
-_Statuts : To do | In progress | Done_
-
-**À partir de l'Epic 4**, les user stories sont listées mais **pas encore détaillées** (critères « Done si », priorité, etc. à préciser ultérieurement).
+| US            | Titre                            | Epic           | Statut |
+| ------------- | -------------------------------- | -------------- | ------ |
+| US-AUTH-01    | Inscription                      | 1 — Auth       | ✅     |
+| US-AUTH-02    | Validation email                 | 1 — Auth       | 🚧     |
+| US-AUTH-03    | Renvoi email validation          | 1 — Auth       | ✅     |
+| US-AUTH-04    | Login                            | 1 — Auth       | ✅     |
+| US-AUTH-05    | Mot de passe oublié              | 1 — Auth       | ✅     |
+| US-AUTH-06    | Changer l’email                  | 1 — Auth       | ✅     |
+| US-AUTH-07    | Changer le nom d’utilisateur     | 1 — Auth       | 🚧     |
+| US-AUTH-08    | Changer le prénom                | 1 — Auth       | ✅     |
+| US-AUTH-09    | Changer le nom                   | 1 — Auth       | ✅     |
+| US-AUTH-10    | Changer le mot de passe          | 1 — Auth       | ✅     |
+| US-BQ-01      | Liste BurgerQuiz                 | 2 — BurgerQuiz | To do  |
+| US-BQ-02      | Créer BurgerQuiz                 | 2 — BurgerQuiz | To do  |
+| US-BQ-03      | Modifier BurgerQuiz              | 2 — BurgerQuiz | To do  |
+| US-BQ-04      | Supprimer BurgerQuiz             | 2 — BurgerQuiz | To do  |
+| US-BQ-NU-01   | Ajouter une manche Nuggets       | 2 — BurgerQuiz | To do  |
+| US-BQ-NU-02   | Modifier Manche Nuggets          | 2 — BurgerQuiz | To do  |
+| US-BQ-SP-01   | Créer Manche Sel ou Poivre       | 2 — BurgerQuiz | To do  |
+| US-BQ-SP-02   | Modifier un Manche Sel ou Poivre | 2 — BurgerQuiz | To do  |
+| US-BQ-ME-01   | Créer Manche Menus               | 2 — BurgerQuiz | To do  |
+| US-BQ-ME-02   | Modifier Manche Menus            | 2 — BurgerQuiz | To do  |
+| US-BQ-ME-03   | Créer un MenuTheme               | 2 — BurgerQuiz | To do  |
+| US-BQ-ME-04   | Modifier un MenuTheme            | 2 — BurgerQuiz | To do  |
+| US-BQ-AD-01   | Créer une Manche Addition        | 2 — BurgerQuiz | To do  |
+| US-BQ-AD-02   | Modifier une Manche Addition     | 2 — BurgerQuiz | To do  |
+| US-BQ-DB-01   | Créer un Burger de la mort       | 2 — BurgerQuiz | To do  |
+| US-GAME-01    | Créer session                    | 3 — Sessions   | To do  |
+| US-GAME-02    | Rejoindre session                | 3 — Sessions   | To do  |
+| US-GAME-03    | Lobby                            | 3 — Sessions   | To do  |
+| US-GAME-04    | Lancer partie                    | 3 — Sessions   | To do  |
+| US-HOST-01    | Voir question                    | 4 — Interface  | To do  |
+| US-HOST-02    | Navigation                       | 4 — Interface  | To do  |
+| US-HOST-03    | Points                           | 4 — Interface  | To do  |
+| US-HOST-04    | Afficher réponse                 | 4 — Interface  | To do  |
+| US-PLAYER-01  | Voir question                    | 4 — Interface  | To do  |
+| US-PLAYER-02  | Voir scores                      | 4 — Interface  | To do  |
+| US-PLAYER-03  | Mise à jour live                 | 4 — Interface  | To do  |
+| US-UX-01      | Navigation                       | 5 — UX         | To do  |
+| US-UX-02      | Messages erreurs                 | 5 — UX         | To do  |
+| US-UX-03      | Loading                          | 5 — UX         | To do  |
+| US-RT-01      | Synchronisation live             | 6 — Temps réel | To do  |
+| US-RT-BUZZ-01 | Buzzer                           | 6 — Temps réel | To do  |
+| US-RT-BUZZ-02 | Affichage buzzer                 | 6 — Temps réel | To do  |
 
 ## 1️⃣ Epics
 
 ### Epic 1 — Authentification
 
-**Objectif** : Permettre aux utilisateurs de s’authentifier et de gérer leur compte/sécurité.
-
-Backend prévu :
-
-- Django REST
-- Djoser
+**Objectif** : Permettre aux utilisateurs de s'authentifier et de gérer leur compte/sécurité.
 
 #### US-AUTH-01 Inscription
 
@@ -183,19 +177,100 @@ Done si :
 
 ---
 
-#### US-AUTH-06 Modifier email
+#### US-AUTH-06 Changer l’email
+
+En tant qu’utilisateur
+
+Je veux modifier mon adresse email
+
+Afin de mettre à jour mon identifiant de connexion
 
 Done si :
 
-- Email modifiable
-- Nouvelle validation obligatoire
+- Saisie du nouvel email (et confirmation si prévu)
+- Compte **désactivé** jusqu’à validation du nouvel email
+- **Déconnexion** immédiate après la demande de changement
+- Email de validation envoyé vers la nouvelle adresse
+- Messages d’erreur visibles (email déjà utilisé, format invalide, etc.)
+
+**Priorité** : Should
+
+---
+
+#### US-AUTH-07 Changer le nom d’utilisateur
+
+En tant qu’utilisateur
+
+Je veux modifier mon nom d’utilisateur (username)
+
+Afin d’aligner mon identifiant avec mes préférences
+
+Done si :
+
+- Saisie du nouveau username
+- Compte **désactivé** jusqu’à revalidation du compte
+- **Déconnexion** immédiate après la demande de changement
+- Messages d’erreur visibles (username déjà pris, règles de format, etc.)
+
+**Priorité** : Should
+
+---
+
+#### US-AUTH-08 Changer le prénom
+
+En tant qu’utilisateur
+
+Je veux modifier mon prénom affiché
+
+Afin que mon profil reflète mes informations à jour
+
+Done si :
+
+- Champ prénom modifiable depuis le profil
+- Sauvegarde persistée
+- Retour utilisateur clair (succès / erreur)
 
 **Priorité** : Could
 
+---
+
+#### US-AUTH-09 Changer le nom
+
+En tant qu’utilisateur
+
+Je veux modifier mon nom affiché
+
+Afin que mon profil reflète mes informations à jour
+
 Done si :
 
-- Email modifiable
-- Email validation obligatoire
+- Champ nom modifiable depuis le profil
+- Sauvegarde persistée
+- Retour utilisateur clair (succès / erreur)
+
+**Priorité** : Could
+
+---
+
+#### US-AUTH-10 Changer le mot de passe
+
+En tant qu’utilisateur
+
+Je veux modifier mon mot de passe
+
+Afin de sécuriser mon compte ou remplacer un mot de passe compromis
+
+Done si :
+
+- Saisie du mot de passe actuel
+- Saisie du nouveau mot de passe (et confirmation)
+- Règles de complexité respectées
+- Ancien mot de passe incorrect rejeté avec message explicite
+- Retour utilisateur clair (succès / erreur)
+
+**Priorité** : Should
+
+---
 
 ### Epic 2 — BurgerQuiz
 

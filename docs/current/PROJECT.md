@@ -4,7 +4,13 @@
 
 ## 1. Vision
 
-L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans un ou plusieurs ensembles « Burger Quiz ». Ensuite : interface pour un organisateur pour présenter le flow de l'émission et jouer en vocal avec les joueurs. Puis : animations, suivi du score. Enfin : buzzer et/ou réponses des joueurs via l'interface.
+L'objectif principal est de pouvoir créer des manches de Burger Quiz, les rassembler dans un ou plusieurs ensembles « Burger Quiz ».
+
+Par la suite :
+
+1. Interface pour un organisateur pour présenter le flow de l'émission et jouer en vocal avec les joueurs.
+2. Animations, suivi du score.
+3. Buzzer et/ou réponses des joueurs via l'interface.
 
 ---
 
@@ -20,19 +26,9 @@ L'objectif est de pouvoir créer des manches de Burger Quiz, les rassembler dans
 - Tests API quiz complets
 - Fixtures et chargement de données
 
-**Manque :**
-
-- Parcours frontend complet (pages BurgerQuizList, BurgerQuizCreate, etc.)
-- Session de jeu (V0.2)
-- Animations, scores, buzzer
-
----
-
 ## 3. Priorités
 
-1. ~~Structurer (docs, suivi)~~ ✅
-2. ~~Endpoints API Quiz~~ ✅
-3. Frontend – parcours Création Burger Quiz (V0.1)
+Frontend – parcours Création Burger Quiz (V0.1)
 
 ---
 
