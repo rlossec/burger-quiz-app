@@ -1,5 +1,4 @@
 
-from unittest import skip
 
 from django.contrib.auth import get_user_model
 from rest_framework import status
@@ -59,7 +58,6 @@ class TestQuestionListEndpoint(APITestCase):
         }
         self.all_question_ids = {str(q.id) for q in self.questions_by_type.values()}
 
-    # 1. Cas simple de succès : GET /api/quiz/questions/ 
     def test_list_questions_success(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -72,17 +70,6 @@ class TestQuestionListEndpoint(APITestCase):
             self.assertIn("created_at", question)
             self.assertIn("updated_at", question)
 
-    # 2. Champ calculé usage_count : GET /api/quiz/questions/ 
-    @skip("Not implemented")
-    def test_list_exposes_usage_count(self):
-        """Champ calculé usage_count."""
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.data.get("results", response.data)
-        if data:
-            self.assertIn("usage_count", data[0])
-
-    # 3. Filtre question_type : GET /api/quiz/questions/?question_type=<type>
     def test_list_questions_success_with_filter_question_type_per_category(self):
         """Test paramétré : pour chaque type (NU, SP, ME, AD, DB), le filtre question_type ne renvoie que les questions de ce type."""
         for question_type, attr, label in QUESTION_TYPE_CATEGORIES:
@@ -97,7 +84,6 @@ class TestQuestionListEndpoint(APITestCase):
                 for other_id in other_ids:
                     self.assertNotIn(other_id, ids, msg=f"question_type={question_type} ne doit pas contenir {other_id}")
 
-    # 4. Filtre original : GET /api/quiz/questions/?original=true|false
     def test_list_filter_original(self):
         """Deux sous-tests : original=true (seulement q_sp, q_ad) et original=false (q_nu, q_me, q_db)."""
         original_true_ids = {str(self.q_sp.id), str(self.q_ad.id)}
@@ -115,7 +101,6 @@ class TestQuestionListEndpoint(APITestCase):
                 for oid in excluded_ids:
                     self.assertNotIn(oid, ids, msg=f"original={original_param} ne doit pas contenir {oid}")
 
-    # 5. Filtre search : GET /api/quiz/questions/?search=...
     def test_list_filter_search(self):
         """Recherche textuelle sur l'énoncé : search renvoie les questions dont le text contient la chaîne (insensible à la casse)."""
         q_pizza = QuestionFactory.create_nu("Pizza margherita au basilic", original=False)

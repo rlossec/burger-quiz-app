@@ -2,7 +2,6 @@
 import io
 from PIL import Image
 from pathlib import Path
-from unittest import skip
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
@@ -311,7 +310,6 @@ class TestUserAvatarUpdate(APITestCase):
         )
         self.user_me_url = reverse('user-me')
 
-    @skip("Not implemented")
     def test_update_avatar_removes_old_file(self):
         """Test que la mise à jour du champ avatar supprime l'ancien fichier."""
         self.client.force_authenticate(user=self.user)

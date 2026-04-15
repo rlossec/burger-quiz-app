@@ -1,4 +1,4 @@
-from unittest import skip
+
 import uuid
 
 from django.contrib.auth import get_user_model
@@ -44,9 +44,3 @@ class TestQuestionDetailEndpoint(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    # 200 OK avec champ usage_count
-    @skip("Not implemented")
-    def test_detail_question_success_with_usage_count(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get("usage_count"), self.question.usage_count)
