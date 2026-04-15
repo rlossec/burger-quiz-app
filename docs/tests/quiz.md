@@ -46,8 +46,7 @@ quiz/tests/
 │   ├── test_list.py
 │   ├── test_detail.py
 │   ├── test_create.py
-│   ├── test_update.py
-│   └── test_structure.py        # Tests structure (GET/PUT)
+│   └── test_structure.py        # GET/PUT structure (pas de test_update sur la ressource)
 ├── salt_or_pepper/
 │   ├── test_list.py
 │   ├── test_detail.py
@@ -228,15 +227,37 @@ Les données de test sont créées via **factory_boy**. Documentation complète 
 
 ### Thèmes de menu (`/api/quiz/menu-themes/`)
 
-**Dossier** : `quiz/tests/menu_themes/`
+**Dossier** : `quiz/tests/menu_themes/`  
 **Exécution** : `uv run manage.py test quiz.tests.menu_themes`
+
+| Fichier          | Tests                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| `test_list.py`   | Liste (200)                                                             |
+| `test_detail.py` | Détail (200), 404                                                       |
+| `test_create.py` | Création thème CL / TR, validations (titre, type, question inexistante) |
+| `test_update.py` | PATCH titre                                                             |
+
+**Particularités** :
+
+- Pas de `test_delete` pour cette ressource dans la suite actuelle.
 
 ---
 
 ### Manche Menus (`/api/quiz/menus/`)
 
-**Dossier** : `quiz/tests/menus/`
+**Dossier** : `quiz/tests/menus/`  
 **Exécution** : `uv run manage.py test quiz.tests.menus`
+
+| Fichier          | Tests                                                                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `test_list.py`   | Liste (200)                                                                                                |
+| `test_detail.py` | Détail (200), 404                                                                                          |
+| `test_create.py` | Création, validations (titre, types de thèmes menu_1 / menu_troll, même thème deux fois, thème inexistant) |
+| `test_update.py` | PATCH titre                                                                                                |
+
+**Particularités** :
+
+- Pas de `test_delete` pour cette ressource dans la suite actuelle.
 
 ---
 
@@ -291,10 +312,7 @@ Suite logique d'appels API (création end-to-end d'un Burger Quiz) :
 | `test_list.py`      | Liste, filtres, timestamps                                 |
 | `test_detail.py`    | Détail, 404, structure incluse dans la réponse             |
 | `test_create.py`    | Création, validation IDs manches, toss                     |
-| `test_update.py`    | PATCH/PUT                                                  |
 | `test_structure.py` | GET/PUT structure (ordre manches, interludes, validations) |
-
----
 
 ### Structure du Burger Quiz (`/api/quiz/burger-quizzes/{id}/structure/`)
 
@@ -302,24 +320,79 @@ Suite logique d'appels API (création end-to-end d'un Burger Quiz) :
 **Fichier** : `test_structure.py`  
 **Exécution** : `uv run manage.py test quiz.tests.burger_quizzes.test_structure`
 
-Documentation détaillée des cas (matrice GET/PUT, auth, erreurs 400) :
+Cette section décrit les **cas couverts par les tests** pour les endpoints de structure du Burger Quiz, en lien avec la spécification API **[§ 3.9 Burger Quiz structure](../backend/api-reference.md#39-burger-quiz-structure)**.
 
-→ **[burger-quiz-structure.md](burger-quiz-structure.md)** (aligné sur [api-reference.md § 3.9](../backend/api-reference.md#39-burger-quiz-structure))
+#### Vue d’ensemble des classes de tests
 
-| Classe de test | Rôle |
-| -------------- | ---- |
-| `TestBurgerQuizStructureAuth` | GET/PUT sans authentification → 401 |
-| `TestBurgerQuizStructureReadEndpoint` | GET : ordre par défaut, interludes, 404, forme de la réponse (objets imbriqués) |
+| Classe de test                          | Rôle                                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `TestBurgerQuizStructureAuth`           | GET/PUT sans authentification → 401                                                               |
+| `TestBurgerQuizStructureReadEndpoint`   | GET : ordre par défaut, interludes, 404, forme de la réponse (objets imbriqués)                   |
 | `TestBurgerQuizStructureUpdateEndpoint` | PUT : succès, remplacement total, ordre implicite, doublons de manche, interludes, structure vide |
-| `TestBurgerQuizStructurePutValidation` | PUT : corps invalide (`elements` manquant, type/id/UUID, mauvais modèle pour `type`) |
+| `TestBurgerQuizStructurePutValidation`  | PUT : corps invalide (`elements` manquant, type/id/UUID, mauvais modèle pour `type`)              |
 
-**Règles couvertes par les tests** :
+#### Endpoints
 
-- Ordre = position dans `elements` ; `PUT` remplace toute la structure
-- Chaque slug de manche au plus une fois ; pas de doublon d’UUID de manche
-- Références aux manches et interludes : objets existants et cohérents avec `type`
-- Une manche peut être réutilisée depuis un autre quiz (ex. Nuggets d’un autre `BurgerQuiz`) — pas d’exigence d’« attache » au quiz courant
-- Plusieurs lignes `video_interlude` avec le même `VideoInterlude` autorisées
+| Méthode | Chemin                                     | Rôle                                               |
+| ------- | ------------------------------------------ | -------------------------------------------------- |
+| `GET`   | `/api/quiz/burger-quizzes/{id}/structure/` | Lire la structure (ordre, types, objets imbriqués) |
+| `PUT`   | `/api/quiz/burger-quizzes/{id}/structure/` | Remplacer entièrement la structure                 |
+
+Authentification : IsAuthenticated
+
+#### Matrice des cas (tests ↔ comportement attendu)
+
+##### Lecture (`GET`)
+
+| Cas                                                                                                                   | Statut | Méthode de test                                      |
+| --------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------- |
+| Structure par défaut après `create_full` : 5 manches dans l’ordre NU → SP → ME → AD → DB                              | 200    | `test_get_structure_default_order`                   |
+| Ordre persisté reflété dans `elements` (y compris interludes avant/après manches)                                     | 200    | `test_get_structure_with_custom_rows`                |
+| `order` dans la réponse suit l’ordre en base (pas forcément l’ordre de création des types)                            | 200    | `test_get_structure_elements_ordered`                |
+| Chaque élément inclut `order`, `type`, `id` et l’objet détaillé sous la clé du type (`nuggets`, `video_interlude`, …) | 200    | `test_get_structure_elements_include_nested_payload` |
+| Burger Quiz inexistant                                                                                                | 404    | `test_get_structure_not_found`                       |
+| Requête non authentifiée                                                                                              | 401    | `test_get_structure_requires_authentication`         |
+
+##### Mise à jour (`PUT`)
+
+| Cas                                                                                                       | Statut | Méthode de test                                  |
+| --------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------ |
+| Remplacement complet : intro + 5 manches + pubs + outro (payload complet)                                 | 200    | `test_put_structure_success`                     |
+| `PUT` supprime les anciennes lignes et ne garde que le nouveau tableau                                    | 200    | `test_put_structure_replaces_existing`           |
+| Rang `order` = position dans le tableau (1 = premier élément)                                             | 200    | `test_put_structure_order_from_array_position`   |
+| Structure vide `{"elements": []}` : plus aucun `BurgerQuizElement` ; `GET` suivant renvoie `[]`           | 200    | `test_put_structure_empty_elements`              |
+| Référencer une manche **Nuggets** appartenant à un autre quiz (pas d’attache obligatoire au quiz courant) | 200    | `test_put_structure_any_nuggets_allowed`         |
+| Plusieurs entrées `video_interlude` avec le **même** `VideoInterlude`                                     | 200    | `test_put_structure_multiple_interludes_allowed` |
+| Même **slug** de manche deux fois (ex. deux `nuggets`)                                                    | 400    | `test_put_structure_duplicate_round_error`       |
+| Interlude : `id` aléatoire inexistant                                                                     | 400    | `test_put_structure_interlude_not_found_error`   |
+| Burger Quiz inexistant                                                                                    | 404    | `test_put_structure_not_found`                   |
+| Requête non authentifiée                                                                                  | 401    | `test_put_structure_requires_authentication`     |
+
+##### Validation du corps `PUT` (erreurs 400)
+
+Les messages exacts sont produits par `parse_structure_element` et `BurgerQuizStructureSerializer` (`burger_quiz_element.py`).
+
+| Cas                                                                                                        | Statut | Méthode de test                                          |
+| ---------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------- |
+| Corps sans clé `elements`                                                                                  | 400    | `test_put_structure_missing_elements_key`                |
+| `elements` n’est pas une liste                                                                             | 400    | `test_put_structure_elements_not_a_list`                 |
+| Un élément du tableau n’est pas un objet                                                                   | 400    | `test_put_structure_element_not_an_object`               |
+| `type` inconnu (hors `nuggets`, `salt_or_pepper`, `menus`, `addition`, `deadly_burger`, `video_interlude`) | 400    | `test_put_structure_unknown_type`                        |
+| `type` absent                                                                                              | 400    | `test_put_structure_missing_type`                        |
+| `id` absent                                                                                                | 400    | `test_put_structure_missing_id`                          |
+| `id` mal formé (pas un UUID)                                                                               | 400    | `test_put_structure_invalid_uuid`                        |
+| `type` = `salt_or_pepper` mais `id` est celui d’un **Nuggets** (mauvais modèle)                            | 400    | `test_put_structure_id_wrong_model_for_type`             |
+| `type` = `video_interlude` mais `id` pointe vers une manche (ex. Nuggets)                                  | 400    | `test_put_structure_video_interlude_id_is_not_interlude` |
+| `type` = `nuggets` et UUID sans ligne **Nuggets** correspondante                                           | 400    | `test_put_structure_round_id_not_found`                  |
+
+#### Règles métier rappelées (côté API)
+
+- **Ordre implicite** : la position dans `elements` définit `order` (1…n).
+- **Manches** : chaque slug de manche (`nuggets`, etc.) ne peut apparaître **qu’une fois** ; le même UUID de manche ne peut pas être dupliqué.
+- **Interludes** : le même `VideoInterlude` peut être réutilisé plusieurs fois dans la liste.
+- **`id` pour une manche** : UUID aligné avec le registre `Round` et la manche concrète (Nuggets, …) — voir commentaire modèle `Round` et signaux dans `quiz/signals.py`.
+
+Pour le détail des champs de réponse et du corps de requête, se reporter à **[api-reference.md § 3.9](../backend/api-reference.md#39-burger-quiz-structure)**.
 
 ---
 
@@ -347,7 +420,3 @@ Messages d'erreur DRF et métier, types de questions, types de menus, types d'in
 | `STRUCTURE_DUPLICATE_ROUND_TYPE` | Type de manche dupliqué dans la structure           |
 | `STRUCTURE_ROUND_NOT_ATTACHED`   | Manche non attachée au Burger Quiz                  |
 | `STRUCTURE_INTERLUDE_NOT_FOUND`  | Interlude référencé inexistant                      |
-
-### URLs et vues factices
-
-Pour que les tests puissent appeler `reverse()` sur les noms d'URL du quiz, le module `quiz` expose des routes via `quiz/urls.py` et un `PlaceholderViewSet` dans `quiz/views.py`. Lors de l'implémentation réelle des endpoints, remplacer ce viewset par les ViewSets métier ; les tests restent inchangés et valideront le comportement attendu.

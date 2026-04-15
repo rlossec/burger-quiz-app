@@ -10,20 +10,7 @@ Point d'entrée de la documentation des tests Burger Quiz.
 - **Organisation** : un fichier par endpoint ou par ressource, dossiers par module
 - **Données** : factories (factory_boy) pour isoler les tests et éviter la duplication
 
----
-
-## Documentation par module
-
-| Module       | Document                               | Contenu                                                                     |
-| ------------ | -------------------------------------- | --------------------------------------------------------------------------- |
-| **Quiz**     | [quiz.md](quiz.md)                     | Tests des endpoints (questions, manches, Burger Quiz), structure, commandes |
-| **Quiz**     | [burger-quiz-structure.md](burger-quiz-structure.md) | Cas de test GET/PUT `/burger-quizzes/{id}/structure/` (matrice, auth, validations) |
-| **Quiz**     | [quiz-factories.md](quiz-factories.md) | Factories factory_boy, méthodes, exemples d'usage                           |
-| **Accounts** | [accounts.md](accounts.md)             | Tests auth (JWT, activation, reset), CRUD utilisateurs                      |
-
----
-
-## Exécution globale
+## Exécution
 
 ```bash
 # Tous les tests (depuis backend/src)
@@ -33,13 +20,15 @@ uv run manage.py test
 docker compose exec backend uv run python manage.py test
 ```
 
----
-
-## Par module
-
 | Module   | Commande                               |
 | -------- | -------------------------------------- |
 | Quiz     | `uv run manage.py test quiz.tests`     |
 | Accounts | `uv run manage.py test accounts.tests` |
 
-→ Détail des commandes et structure dans chaque document ci-dessus.
+## Documentation
+
+| Module       | Document                               | Contenu                                                                                     |
+| ------------ | -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Quiz**     | [quiz.md](quiz.md)                     | Tests des endpoints (questions, manches, Burger Quiz), matrice structure GET/PUT, commandes |
+| **Quiz**     | [quiz-factories.md](quiz-factories.md) | Factories factory_boy, méthodes, exemples d'usage                                           |
+| **Accounts** | [accounts.md](accounts.md)             | Tests auth (JWT, activation, reset), CRUD utilisateurs                                      |
