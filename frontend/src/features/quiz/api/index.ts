@@ -7,3 +7,4 @@ export { menusApi } from './menus';
 export { menuThemesApi } from './menu-themes';
 export { saltPepperApi } from './salt-pepper';
 export { interludesApi } from './interludes';
+export { tagsApi } from './tags';

@@ -52,4 +52,9 @@ export const queryKeys = {
     lists: () => ['interludes', 'list'] as const,
     detail: (id: string) => ['interludes', id] as const,
   },
+
+  tags: {
+    all: () => ['tags'] as const,
+    catalog: () => ['tags', 'catalog'] as const,
+  },
 } as const;

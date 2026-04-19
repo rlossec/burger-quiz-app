@@ -1,33 +1,39 @@
 import { apiClient } from '@/lib/axios';
 import type {
   PaginatedResponse,
-  InterludeDetail,
-  InterludeInput,
-  InterludeListParams,
+  VideoInterludeDetail,
+  VideoInterludeInput,
+  VideoInterludeListParams,
+  VideoInterludeListItem,
 } from '@/types';
 
 export const interludesApi = {
-  list: async (params?: InterludeListParams): Promise<PaginatedResponse<InterludeDetail>> => {
+  list: async (
+    params?: VideoInterludeListParams
+  ): Promise<PaginatedResponse<VideoInterludeListItem>> => {
     const { data } = await apiClient.get('/quiz/interludes/', { params });
     return data;
   },
 
-  detail: async (id: string): Promise<InterludeDetail> => {
+  detail: async (id: string): Promise<VideoInterludeDetail> => {
     const { data } = await apiClient.get(`/quiz/interludes/${id}/`);
     return data;
   },
 
-  create: async (payload: InterludeInput): Promise<InterludeDetail> => {
+  create: async (payload: VideoInterludeInput): Promise<VideoInterludeDetail> => {
     const { data } = await apiClient.post('/quiz/interludes/', payload);
     return data;
   },
 
-  update: async (id: string, payload: InterludeInput): Promise<InterludeDetail> => {
+  update: async (id: string, payload: VideoInterludeInput): Promise<VideoInterludeDetail> => {
     const { data } = await apiClient.put(`/quiz/interludes/${id}/`, payload);
     return data;
   },
 
-  patch: async (id: string, payload: Partial<InterludeInput>): Promise<InterludeDetail> => {
+  patch: async (
+    id: string,
+    payload: Partial<VideoInterludeInput>
+  ): Promise<VideoInterludeDetail> => {
     const { data } = await apiClient.patch(`/quiz/interludes/${id}/`, payload);
     return data;
   },

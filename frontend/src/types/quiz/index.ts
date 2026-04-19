@@ -7,10 +7,10 @@ export type {
 } from './deadly-burger';
 export type { SaltPepperDetail, SaltPepperInput, SaltPepperListParams } from './salt-pepper';
 export type {
-  InterludeType,
-  InterludeDetail,
-  InterludeInput,
-  InterludeListParams,
+  VideoInterludeListItem,
+  VideoInterludeDetail,
+  VideoInterludeInput,
+  VideoInterludeListParams,
 } from './interludes';
 export type {
   MenuThemeType,
@@ -24,9 +24,9 @@ export type {
   BurgerQuizDetail,
   BurgerQuizInput,
   BurgerQuizListParams,
-  RoundType,
-  ElementType,
-  BurgerQuizStructureInterlude,
+  StructureElementSlug,
   BurgerQuizStructureElement,
   BurgerQuizStructureResponse,
+  BurgerQuizStructureElementWrite,
+  BurgerQuizStructurePutPayload,
 } from './burger-quiz';

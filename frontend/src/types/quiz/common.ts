@@ -16,9 +16,8 @@ export interface Author {
   username: string;
 }
 
-/* Réponse */
+/* Réponse d'une question² */
 export interface AnswerDetail {
-  id: string;
   text: string;
   is_correct: boolean;
 }

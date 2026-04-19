@@ -24,3 +24,31 @@ export const getApiErrorMessage = (error: unknown): string => {
   }
   return 'Une erreur inattendue est survenue.';
 };
+
+/**
+ * Extrait les erreurs par champ depuis une réponse 400 (validation Django REST).
+ * Retourne un objet { fieldName: "premier message" } pour chaque champ en erreur.
+ */
+export const getApiFieldErrors = (error: unknown): Record<string, string> => {
+  if (error instanceof AxiosError && error.response?.status === 400) {
+    const data = error.response.data;
+    if (
+      data &&
+      typeof data === 'object' &&
+      !Array.isArray(data) &&
+      typeof data.detail !== 'string'
+    ) {
+      const out: Record<string, string> = {};
+      for (const key of Object.keys(data)) {
+        const val = (data as Record<string, unknown>)[key];
+        if (Array.isArray(val) && val[0]) {
+          out[key] = String(val[0]);
+        } else if (typeof val === 'string') {
+          out[key] = val;
+        }
+      }
+      return out;
+    }
+  }
+  return {};
+};

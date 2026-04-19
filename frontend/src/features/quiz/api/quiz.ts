@@ -4,6 +4,7 @@ import type {
   BurgerQuizDetail,
   BurgerQuizInput,
   BurgerQuizListParams,
+  BurgerQuizStructurePutPayload,
   BurgerQuizStructureResponse,
 } from '@/types';
 
@@ -14,7 +15,9 @@ export const quizApi = {
   },
 
   detail: async (id: string): Promise<BurgerQuizDetail> => {
-    const { data } = await apiClient.get(`/quiz/burger-quizzes/${id}/`);
+    const { data } = await apiClient.get(`/quiz/burger-quizzes/${id}/`, {
+      params: { expand: 'full' },
+    });
     return data;
   },
 
@@ -34,6 +37,14 @@ export const quizApi = {
 
   structure: async (id: string): Promise<BurgerQuizStructureResponse> => {
     const { data } = await apiClient.get(`/quiz/burger-quizzes/${id}/structure/`);
+    return data;
+  },
+
+  updateStructure: async (
+    id: string,
+    payload: BurgerQuizStructurePutPayload
+  ): Promise<BurgerQuizStructureResponse> => {
+    const { data } = await apiClient.put(`/quiz/burger-quizzes/${id}/structure/`, payload);
     return data;
   },
 } as const;

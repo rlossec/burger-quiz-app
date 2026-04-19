@@ -4,7 +4,7 @@ import type { SaltPepperDetail } from './salt-pepper';
 import type { MenusDetail } from './menus';
 import type { AdditionDetail } from './addition';
 import type { DeadlyBurgerDetail } from './deadly-burger';
-import type { InterludeType } from './interludes';
+import type { VideoInterludeDetail } from './interludes';
 
 export interface BurgerQuizDetail {
   id: string;
@@ -14,23 +14,19 @@ export interface BurgerQuizDetail {
   tags: string[];
   created_at: string;
   updated_at: string;
-  nuggets: NuggetsDetail | null;
-  salt_or_pepper: SaltPepperDetail | null;
-  menus: MenusDetail | null;
-  addition: AdditionDetail | null;
-  deadly_burger: DeadlyBurgerDetail | null;
+  /**
+   * Ordre des manches et interludes.
+   * Sans `?expand=full` : seulement `order`, `type`, `id`.
+   * Avec `expand=full` ou GET `/structure/` : détail sous la clé du `type`.
+   */
+  structure: BurgerQuizStructureElement[];
 }
 
-/* Payload create/update */
+/** Payload create/update — BurgerQuizSerializer (hors structure, gérée par PUT /structure/). */
 export interface BurgerQuizInput {
   title: string;
   toss: string;
   tags?: string[];
-  nuggets_id?: string | null;
-  salt_or_pepper_id?: string | null;
-  menus_id?: string | null;
-  addition_id?: string | null;
-  deadly_burger_id?: string | null;
 }
 
 export interface BurgerQuizListParams {
@@ -40,25 +36,43 @@ export interface BurgerQuizListParams {
   ordering?: string;
 }
 
-/* Structure */
-export type RoundType = 'NU' | 'SP' | 'ME' | 'AD' | 'DB';
-export type ElementType = 'round' | 'interlude';
+/** Structure d'un Burger Quiz */
 
-export interface BurgerQuizStructureInterlude {
-  id: string;
-  title: string;
-  interlude_type: InterludeType;
-  youtube_video_id: string;
-}
+/** Slug API aligné sur `STRUCTURE_TYPE_TO_MODEL` (backend). */
+export type StructureElementSlug =
+  | 'nuggets'
+  | 'salt_or_pepper'
+  | 'menus'
+  | 'addition'
+  | 'deadly_burger'
+  | 'video_interlude';
 
+/**
+ * GET détail (`structure`) ou GET `/structure/`.
+ */
 export interface BurgerQuizStructureElement {
   order: number;
-  element_type: ElementType;
-  round_type: RoundType | null;
-  interlude: BurgerQuizStructureInterlude | null;
+  type: StructureElementSlug;
+  id: string;
+  nuggets?: NuggetsDetail;
+  salt_or_pepper?: SaltPepperDetail;
+  menus?: MenusDetail;
+  addition?: AdditionDetail;
+  deadly_burger?: DeadlyBurgerDetail;
+  video_interlude?: VideoInterludeDetail;
 }
 
 export interface BurgerQuizStructureResponse {
   burger_quiz_id: string;
   elements: BurgerQuizStructureElement[];
+}
+
+/** PUT `/structure/` */
+export interface BurgerQuizStructureElementWrite {
+  type: StructureElementSlug;
+  id: string;
+}
+
+export interface BurgerQuizStructurePutPayload {
+  elements: BurgerQuizStructureElementWrite[];
 }
