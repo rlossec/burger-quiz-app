@@ -11,6 +11,7 @@ from .addition import AdditionViewSet
 from .deadly_burger import DeadlyBurgerViewSet
 from .video_interlude import VideoInterludeViewSet
 from .burger_quiz import BurgerQuizViewSet
+from .tags import TagListAPIView
 
 __all__ = [
     "QuestionViewSet",
@@ -22,4 +23,5 @@ __all__ = [
     "DeadlyBurgerViewSet",
     "VideoInterludeViewSet",
     "BurgerQuizViewSet",
+    "TagListAPIView",
 ]

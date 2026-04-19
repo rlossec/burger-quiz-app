@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    TagListAPIView,
     QuestionViewSet,
     NuggetsViewSet,
     SaltOrPepperViewSet,
@@ -26,4 +27,5 @@ router.register("burger-quizzes", BurgerQuizViewSet, basename="burger-quiz")
 
 urlpatterns = [
     path("quiz/", include(router.urls)),
+    path("quiz/tags/", TagListAPIView.as_view(), name="quiz-tags"),
 ]
