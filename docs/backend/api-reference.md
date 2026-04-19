@@ -589,7 +589,7 @@ Rounds and interludes are **independent** resources; the run is wired to a quiz 
 4. **Burger Quiz**: `POST /api/quiz/burger-quizzes/` with **`title`**, **`toss`**, optional **`tags`** (no `nuggets_id` / … in the current serializer).
 5. **Structure**: `PUT /api/quiz/burger-quizzes/{id}/structure/` — ordered list of **`type` + `id`** (`nuggets`, `video_interlude`, …); rank follows **array position**.
 
-### 3.0.1 End-to-end call sequence (from scratch)
+### End-to-end call sequence (from scratch)
 
 Use this sequence to build one complete Burger Quiz with rounds and interludes.
 Replace `BASE_URL` and `TOKEN` with your environment values.
@@ -1788,9 +1788,41 @@ Example **after** `PUT …/structure/` with **`?expand=full`** (shape only; payl
 - **400 Bad Request**: duplicate round slug/UUID, unknown `id` / `type`, malformed payload, missing `elements`.
 - **404 Not Found**: Burger Quiz not found.
 
----
+### 3.10 Tags (autocomplete)
 
-### 3.10 Quiz recap — Constraints per round
+| Method | Endpoint          | Description                          |
+| ------ | ----------------- | ------------------------------------ |
+| `GET`  | `/api/quiz/tags/` | Search tag names (substring, sorted) |
+
+**Query parameters**
+
+| Name    | Type    | Default | Description                                                                       |
+| ------- | ------- | ------- | --------------------------------------------------------------------------------- |
+| `q`     | string  | —       | Optional. Case-insensitive **substring** match on the tag **name** (`icontains`). |
+| `limit` | integer | `20`    | Maximum number of results; clamped between **1** and **100**.                     |
+
+**Permissions**: **`IsAuthenticated`** (JWT) — same as other `/api/quiz/...` routes.
+
+**Response** `200 OK`:
+
+```json
+{
+  "results": ["cinema-scope", "culture"]
+}
+```
+
+- **`results`**: array of tag **name** strings, sorted by **name** ascending.
+- If **`q`** is omitted or empty, the first **`limit`** tags in the database are returned (alphabetical order).
+- If **`q`** is set, only tags whose **name** contains `q` (case-insensitive) are returned, still sorted by name and capped by **`limit`**.
+
+**Example**
+
+```bash
+curl -s -H "Authorization: Bearer <TOKEN>" \
+  "http://localhost:8000/api/quiz/tags/?q=cult&limit=20"
+```
+
+### 3.11 Quiz recap — Constraints per round
 
 | Round              | Constraint                                                                |
 | ------------------ | ------------------------------------------------------------------------- |
