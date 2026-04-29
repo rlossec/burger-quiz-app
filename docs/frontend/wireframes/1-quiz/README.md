@@ -18,5 +18,6 @@ Maquettes liées à la création et à la gestion des Burger Quiz et des manches
 | [deadly-burger.md](deadly-burger.md)     | Burger de la mort                                  |
 | [interludes.md](interludes.md)           | Interludes vidéo (intro, outro, pub)               |
 | [burger-quiz.md](burger-quiz.md)         | Burger Quiz (list, détail, create/edit, structure) |
+| [manches.md](manches.md)                 | Hub Manches (navigation + stats par type)          |
 
 Composants communs (InlineForm, etc.) : [../components.md](../components.md).
