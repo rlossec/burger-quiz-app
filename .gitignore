@@ -25,3 +25,13 @@ __pycache__/
 *.pyzwzw
 *.pyzwzwz
 
+
+# Temp
+backend/src/fixtures/clean_quiz_data copy.json
+backend/src/fixtures/clean_quiz_data.json
+backend/src/fixtures/quiz_data copy.json
+backend/src/fixtures/quiz_data.json
+backend/src/media/avatars/old_avatar_Sw3eQw9.jpg
+backend/src/media/avatars/old_avatar.jpg
+docs/backend/status.md
+docs/flows/session.md
