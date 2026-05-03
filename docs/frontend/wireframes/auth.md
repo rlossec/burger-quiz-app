@@ -19,7 +19,7 @@ Réf. : [page_reference](../page_reference.md) · [README](README.md). Backend :
 
 ### Principe
 
-Connexion par email ou identifiant + mot de passe. Lien « Mot de passe oublié », lien « S'inscrire ». Après succès : redirection vers BurgerQuizList. Message d’erreur en cas d’échec.
+Connexion par email ou identifiant + mot de passe. Lien « Mot de passe oublié », lien « S'inscrire ». Après succès : redirection vers BurgerQuizList. Message d'erreur en cas d'échec.
 
 ### Wireframe
 
@@ -79,7 +79,7 @@ Création de compte : email, username, mot de passe, confirmation. Compte créé
 
 ### Principe
 
-Page atteinte via le lien reçu par email (uid + token). Succès : « Votre compte est activé », bouton Se connecter. Échec : « Lien invalide ou expiré », bouton Renvoyer l’email d’activation.
+Page atteinte via le lien reçu par email (uid + token). Succès : « Votre compte est activé », bouton Se connecter. Échec : « Lien invalide ou expiré », bouton Renvoyer l'email d'activation.
 
 ### Wireframe
 
@@ -151,7 +151,7 @@ Champ email. Bouton Envoyer le lien. Message neutre après envoi. Lien Retour à
 
 ### Principe
 
-Page via lien email (uid + token dans l’URL). Champs : nouveau mot de passe, confirmer. Bouton Enregistrer. Messages d’erreur (lien invalide, mots de passe différents). Après succès : message + lien vers connexion.
+Page via lien email (uid + token dans l'URL). Champs : nouveau mot de passe, confirmer. Bouton Enregistrer. Messages d'erreur (lien invalide, mots de passe différents). Après succès : message + lien vers connexion.
 
 ### Wireframe
 
@@ -177,7 +177,7 @@ Page via lien email (uid + token dans l’URL). Champs : nouveau mot de passe, c
 
 ### Principe
 
-Page dans l’app (utilisateur connecté). Email actuel en lecture seule, champ nouvel email. Bouton Enregistrer. Message : un email de confirmation sera envoyé au nouvel email.
+Page dans l'app (utilisateur connecté). Email actuel en lecture seule, champ nouvel email. Bouton Enregistrer. Message : un email de confirmation sera envoyé au nouvel email.
 
 ### Wireframe
 

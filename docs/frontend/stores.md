@@ -11,10 +11,15 @@ Définition des états globaux pour le frontend avec **Zustand**.
 | Store                   | Librairie | Persistance  | Description                  |
 | ----------------------- | --------- | ------------ | ---------------------------- |
 | `useAuthStore`          | Zustand   | localStorage | Authentification utilisateur |
-| `useThemeStore`         | Zustand   | localStorage | Thème dark/light             |
-| `useNotificationStore`  | Zustand   | Non          | Toasts et alertes            |
+| `useThemeStore`         | Zustand   | localStorage | Thème dark/light (prévu)     |
 | `useQuizStructureStore` | Zustand   | Non          | Structure du quiz en édition |
 | `useGameStore`          | Zustand   | Non          | Session de jeu en cours      |
+
+> **Note d'architecture**
+>
+> - Les **stores transverses** (auth, thème) vivent dans `src/store/`.
+> - Les **stores métier** (quiz, play, etc.) vivent dans leurs dossiers de feature (`src/features/*/store.ts`).
+> - Les **notifications** sont gérées via les **toasts `shadcn/ui`** (`useToast` + `<Toaster />`), sans store Zustand dédié.
 
 ---
 
@@ -22,26 +27,27 @@ Définition des états globaux pour le frontend avec **Zustand**.
 
 Gestion de l'authentification utilisateur.
 
+> **Note** : Les tokens JWT sont gérés séparément dans `tokenStorage` (voir [Gestion des tokens](#gestion-des-tokens)).
+
 ```typescript
-// src/features/auth/store.ts
+// src/stores/auth.ts
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { User, AuthTokens } from "@/types/auth";
+import { persist, createJSONStorage } from "zustand/middleware";
+import type { User } from "@/types/auth";
 
 interface AuthState {
   // State
   user: User | null;
-  tokens: AuthTokens | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
+  isHydrated: boolean;
 
   // Actions
   setUser: (user: User | null) => void;
-  setTokens: (tokens: AuthTokens | null) => void;
-  login: (user: User, tokens: AuthTokens) => void;
+  login: (user: User) => void;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
+  setHydrated: (hydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -49,43 +55,120 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       // Initial state
       user: null,
-      tokens: null,
       isAuthenticated: false,
-      isLoading: true,
+      isHydrated: false,
 
       // Actions
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) =>
+        set({
+          user,
+          isAuthenticated: !!user,
+        }),
 
-      setTokens: (tokens) => set({ tokens }),
+      login: (user) =>
+        set({
+          user,
+          isAuthenticated: true,
+        }),
 
-      login: (user, tokens) =>
-        set({ user, tokens, isAuthenticated: true, isLoading: false }),
-
-      logout: () => set({ user: null, tokens: null, isAuthenticated: false }),
+      logout: () =>
+        set({
+          user: null,
+          isAuthenticated: false,
+        }),
 
       updateUser: (data) =>
         set((state) => ({
           user: state.user ? { ...state.user, ...data } : null,
         })),
+
+      setHydrated: (isHydrated) => set({ isHydrated }),
     }),
     {
       name: "auth-storage",
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        tokens: state.tokens,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHydrated(true);
+      },
     },
   ),
 );
+
+// Selectors (pour optimiser les re-renders)
+export const selectUser = (state: AuthState) => state.user;
+export const selectIsAuthenticated = (state: AuthState) =>
+  state.isAuthenticated;
+export const selectIsHydrated = (state: AuthState) => state.isHydrated;
 ```
 
 ### Données stockées
 
-| Propriété         | Type                 | Persisté           | Description             |
-| ----------------- | -------------------- | ------------------ | ----------------------- |
-| `user`            | `User \| null`       | Non                | Utilisateur connecté    |
-| `tokens`          | `AuthTokens \| null` | Oui (localStorage) | Access + Refresh tokens |
-| `isAuthenticated` | `boolean`            | Non                | Calculé depuis user     |
-| `isLoading`       | `boolean`            | Non                | Chargement initial      |
+| Propriété         | Type           | Persisté           | Description                                   |
+| ----------------- | -------------- | ------------------ | --------------------------------------------- |
+| `user`            | `User \| null` | Oui (localStorage) | Utilisateur connecté                          |
+| `isAuthenticated` | `boolean`      | Oui (localStorage) | État de connexion                             |
+| `isHydrated`      | `boolean`      | Non                | `true` quand le store a fini de se réhydrater |
+
+### Qu'est-ce que `isHydrated` ?
+
+Zustand persist charge les données depuis localStorage de manière **asynchrone**. Pendant ce court laps de temps, le state est dans son état initial (`user: null`), ce qui peut causer un "flash" où l'app pense que l'utilisateur n'est pas connecté.
+
+`isHydrated` permet d'attendre que la réhydratation soit terminée avant d'afficher le contenu protégé :
+
+```tsx
+// Exemple dans ProtectedRoute
+const isHydrated = useAuthStore(selectIsHydrated);
+const isAuthenticated = useAuthStore(selectIsAuthenticated);
+
+if (!isHydrated) {
+  return <LoadingSpinner />;
+}
+
+if (!isAuthenticated) {
+  return <Navigate to="/login" />;
+}
+```
+
+---
+
+### Gestion des tokens
+
+Les tokens JWT sont gérés **séparément** dans `src/lib/axios.ts` via `tokenStorage` :
+
+```typescript
+// src/lib/axios.ts
+
+const TOKEN_KEYS = {
+  access: "access_token",
+  refresh: "refresh_token",
+} as const;
+
+export const tokenStorage = {
+  getAccess: () => localStorage.getItem(TOKEN_KEYS.access),
+  getRefresh: () => localStorage.getItem(TOKEN_KEYS.refresh),
+  setTokens: (access: string, refresh: string) => {
+    localStorage.setItem(TOKEN_KEYS.access, access);
+    localStorage.setItem(TOKEN_KEYS.refresh, refresh);
+  },
+  setAccess: (access: string) => {
+    localStorage.setItem(TOKEN_KEYS.access, access);
+  },
+  clear: () => {
+    localStorage.removeItem(TOKEN_KEYS.access);
+    localStorage.removeItem(TOKEN_KEYS.refresh);
+  },
+};
+```
+
+**Pourquoi cette séparation ?**
+
+1. **Couplage HTTP** : Les tokens sont injectés automatiquement via les interceptors axios
+2. **Refresh automatique** : La logique de refresh 401 est gérée au même endroit
+3. **Simplicité** : Le store auth reste focalisé sur les données utilisateur
 
 ---
 
@@ -129,7 +212,7 @@ export const useThemeStore = create<ThemeState>()(
 ### Intégration shadcn/ui
 
 ```typescript
-// src/app/providers.tsx
+// src/providers (ThemeProvider)
 
 import { useEffect } from "react";
 import { useThemeStore } from "@/stores/theme";
@@ -157,63 +240,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 ---
 
-## 3. NotificationStore
+## 3. Notifications (shadcn / toasts)
 
-Gestion des notifications toast.
+> **Décision :** pas de `NotificationStore` Zustand.  
+> Les notifications sont gérées uniquement via les **toasts `shadcn/ui`**.
 
-```typescript
-// src/stores/notification.ts
+### Principe
 
-import { create } from "zustand";
+- Utilisation de `components/ui/use-toast.ts` :
+  - Hook `useToast()` pour déclencher des toasts.
+  - Composant global `<Toaster />` monté une seule fois (dans les providers / layout).
+- Les toasts sont **éphémères** et ne sont pas stockés dans un store global.
+- Les mutations React Query (create/edit/delete) appellent `toast({ title, description, variant })`
+  directement dans les hooks / composants.
 
-type NotificationType = "success" | "error" | "warning" | "info";
+### Bonnes pratiques
 
-interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message?: string;
-  duration?: number; // ms, défaut 5000
-}
-
-interface NotificationState {
-  notifications: Notification[];
-  add: (notification: Omit<Notification, "id">) => void;
-  remove: (id: string) => void;
-  clear: () => void;
-}
-
-export const useNotificationStore = create<NotificationState>((set) => ({
-  notifications: [],
-
-  add: (notification) =>
-    set((state) => ({
-      notifications: [
-        ...state.notifications,
-        { ...notification, id: crypto.randomUUID() },
-      ],
-    })),
-
-  remove: (id) =>
-    set((state) => ({
-      notifications: state.notifications.filter((n) => n.id !== id),
-    })),
-
-  clear: () => set({ notifications: [] }),
-}));
-
-// Helper functions
-export const toast = {
-  success: (title: string, message?: string) =>
-    useNotificationStore.getState().add({ type: "success", title, message }),
-  error: (title: string, message?: string) =>
-    useNotificationStore.getState().add({ type: "error", title, message }),
-  warning: (title: string, message?: string) =>
-    useNotificationStore.getState().add({ type: "warning", title, message }),
-  info: (title: string, message?: string) =>
-    useNotificationStore.getState().add({ type: "info", title, message }),
-};
-```
+- Centraliser éventuellement 1–2 helpers dans `lib/notifications.ts` (ex. `showSuccessToast`, `showErrorToast`)
+  qui wrappe `useToast` pour uniformiser le wording et les variantes.
 
 ---
 
@@ -472,21 +516,20 @@ export const useGameStore = create<GameState>((set, get) => ({
 
 ```
 src/
-├── stores/
-│   ├── index.ts          # Re-exports
-│   ├── theme.ts
-│   └── notification.ts
+├── store/
+│   ├── index.ts          # Re-exports (useAuthStore, selectors...)
+│   └── authStore.ts      # useAuthStore (user, isAuthenticated, isHydrated)
 │
 └── features/
-    ├── auth/
-    │   └── store.ts      # useAuthStore
-    │
     ├── quiz/
-    │   └── store.ts      # useQuizStructureStore
+    │   └── store.ts      # useQuizStructureStore (à venir)
     │
     └── play/
-        └── store.ts      # useGameStore
+        └── store.ts      # useGameStore (à venir)
 ```
+
+> **Note** : Le store auth vit dans `src/store/authStore.ts`, pas dans `features/auth`.  
+> Les stores métier (quiz, play) sont dans leur feature.
 
 ---
 

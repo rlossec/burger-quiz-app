@@ -12,7 +12,7 @@ Réf. : [page_reference](../page_reference.md) · [README](README.md)
 
 ### Principe
 
-Structure commune à toutes les pages (hors Login) : navbar avec logo, liens (Burger Quiz, Questions, etc.), zone utilisateur et logout ; fil d’Ariane ou titre de page ; zone de contenu (liste, formulaire ou détail).
+Structure commune à toutes les pages (hors Login) : navbar avec logo, liens (Burger Quiz, Questions, etc.), zone utilisateur et logout ; fil d'Ariane ou titre de page ; zone de contenu (liste, formulaire ou détail).
 
 ### Wireframe
 
@@ -30,4 +30,4 @@ Structure commune à toutes les pages (hors Login) : navbar avec logo, liens (Bu
 
 ### Appels API
 
-Aucun appel direct pour le layout. Les pages filles utilisent le token JWT (obtenu via `POST /api/auth/jwt/create/`) dans l’en-tête `Authorization: Bearer <access>`.
+Aucun appel direct pour le layout. Les pages filles utilisent le token JWT (obtenu via `POST /api/auth/jwt/create/`) dans l'en-tête `Authorization: Bearer <access>`.

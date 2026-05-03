@@ -13,7 +13,7 @@ Réf. : [components](../components.md) · [README](README.md)
 
 ### Principe
 
-Demande de confirmation avant suppression d’une ressource (manche, question, Burger Quiz, etc.). Affiche le nom de la ressource et son type. Boutons Annuler et Supprimer.
+Demande de confirmation avant suppression d'une ressource (manche, question, Burger Quiz, etc.). Affiche le nom de la ressource et son type. Boutons Annuler et Supprimer.
 
 ### Wireframe
 
@@ -38,9 +38,9 @@ Selon la ressource : `DELETE /api/quiz/{resource}/{id}/` (questions, nuggets, sa
 
 ### Principe
 
-Permet d’ajouter des questions à une manche (Nuggets, Deadly Burger, etc.) : **sélectionner des questions existantes** via un **outil de recherche**, ou créer une nouvelle question (inline / nouvelle page selon choix). Les questions sélectionnées sont **ajoutées à la liste** du formulaire parent ; les IDs sont envoyés **lors de la soumission** du formulaire (pas de sauvegarde dans cette modale).
+Permet d'ajouter des questions à une manche (Nuggets, Deadly Burger, etc.) : **sélectionner des questions existantes** via un **outil de recherche**, ou créer une nouvelle question (inline / nouvelle page selon choix). Les questions sélectionnées sont **ajoutées à la liste** du formulaire parent ; les IDs sont envoyés **lors de la soumission** du formulaire (pas de sauvegarde dans cette modale).
 
-**Outil de recherche** : champ de recherche (texte sur l’énoncé), filtre par type (prérempli selon la manche : NU, DB, etc.), résultats paginés avec case à cocher. Les questions déjà présentes dans la manche peuvent être grisées / non sélectionnables pour éviter les doublons.
+**Outil de recherche** : champ de recherche (texte sur l'énoncé), filtre par type (prérempli selon la manche : NU, DB, etc.), résultats paginés avec case à cocher. Les questions déjà présentes dans la manche peuvent être grisées / non sélectionnables pour éviter les doublons.
 
 ### Wireframe
 
@@ -54,7 +54,7 @@ Permet d’ajouter des questions à une manche (Nuggets, Deadly Burger, etc.) : 
 |  | Résultats (questions existantes)                                      |  |
 |  | [ ] Quelle est la capitale…        NU   (déjà dans la manche → grisé) |  |
 |  | [X] Paris est la capitale de…      NU                                  |  |
-|  | [ ] La France a pour chef d’État…  NU                                  |  |
+|  | [ ] La France a pour chef d'État…  NU                                  |  |
 |  |  < Préc  |  1  2  3  |  Suiv >                                          |  |
 |  +-----------------------------------------------------------------------+  |
 |  ( ) Créer une nouvelle question  (optionnel, selon flux)                 |

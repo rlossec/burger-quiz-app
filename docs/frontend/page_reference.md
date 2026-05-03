@@ -11,11 +11,11 @@ Structure des pages et URLs du frontend.
 
 ## Légende
 
-| Statut | Description    |
-| ------ | -------------- |
-| ⊘      | Non implémenté |
-| 🟡     | En cours       |
-| ✅     | Implémenté     |
+| Statut | Description            |
+| ------ | ---------------------- |
+| ⊘      | Non implémenté         |
+| 🟡     | Placeholder / En cours |
+| ✅     | Implémenté             |
 
 ---
 
@@ -23,32 +23,29 @@ Structure des pages et URLs du frontend.
 
 | Route                        | Page         | Description          | Maquette                      | Fichier |
 | ---------------------------- | ------------ | -------------------- | ----------------------------- | ------- |
-| `/login`                     | LoginPage    | Connexion            | [auth.md](wireframes/auth.md) | ⊘       |
-| `/register`                  | RegisterPage | Inscription          | [auth.md](wireframes/auth.md) | ⊘       |
-| `/auth/activate/:uid/:token` | ActivatePage | Activation du compte | [auth.md](wireframes/auth.md) | ⊘       |
+| `/login`                     | LoginPage    | Connexion            | [auth.md](wireframes/auth.md) | ✅      |
+| `/register`                  | RegisterPage | Inscription          | [auth.md](wireframes/auth.md) | ✅      |
+| `/auth/activate/:uid/:token` | ActivatePage | Activation du compte | [auth.md](wireframes/auth.md) | ✅      |
 
-| `/auth/resend-activation` | ResendActivationPage | Renvoi email d'activation | [auth.md](wireframes/auth.md) | ⊘ |
-| `/auth/forgot-password` | ForgotPasswordPage | Demande reset mot de passe | [auth.md](wireframes/auth.md) | ⊘ |
-| `/auth/password/reset/confirm/:uid/:token` | ResetPasswordPage | Nouveau mot de passe | [auth.md](wireframes/auth.md) | ⊘ |
-| `/auth/email-sent` | EmailSentPage | Confirmation envoi email | [auth.md](wireframes/auth.md) | ⊘ |
-| `*` | NotFoundPage | Page 404 | ⊘ | ⊘ |
+| `/auth/resend-activation` | ResendActivationPage | Renvoi email d'activation | [auth.md](wireframes/auth.md) | ✅ |
+| `/auth/forgot-password` | ForgotPasswordPage | Demande reset mot de passe | [auth.md](wireframes/auth.md) | ✅ |
+| `/auth/password/reset/confirm/:uid/:token` | ResetPasswordPage | Nouveau mot de passe | [auth.md](wireframes/auth.md) | ✅ |
+| `/auth/email-sent` | EmailSentPage | Confirmation envoi email | [auth.md](wireframes/auth.md) | ✅ |
+| `*` | NotFoundPage | Page 404 | ⊘ | ✅ |
 
 ## Routes protégées (auth requise)
 
 ### Dashboard
 
-| Route        | Page          | Description                 | Maquette | Fichier |
-| ------------ | ------------- | --------------------------- | -------- | ------- |
-| `/dashboard` | DashboardPage | Tableau de bord utilisateur | ⊘        | ⊘       |
+| Route        | Page     | Description                 | Maquette | Fichier |
+| ------------ | -------- | --------------------------- | -------- | ------- |
+| `/dashboard` | HomePage | Tableau de bord utilisateur | ⊘        | ✅      |
 
 ### Profil utilisateur
 
-| Route                      | Page               | Description             | Maquette                      | Fichier |
-| -------------------------- | ------------------ | ----------------------- | ----------------------------- | ------- |
-| `/profile`                 | ProfilePage        | Profil utilisateur      | ⊘                             | ⊘       |
-| `/profile/edit`            | ProfileEditPage    | Modifier le profil      | ⊘                             | ⊘       |
-| `/profile/change-email`    | ChangeEmailPage    | Changer l'email         | [auth.md](wireframes/auth.md) | ⊘       |
-| `/profile/change-password` | ChangePasswordPage | Changer le mot de passe | ⊘                             | ⊘       |
+| Route      | Page        | Description        | Maquette | Fichier |
+| ---------- | ----------- | ------------------ | -------- | ------- |
+| `/profile` | ProfilePage | Profil utilisateur | ⊘        | ✅      |
 
 ### Burger Quiz (CRUD)
 
@@ -56,56 +53,54 @@ Structure des pages et URLs du frontend.
 
 | Route          | Page                 | Description                         | Maquette                                           | Fichier |
 | -------------- | -------------------- | ----------------------------------- | -------------------------------------------------- | ------- |
-| `/quiz`        | BurgerQuizListPage   | Liste des Burger quiz               | [burger-quiz.md](wireframes/1-quiz/burger-quiz.md) | ⊘       |
-| `/quiz/create` | BurgerQuizCreatePage | Créer un Burger quiz                | [burger-quiz.md](wireframes/1-quiz/burger-quiz.md) | ⊘       |
-| `/quiz/:id`    | BurgerQuizDetailEdit | Détail + Édition du quiz et manches | [burger-quiz.md](wireframes/1-quiz/burger-quiz.md) | ⊘       |
-
-> **Note** : La route `/quiz/:id/edit` a été fusionnée dans `/quiz/:id` (BurgerQuizDetailEdit).
+| `/quiz`        | BurgerQuizListPage   | Liste des Burger quiz               | [burger-quiz.md](wireframes/1-quiz/burger-quiz.md) | ✅      |
+| `/quiz/create` | BurgerQuizCreatePage | Créer un Burger quiz                | [burger-quiz.md](wireframes/1-quiz/burger-quiz.md) | 🟡      |
+| `/quiz/:id`    | BurgerQuizDetailEdit | Détail + Édition du quiz et manches | [burger-quiz.md](wireframes/1-quiz/burger-quiz.md) | 🟡      |
 
 #### Manches
 
 | Route                     | Page                   | Description                           | Maquette                                                   | Fichier |
 | ------------------------- | ---------------------- | ------------------------------------- | ---------------------------------------------------------- | ------- |
-| `/nuggets`                | NuggetsListPage        | Liste des manches Nuggets             | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | ⊘       |
-| `/nuggets/create`         | NuggetsCreatePage      | Créer une manche Nuggets              | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | ⊘       |
-| `/nuggets/:id`            | NuggetsDetailPage      | Détail d'une manche Nuggets           | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | ⊘       |
-| `/nuggets/:id/edit`       | NuggetsEditPage        | Modifier une manche Nuggets           | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | ⊘       |
-| `/salt-pepper`            | SaltPepperListPage     | Liste des manches Sel ou Poivre       | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | ⊘       |
-| `/salt-pepper/create`     | SaltPepperCreatePage   | Créer une manche Sel ou Poivre        | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | ⊘       |
-| `/salt-pepper/:id`        | SaltPepperDetailPage   | Détail d'une manche Sel ou Poivre     | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | ⊘       |
-| `/salt-pepper/:id/edit`   | SaltPepperEditPage     | Modifier une manche Sel ou Poivre     | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | ⊘       |
-| `/menus`                  | MenusListPage          | Liste des manches Menus               | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | ⊘       |
-| `/menus/create`           | MenusCreatePage        | Créer une manche Menus                | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | ⊘       |
-| `/menus/:id`              | MenusDetailPage        | Détail d'une manche Menus             | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | ⊘       |
-| `/menus/:id/edit`         | MenusEditPage          | Modifier une manche Menus             | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | ⊘       |
-| `/addition`               | AdditionListPage       | Liste des manches Addition            | [addition.md](wireframes/1-quiz/addition.md)               | ⊘       |
-| `/addition/create`        | AdditionCreatePage     | Créer une manche Addition             | [addition.md](wireframes/1-quiz/addition.md)               | ⊘       |
-| `/addition/:id`           | AdditionDetailPage     | Détail d'une manche Addition          | [addition.md](wireframes/1-quiz/addition.md)               | ⊘       |
-| `/addition/:id/edit`      | AdditionEditPage       | Modifier une manche Addition          | [addition.md](wireframes/1-quiz/addition.md)               | ⊘       |
-| `/deadly-burger`          | DeadlyBurgerListPage   | Liste des manches Burger de la mort   | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | ⊘       |
-| `/deadly-burger/create`   | DeadlyBurgerCreatePage | Créer une manche Burger de la mort    | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | ⊘       |
-| `/deadly-burger/:id`      | DeadlyBurgerDetailPage | Détail d'une manche Burger de la mort | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | ⊘       |
-| `/deadly-burger/:id/edit` | DeadlyBurgerEditPage   | Modifier une manche Burger de la mort | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | ⊘       |
+| `/nuggets`                | NuggetsListPage        | Liste des manches Nuggets             | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | 🟡      |
+| `/nuggets/create`         | NuggetsCreatePage      | Créer une manche Nuggets              | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | 🟡      |
+| `/nuggets/:id`            | NuggetsDetailPage      | Détail d'une manche Nuggets           | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | 🟡      |
+| `/nuggets/:id/edit`       | NuggetsEditPage        | Modifier une manche Nuggets           | [nuggets.md](wireframes/1-quiz/nuggets.md)                 | 🟡      |
+| `/salt-pepper`            | SaltPepperListPage     | Liste des manches Sel ou Poivre       | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | 🟡      |
+| `/salt-pepper/create`     | SaltPepperCreatePage   | Créer une manche Sel ou Poivre        | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | 🟡      |
+| `/salt-pepper/:id`        | SaltPepperDetailPage   | Détail d'une manche Sel ou Poivre     | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | 🟡      |
+| `/salt-pepper/:id/edit`   | SaltPepperEditPage     | Modifier une manche Sel ou Poivre     | [salt-or-pepper.md](wireframes/1-quiz/salt-or-pepper.md)   | 🟡      |
+| `/menus`                  | MenusListPage          | Liste des manches Menus               | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | 🟡      |
+| `/menus/create`           | MenusCreatePage        | Créer une manche Menus                | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | 🟡      |
+| `/menus/:id`              | MenusDetailPage        | Détail d'une manche Menus             | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | 🟡      |
+| `/menus/:id/edit`         | MenusEditPage          | Modifier une manche Menus             | [menus-menutheme.md](wireframes/1-quiz/menus-menutheme.md) | 🟡      |
+| `/addition`               | AdditionListPage       | Liste des manches Addition            | [addition.md](wireframes/1-quiz/addition.md)               | 🟡      |
+| `/addition/create`        | AdditionCreatePage     | Créer une manche Addition             | [addition.md](wireframes/1-quiz/addition.md)               | 🟡      |
+| `/addition/:id`           | AdditionDetailPage     | Détail d'une manche Addition          | [addition.md](wireframes/1-quiz/addition.md)               | 🟡      |
+| `/addition/:id/edit`      | AdditionEditPage       | Modifier une manche Addition          | [addition.md](wireframes/1-quiz/addition.md)               | 🟡      |
+| `/deadly-burger`          | DeadlyBurgerListPage   | Liste des manches Burger de la mort   | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | 🟡      |
+| `/deadly-burger/create`   | DeadlyBurgerCreatePage | Créer une manche Burger de la mort    | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | 🟡      |
+| `/deadly-burger/:id`      | DeadlyBurgerDetailPage | Détail d'une manche Burger de la mort | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | 🟡      |
+| `/deadly-burger/:id/edit` | DeadlyBurgerEditPage   | Modifier une manche Burger de la mort | [deadly-burger.md](wireframes/1-quiz/deadly-burger.md)     | 🟡      |
 
 #### Interludes vidéo
 
 | Route                  | Page                 | Description                 | Maquette                                         | Fichier |
 | ---------------------- | -------------------- | --------------------------- | ------------------------------------------------ | ------- |
-| `/interludes`          | InterludesListPage   | Liste des interludes vidéo  | [interludes.md](wireframes/1-quiz/interludes.md) | ⊘       |
-| `/interludes/create`   | InterludesCreatePage | Créer un interlude vidéo    | [interludes.md](wireframes/1-quiz/interludes.md) | ⊘       |
-| `/interludes/:id`      | InterludesDetailPage | Détail d'un interlude vidéo | [interludes.md](wireframes/1-quiz/interludes.md) | ⊘       |
-| `/interludes/:id/edit` | InterludesEditPage   | Modifier un interlude vidéo | [interludes.md](wireframes/1-quiz/interludes.md) | ⊘       |
+| `/interludes`          | InterludesListPage   | Liste des interludes vidéo  | [interludes.md](wireframes/1-quiz/interludes.md) | 🟡      |
+| `/interludes/create`   | InterludesCreatePage | Créer un interlude vidéo    | [interludes.md](wireframes/1-quiz/interludes.md) | 🟡      |
+| `/interludes/:id`      | InterludesDetailPage | Détail d'un interlude vidéo | [interludes.md](wireframes/1-quiz/interludes.md) | 🟡      |
+| `/interludes/:id/edit` | InterludesEditPage   | Modifier un interlude vidéo | [interludes.md](wireframes/1-quiz/interludes.md) | 🟡      |
 
 ### Session de jeu 🚧
 
 | Route                      | Page              | Description                    | Maquette                                     | Fichier |
 | -------------------------- | ----------------- | ------------------------------ | -------------------------------------------- | ------- |
-| `/play`                    | PlayHomePage      | Accueil Play (créer/rejoindre) | [README.md](wireframes/2-sessions/README.md) | ⊘       |
-| `/play/create`             | CreateSessionPage | Créer une session              | [README.md](wireframes/2-sessions/README.md) | ⊘       |
-| `/play/join`               | JoinSessionPage   | Rejoindre une session          | [README.md](wireframes/2-sessions/README.md) | ⊘       |
-| `/play/:sessionId/lobby`   | LobbyPage         | Salle d'attente                | [README.md](wireframes/2-sessions/README.md) | ⊘       |
-| `/play/:sessionId/game`    | GamePage          | Partie en cours                | [README.md](wireframes/2-sessions/README.md) | ⊘       |
-| `/play/:sessionId/results` | ResultsPage       | Résultats de la partie         | [README.md](wireframes/2-sessions/README.md) | ⊘       |
+| `/play`                    | PlayHomePage      | Accueil Play (créer/rejoindre) | [README.md](wireframes/2-sessions/README.md) | 🟡      |
+| `/play/create`             | CreateSessionPage | Créer une session              | [README.md](wireframes/2-sessions/README.md) | 🟡      |
+| `/play/join`               | JoinSessionPage   | Rejoindre une session          | [README.md](wireframes/2-sessions/README.md) | 🟡      |
+| `/play/:sessionId/lobby`   | LobbyPage         | Salle d'attente                | [README.md](wireframes/2-sessions/README.md) | 🟡      |
+| `/play/:sessionId/game`    | GamePage          | Partie en cours                | [README.md](wireframes/2-sessions/README.md) | 🟡      |
+| `/play/:sessionId/results` | ResultsPage       | Résultats de la partie         | [README.md](wireframes/2-sessions/README.md) | 🟡      |
 
 ---
 
@@ -113,10 +108,10 @@ Structure des pages et URLs du frontend.
 
 | Composant  | Description                               | Maquette                          | Fichier |
 | ---------- | ----------------------------------------- | --------------------------------- | ------- |
-| `<Layout>` | Layout principal (Header + Main + Footer) | [layout.md](wireframes/layout.md) | ⊘       |
-| `<Header>` | En-tête avec navigation                   | [layout.md](wireframes/layout.md) | ⊘       |
-| `<Nav>`    | Navigation principale                     | [layout.md](wireframes/layout.md) | ⊘       |
-| `<Footer>` | Pied de page                              | [layout.md](wireframes/layout.md) | ⊘       |
+| `<Layout>` | Layout principal (Header + Main + Footer) | [layout.md](wireframes/layout.md) | ✅      |
+| `<Header>` | En-tête avec navigation                   | [layout.md](wireframes/layout.md) | ✅      |
+| `<Nav>`    | Navigation principale                     | [layout.md](wireframes/layout.md) | ✅      |
+| `<Footer>` | Pied de page                              | [layout.md](wireframes/layout.md) | ✅      |
 
 ---
 

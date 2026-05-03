@@ -1,6 +1,6 @@
 # Composants et patterns frontend
 
-Ce document décrit les composants réutilisables et les patterns d’interface imaginés pour les pages du frontend. Structure des pages : [page_reference.md](page_reference.md). Wireframes : [wireframes/README.md](wireframes/README.md).
+Ce document décrit les composants réutilisables et les patterns d'interface imaginés pour les pages du frontend. Structure des pages : [page_reference.md](page_reference.md). Wireframes : [wireframes/README.md](wireframes/README.md).
 
 ---
 
@@ -8,12 +8,12 @@ Ce document décrit les composants réutilisables et les patterns d’interface 
 
 ### QuestionsInlineForm
 
-Pattern d’ajout de **questions** directement dans un formulaire de création/édition de manche, sans quitter la page.
+Pattern d'ajout de **questions** directement dans un formulaire de création/édition de manche, sans quitter la page.
 
 #### Principe
 
 - Chaque ligne = une question (énoncé + réponses selon le type).
-- Le **`question_type`** est **prérempli** selon la page (NU, SP, ME, AD, DB) et non modifiable dans l’inline.
+- Le **`question_type`** est **prérempli** selon la page (NU, SP, ME, AD, DB) et non modifiable dans l'inline.
 - Actions : **ajouter** une ligne (nouvelle question inline), **supprimer** une ligne (avec confirmation si besoin).
 - A arbitrer : À la soumission du formulaire parent : création des questions puis de la manche (ou mise à jour) ou soumission indépendante ?
 
@@ -39,7 +39,7 @@ Pattern d’ajout de **questions** directement dans un formulaire de création/�
 
 ### Ajout / suppression de lignes
 
-- **Ajouter** : bouton « Ajouter une question » (ou équivalent) qui ajoute une ligne d’inline form.
+- **Ajouter** : bouton « Ajouter une question » (ou équivalent) qui ajoute une ligne d'inline form.
 - **Supprimer** : icône/bouton (ex. poubelle) sur chaque ligne, avec éventuelle modale de confirmation.
 - Contraintes à respecter côté UI : minimum 2 propositions pour Sel ou poivre ; nombre pair pour Nuggets ; exactement 10 pour DeadlyBurger.
 
