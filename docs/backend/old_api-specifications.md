@@ -1,15 +1,25 @@
 # Référence API Burger Quiz
 
-Ce document décrit les endpoints de l’API Burger Quiz : **Accounts** (authentification et utilisateurs) et **Quiz** (manches, questions, Burger Quiz). Les contraintes métier détaillées et le flux de création d’un Burger Quiz sont décrits dans `docs/backend/api-endpoints-et-contraintes.md`.
+Ce document décrit les endpoints de l’API Burger Quiz 
+
+Les contraintes métier détaillées et le flux de création d’un Burger Quiz sont décrits dans `docs/backend/api-endpoints-et-contraintes.md`.
 
 **Base URL** : `/api/`  
-**Authentification** : JWT Bearer. En-tête : `Authorization: Bearer <access_token>`. Obtenir un token : `POST /api/auth/jwt/create/`.
+**Authentification** : JWT Bearer.  
+En-tête : `Authorization: Bearer <access_token>`. Obtenir un token : `POST /api/auth/jwt/create/`.
+
+
+Les endpoints sont présentés apar application :
+
+- **Accounts** (authentification et utilisateurs) 
+- **Quiz** (manches, questions, Burger Quiz). 
 
 ---
 
 ## 1. Accounts
 
 Tous les endpoints Accounts sont préfixés par **`/api/auth/`**.
+Authentication and user management endpoints are provided by Djoser + SimpleJWT.
 
 ### 1.1 JWT
 
