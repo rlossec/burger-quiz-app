@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, HelpCircle, Play, Palette } from 'lucide-react';
+import { Home, HelpCircle, Play, Palette, Layers3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { appTheme } from '@/theme';
 
@@ -11,6 +11,7 @@ interface NavProps {
 const navItems = [
   { to: '/', label: 'Accueil', icon: Home },
   { to: '/quiz', label: 'Mes Quiz', icon: HelpCircle },
+  { to: '/rounds', label: 'Manches', icon: Layers3 },
   { to: '/play', label: 'Jouer', icon: Play },
   { to: '/drafts', label: 'Drafts', icon: Palette, temp: true },
 ];

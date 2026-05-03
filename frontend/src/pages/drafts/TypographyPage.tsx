@@ -28,10 +28,7 @@ export function TypographyPage() {
           </div>
           <div className="space-y-2">
             <p className={cn(typography.small, text.muted)}>Body - DM Sans</p>
-            <p
-              className={cn('text-lg', text.secondary)}
-              style={{ fontFamily: fonts.body }}
-            >
+            <p className={cn('text-lg', text.secondary)} style={{ fontFamily: fonts.body }}>
               Le quiz où tout le monde peut devenir le roi du burger ! Gagnez des miams et affrontez
               vos amis dans des manches épiques.
             </p>
@@ -57,7 +54,10 @@ export function TypographyPage() {
             { key: 'small', label: 'Small', desc: 'text-sm' },
             { key: 'xs', label: 'XS', desc: 'text-xs' },
           ].map((item) => (
-            <div key={item.key} className="flex items-baseline gap-4 border-b border-cream/10 pb-4 last:border-0">
+            <div
+              key={item.key}
+              className="flex items-baseline gap-4 border-b border-cream/10 pb-4 last:border-0"
+            >
               <div className="w-24 shrink-0">
                 <span className={cn(typography.xs, 'font-mono text-denim')}>{item.key}</span>
               </div>
@@ -74,7 +74,9 @@ export function TypographyPage() {
 
       {/* Couleurs de texte */}
       <section className={cn('rounded-2xl', spacing.card.padding, cards.default)}>
-        <h2 className={cn(typography.h3, text.primary, 'mb-6')}>Couleurs de texte (appTheme.text)</h2>
+        <h2 className={cn(typography.h3, text.primary, 'mb-6')}>
+          Couleurs de texte (appTheme.text)
+        </h2>
 
         <div className="grid gap-6 sm:grid-cols-2">
           {/* Neutres */}
@@ -88,10 +90,7 @@ export function TypographyPage() {
                 { key: 'inactive', label: 'Texte inactif' },
                 { key: 'subtle', label: 'Texte subtil' },
               ].map((item) => (
-                <p
-                  key={item.key}
-                  className={text[item.key as keyof typeof text] as string}
-                >
+                <p key={item.key} className={text[item.key as keyof typeof text] as string}>
                   {item.key} - {item.label}
                 </p>
               ))}

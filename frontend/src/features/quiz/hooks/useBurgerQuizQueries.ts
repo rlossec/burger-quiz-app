@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/components/ui/use-toast';
 import { getApiErrorMessage } from '@/lib/api-error';
-import type { BurgerQuizInput, BurgerQuizListParams } from '@/types';
+import type { BurgerQuizInput, BurgerQuizListParams, BurgerQuizStructurePutPayload } from '@/types';
 import { queryKeys } from '../api/query-keys';
 import { quizApi } from '../api/quiz';
 
@@ -85,6 +85,28 @@ export function useDeleteBurgerQuizMutation() {
       toast({
         variant: 'destructive',
         title: 'Erreur lors de la suppression du quiz',
+        description: getApiErrorMessage(error),
+      });
+    },
+  });
+}
+
+export function useUpdateBurgerQuizStructureMutation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: BurgerQuizStructurePutPayload }) =>
+      quizApi.updateStructure(id, payload),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.quiz.structure(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.quiz.detail(id) });
+      toast({ title: 'Structure enregistrée avec succès' });
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: "Erreur lors de l'enregistrement de la structure",
         description: getApiErrorMessage(error),
       });
     },

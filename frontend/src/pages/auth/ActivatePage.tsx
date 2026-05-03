@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
@@ -15,8 +15,16 @@ export function ActivatePage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<ActivationStatus>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const hasAttemptedActivationRef = useRef(false);
 
   useEffect(() => {
+    if (hasAttemptedActivationRef.current) {
+      return;
+    }
+    hasAttemptedActivationRef.current = true;
+
+    let redirectTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const activateAccount = async () => {
       if (!uid || !token) {
         setStatus('error');
@@ -27,7 +35,7 @@ export function ActivatePage() {
       try {
         await apiClient.post(AUTH_ENDPOINTS.users.activation, { uid, token });
         setStatus('success');
-        setTimeout(() => {
+        redirectTimeout = setTimeout(() => {
           navigate('/auth/login');
         }, 3000);
       } catch (err) {
@@ -44,6 +52,12 @@ export function ActivatePage() {
     };
 
     activateAccount();
+
+    return () => {
+      if (redirectTimeout) {
+        clearTimeout(redirectTimeout);
+      }
+    };
   }, [uid, token, navigate]);
 
   return (

@@ -6,3 +6,4 @@ export * from './useMenuThemesQueries';
 export * from './useAdditionQueries';
 export * from './useDeadlyBurgerQueries';
 export * from './useInterludesQueries';
+export * from './useTagCatalog';
