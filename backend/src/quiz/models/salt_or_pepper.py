@@ -2,6 +2,8 @@ import uuid
 
 from django.db import models
 
+from .base import QuizContentMixin
+
 
 class SaltOrPepperQuestion(models.Model):
     """Lien SaltOrPepper ↔ Question avec ordre. Une question (type SP) n'appartient qu'à un seul Sel ou poivre."""
@@ -18,15 +20,15 @@ class SaltOrPepperQuestion(models.Model):
         ]
 
 
-class SaltOrPepper(models.Model):
+class SaltOrPepper(QuizContentMixin, models.Model):
     """Manche Sel ou Poivre : les réponses de chaque question sont parmi une liste restreinte (souvent 2–4, max 5)."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True, blank=True)
     original = models.BooleanField(
-        default=False,
-        help_text="True = manche issue d'une émission diffusée.",
+        default=True,
+        help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     choice_labels = models.JSONField(
         default=list,

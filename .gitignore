@@ -7,6 +7,9 @@ venv/
 env/*.env
 !env/*.example
 
+# Rapports de tests générés
+**/reports/
+
 # Python cache
 __pycache__/
 

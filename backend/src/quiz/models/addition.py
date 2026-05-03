@@ -1,7 +1,8 @@
-from re import T
 import uuid
 
 from django.db import models
+
+from .base import QuizContentMixin
 
 
 class AdditionQuestion(models.Model):
@@ -19,13 +20,13 @@ class AdditionQuestion(models.Model):
         ]
 
 
-class Addition(models.Model):
+class Addition(QuizContentMixin, models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True, blank=True)
     original = models.BooleanField(
         default=True,
-        help_text="True = manche issue d'une émission diffusée.",
+        help_text="True = créée directement, False = issue d'une émission diffusée.",
     )
     questions = models.ManyToManyField(
         "Question",

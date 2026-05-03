@@ -1,5 +1,8 @@
 # Constantes partagées pour les tests du module quiz.
-# Alignées sur docs/backend/api-endpoints-et-contraintes.md et docs/api-reference.md.
+# Alignées sur docs/backend/api-reference.md.
+
+# Message DRF lorsque les credentials ne sont pas fournis (routes privées)
+AUTHENTICATION_MISSING = "Authentication credentials were not provided."
 
 MANDATORY_FIELD_ERROR_MESSAGE = "Ce champ est obligatoire."
 
@@ -29,8 +32,19 @@ QUESTION_TYPE_DB = "DB"
 MENU_TYPE_CL = "CL"
 MENU_TYPE_TR = "TR"
 
+# Messages d'erreur interludes
+INTERLUDE_INVALID_YOUTUBE_URL = "L'URL YouTube n'est pas valide."
+INTERLUDE_IN_USE = "Cet interlude est utilisé dans un ou plusieurs Burger Quiz."
+
+# Messages d'erreur structure
+STRUCTURE_DUPLICATE_ROUND_TYPE = "Chaque type de manche ne peut apparaître qu'une seule fois."
+STRUCTURE_DUPLICATE_ORDER = "Chaque valeur de order doit être unique dans la structure."
+STRUCTURE_ROUND_NOT_ATTACHED = "La manche référencée n'est pas attachée au Burger Quiz."
+STRUCTURE_INTERLUDE_NOT_FOUND = "L'interlude référencé n'existe pas."
+
 # Export pour tests
 __all__ = [
+    "AUTHENTICATION_MISSING",
     "MANDATORY_FIELD_ERROR_MESSAGE",
     "QUESTION_TYPE_NU",
     "QUESTION_TYPE_SP",
@@ -39,4 +53,10 @@ __all__ = [
     "QUESTION_TYPE_DB",
     "MENU_TYPE_CL",
     "MENU_TYPE_TR",
+    "INTERLUDE_INVALID_YOUTUBE_URL",
+    "INTERLUDE_IN_USE",
+    "STRUCTURE_DUPLICATE_ROUND_TYPE",
+    "STRUCTURE_DUPLICATE_ORDER",
+    "STRUCTURE_ROUND_NOT_ATTACHED",
+    "STRUCTURE_INTERLUDE_NOT_FOUND",
 ]

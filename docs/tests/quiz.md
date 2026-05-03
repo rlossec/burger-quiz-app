@@ -1,267 +1,422 @@
 # Tests du module Quiz
 
-Ce document décrit les tests des endpoints du module `quiz` (questions, manches, Burger Quiz), alignés sur les spécifications **`docs/backend/api-endpoints-et-contraintes.md`** et **`docs/api-reference.md`**.
+Ce document décrit les tests des endpoints du module `quiz` (questions, manches, Burger Quiz), alignés sur la spécification **`docs/backend/api-reference.md`**.
 
 ## Exécution des tests
 
 Tous les tests du module quiz :
 
 ```bash
-uv run manage.py test quiz.tests
+uv run manage.py test quiz.tests # Depuis backend/src
+docker compose exec backend uv run python manage.py test quiz.tests # Avec Docker
 ```
 
-Avec Docker (depuis la racine du projet, `manage.py` dans `backend/src`) :
-
-```bash
-docker compose exec backend uv run python manage.py test quiz.tests
-```
+**Rapport HTML** : à chaque exécution des tests, un rapport est généré dans `backend/src/reports/test-report.html` (résumé : succès / échecs / ignorés, détail des erreurs). Ouvrir ce fichier dans un navigateur pour consulter le bilan.
 
 ---
 
 ## Structure des tests
 
-Les tests sont organisés en **dossiers par famille** avec **un fichier par endpoint**.
+Les tests sont organisés en dossiers par **ressources** avec **un fichier par type d'endpoint**.
 
-Les données de test du quiz sont créées via des **factories** (factory_boy). La liste des factories, leurs méthodes et des exemples d’usage sont décrits dans un fichier dédié :
+```
+quiz/tests/
+├── mixins/                      # Mixins réutilisables
+│   ├── __init__.py
+│   ├── base.py                  # ResourceTestMixin (base)
+│   ├── auth.py                  # AuthRequiredMixin
+│   ├── author.py                # AuthorAutoAssignOnCreateMixin, etc.
+│   ├── tags.py                  # TagsOnCreateMixin, etc.
+│   └── timestamps.py            # TimestampsInDetailResponseMixin, etc.
+├── factories.py                 # Factories (factory_boy)
+├── __init__.py                  # Constantes partagées
+├── interludes/                  # Tests interludes vidéo
+│   ├── test_list.py
+│   ├── test_detail.py
+│   ├── test_create.py
+│   ├── test_update.py
+│   └── test_delete.py
+├── questions/
+│   ├── test_list.py
+│   ├── test_detail.py
+│   ├── test_create.py
+│   ├── test_update.py
+│   └── test_delete.py
+├── burger_quizzes/
+│   ├── test_list.py
+│   ├── test_detail.py
+│   ├── test_create.py
+│   └── test_structure.py        # GET/PUT structure (pas de test_update sur la ressource)
+├── salt_or_pepper/
+│   ├── test_list.py
+│   ├── test_detail.py
+│   ├── test_create.py
+│   └── test_update.py
+└── ... (autres ressources)
+```
 
-→ **[Factories Quiz — liste et fonctionnement](quiz-factories.md)**
+### Principe
+
+Les tests métier spécifiques restent dans chaque fichier (`test_create.py`, `test_list.py`, etc.). Les tests des champs communs (`author`, `tags`, `timestamps`, `auth`) sont ajoutés via **des mixins** importés depuis `quiz/tests/mixins/`.
+
+**Avantages** :
+
+- Un seul fichier par endpoint, tout au même endroit
+- Tests uniformes sur toutes les ressources
+- Exécution par ressource : `uv run manage.py test quiz.tests.salt_or_pepper`
+- Exécution ciblée : `uv run manage.py test quiz.tests.salt_or_pepper.test_create`
+
+---
+
+## Mixins disponibles
+
+### Dossier `quiz/tests/mixins/`
+
+| Fichier         | Mixin                             | Usage (fichier cible) |
+| --------------- | --------------------------------- | --------------------- |
+| `auth.py`       | `AuthRequiredMixin`               | `test_list.py`        |
+| `author.py`     | `AuthorAutoAssignOnCreateMixin`   | `test_create.py`      |
+| `author.py`     | `AuthorReadOnlyOnCreateMixin`     | `test_create.py`      |
+| `author.py`     | `AuthorInDetailResponseMixin`     | `test_detail.py`      |
+| `author.py`     | `AuthorInListResponseMixin`       | `test_list.py`        |
+| `author.py`     | `AuthorFilterMixin`               | `test_list.py`        |
+| `author.py`     | `AuthorNotChangedOnUpdateMixin`   | `test_update.py`      |
+| `tags.py`       | `TagsOnCreateMixin`               | `test_create.py`      |
+| `tags.py`       | `TagsInDetailResponseMixin`       | `test_detail.py`      |
+| `tags.py`       | `TagsInListResponseMixin`         | `test_list.py`        |
+| `tags.py`       | `TagsFilterMixin`                 | `test_list.py`        |
+| `tags.py`       | `TagsUpdateMixin`                 | `test_update.py`      |
+| `timestamps.py` | `TimestampsInDetailResponseMixin` | `test_detail.py`      |
+| `timestamps.py` | `TimestampsInListResponseMixin`   | `test_list.py`        |
+| `timestamps.py` | `TimestampsReadOnlyMixin`         | `test_create.py`      |
+
+### Exemple d'utilisation
+
+```python
+# quiz/tests/salt_or_pepper/test_create.py
+
+from rest_framework.test import APITestCase
+from ..factories import SaltOrPepperFactory, QuestionFactory
+from ..mixins import (
+    AuthorAutoAssignOnCreateMixin,
+    AuthorReadOnlyOnCreateMixin,
+    TagsOnCreateMixin,
+    TimestampsReadOnlyMixin,
+)
+
+# Tests métier existants
+class TestSaltOrPepperCreateEndpoint(APITestCase):
+    def test_create_salt_or_pepper_success(self):
+        ...
+
+# Tests author via mixin
+class TestSaltOrPepperCreateAuthor(
+    AuthorAutoAssignOnCreateMixin,
+    AuthorReadOnlyOnCreateMixin,
+    APITestCase,
+):
+    factory = SaltOrPepperFactory
+    url_basename = "salt-or-pepper"
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(...)
+        self.client.force_authenticate(user=self.user)
+        self.q1 = QuestionFactory.create_sp("SP1")
+
+    def get_valid_payload(self):
+        return {"title": "Test", "propositions": ["A", "B"], "question_ids": [str(self.q1.id)]}
+```
+
+### Configuration des mixins
+
+Chaque mixin attend certains attributs :
+
+| Attribut              | Description                                | Requis par                    |
+| --------------------- | ------------------------------------------ | ----------------------------- |
+| `factory`             | Factory pour créer des instances           | Tous sauf `AuthRequiredMixin` |
+| `url_basename`        | Basename de l'URL (ex: `"salt-or-pepper"`) | Tous                          |
+| `self.user`           | Utilisateur authentifié (dans `setUp`)     | Tous sauf `AuthRequiredMixin` |
+| `get_valid_payload()` | Méthode retournant un payload valide       | Create, Update                |
+
+---
+
+## Factories
+
+Les données de test sont créées via **factory_boy**. Documentation complète :
+
+→ **[Factories Quiz](quiz-factories.md)**
 
 ---
 
 ## Détail par ressource
 
-### Questions
+### Interludes vidéo (`/api/quiz/interludes/`)
 
-- **Dossier** : `quiz/tests/questions/`
-- **Exécution** : `uv run manage.py test quiz.tests.questions`
+**Dossier** : `quiz/tests/interludes/`
+**Exécution** : `uv run manage.py test quiz.tests.interludes`
 
-| Endpoint                        | Fichier          | Nb Tests | Lien                                               |
-| ------------------------------- | ---------------- | -------- | -------------------------------------------------- |
-| `GET /api/quiz/questions/`      | `test_list.py`   | 4        | [Liste des questions](#liste-des-questions)        |
-| `GET /api/quiz/questions/<id>/` | `test_detail.py` | 2        | [Détail d'une question](#détail-dune-question)     |
-| `POST /api/quiz/questions/`     | `test_create.py` | 15       | [Création d'une question](#création-dune-question) |
+| Fichier          | Tests                                                   |
+| ---------------- | ------------------------------------------------------- |
+| `test_list.py`   | Liste, filtres (interlude_type, search), champs réponse |
+| `test_detail.py` | Détail, 404, author, timestamps                         |
+| `test_create.py` | Création, validation URL YouTube, formats URL, tags     |
+| `test_update.py` | PATCH/PUT, validation, author non modifié               |
+| `test_delete.py` | Suppression, 404, erreur si en utilisation              |
 
-#### Liste des questions
+**Particularités** :
 
-**Endpoint** : `GET /api/quiz/questions/`
-Body : Aucun
-**Réponse attendue** :
+- Validation URL YouTube (différents formats acceptés)
+- `youtube_video_id` calculé automatiquement
+- Suppression bloquée si l'interlude est utilisé dans une structure
 
-```json
-{
-  "count": 2,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": "c8d5d5c0-1234-4b8f-9c2a-111111111111",
-      "text": "Question Nuggets",
-      "question_type": "NU",
-      "original": false,
-      "explanations": "Explications",
-      "video_url": "https://video.com",
-      "image_url": "https://image.com",
-      "created_at": "2025-01-01T12:00:00Z",
-      "updated_at": "2025-01-01T12:00:00Z"
-    },
-    {
-      "id": "d3a9f3b1-5678-4c1b-8f3e-222222222222",
-      "text": "Question SP",
-      "question_type": "SP",
-      "original": true,
-      "explanations": "Explications",
-      "video_url": "https://video.com",
-      "image_url": "https://image.com",
-      "created_at": "2025-01-02T09:30:00Z",
-      "updated_at": "2025-01-02T09:30:00Z"
-    }
-  ]
-}
-```
+---
 
-**Légende Avancement** : 🔲 Skip | 🟡 Failed | 🟢 Passed — **Status** : 🟢 200
+### Questions (`/api/quiz/questions/`)
 
-|   # | Endpoint (URL + filtres)                                      | Status | Description                                                                                                                     | Avancement |
-| --: | ------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-|   1 | `GET /api/quiz/questions/`                                    | 🟢 200 | Cas simple de succès ; liste complète, champs exposés (id, text, question_type, original, usage_count, created_at, updated_at). | 🟡         |
-|   2 | `GET /api/quiz/questions/`                                    | 🟢 200 | Champ calculé `usage_count` présent sur chaque question (test actuellement skip).                                               | 🔲         |
-|   3 | `GET /api/quiz/questions/?question_type=<type>`               | 🟢 200 | Test paramétré (sous-tests NU, SP, ME, AD, DB) : seules les questions du type demandé sont renvoyées.                           | 🟡         |
-|   4 | `GET /api/quiz/questions/?original=true` \| `?original=false` | 🟢 200 | Deux sous-tests : seules les questions avec `original=true` ou `original=false` selon le paramètre.                             | 🟡         |
+**Dossier** : `quiz/tests/questions/`
+**Exécution** : `uv run manage.py test quiz.tests.questions`
 
-#### Détail d'une question
-
-**Endpoint** : `GET /api/quiz/questions/<id>/`  
-Body : Aucun
-
-Réponse attendue :
-
-```json
-{
-  "id": "d3a9f3b1-5678-4c1b-8f3e-222222222222",
-  "text": "Question SP",
-  "question_type": "SP",
-  "original": true,
-  "explanations": "Explications",
-  "video_url": "https://video.com",
-  "image_url": "https://image.com",
-  "created_at": "2025-01-02T09:30:00Z",
-  "updated_at": "2025-01-02T09:30:00Z",
-  "answers": [
-    { "text": "Paris", "is_correct": true },
-    { "text": "Lyon", "is_correct": false },
-    { "text": "Marseille", "is_correct": false },
-    { "text": "Toulouse", "is_correct": false }
-  ]
-}
-```
-
-**Légende Avancement** : 🔲 Skip | 🟡 Failed | 🟢 Passed —
-
-|   # | Cas                                             | Status | Description                                        | Avancement |
-| --: | ----------------------------------------------- | ------ | -------------------------------------------------- | ---------- |
-|   1 | `GET /api/quiz/questions/<id>/` (id existant)   | 🟢 200 | Succès ; champs id, text, question_type, original. | 🟡         |
-|   2 | `GET /api/quiz/questions/<id>/` (id inexistant) | 🔴 404 | Not Found.                                         | 🟡         |
-
-#### Création d'une question
-
-**Endpoint** : `POST /api/quiz/questions/`  
-**Body** :
-
-```json
-{
-  ## obligatoire
-  "text": "intitulé de la question",
-  "question_type": "Type de la question parmi NU, SP, ME, AD, DB",
-  ## optionnel mais requis pour certain type de question
-  "answers": [
-    {"text": "Paris", "is_correct": true},
-    {"text": "Lyon", "is_correct": false},
-    {"text": "Marseille", "is_correct": false},
-    {"text": "Toulouse", "is_correct": false}
-  ],
-  ## optionnel
-  "video_url": "url d'une vidéo pour la question",
-  "audio_url": "url d'un audio pour la question",
-  "original": "Spécifié si faux"
-}
-```
-
-**Contraintes par type** (réponses `answers` selon le type) :
-
-| Type                       | Règle                                                                                                         |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **NU** (Nuggets)           | 4 réponses proposées, **une seule** valide (`is_correct=true`) et 3 leurres.                                  |
-| **SP** (Sel ou poivre)     | Plusieurs réponses exactes possibles ; pas de leurres (plusieurs `is_correct=true` autorisés).                |
-| **ME** (Menu)              | Une réponse exacte possible ; pas de leurres (`is_correct=true` sur une réponse).                             |
-| **AD** (Addition)          | Une réponse exacte ou pas de réponse possible ; pas de leurres. Si `answers` fournies, au moins une correcte. |
-| **DB** (Burger de la mort) | **Pas de réponses** : `answers` absentes ou tableau vide.                                                     |
-
-**Légende Avancement** : 🔲 Skip | 🟡 Failed | 🟢 Passed — **Status** : 🟢 201 | 🔴 400
-
-|   # | Cas                                                 | Status | Description                                          | Avancement |
-| --: | --------------------------------------------------- | ------ | ---------------------------------------------------- | ---------- |
-|   1 | `POST` NU payload valide (4 réponses, 1 is_correct) | 🟢 201 | Création OK ; question + 4 answers en BDD.           | 🟡         |
-|   2 | `POST` avec video_url et audio_url                  | 🟢 201 | Champs optionnels enregistrés.                       | 🟡         |
-|   3 | `POST` sans `text`                                  | 🔴 400 | Champ text requis.                                   | 🟡         |
-|   4 | `POST` sans `question_type`                         | 🔴 400 | Champ question_type requis.                          | 🟡         |
-|   5 | `POST` NU, SP, ME ou AD sans `answers`              | 🔴 400 | answers requis pour ces types.                       | 🟡         |
-|   6 | `POST` DB avec `answers` vide                       | 🟢 201 | DB ne requiert pas de réponses.                      | 🟡         |
-|   7 | `POST` NU avec nombre de réponses ≠ 4 (1 ou 5)      | 🔴 400 | Exactement 4 réponses pour NU.                       | 🟡         |
-|   8 | `POST` NU sans aucune `is_correct=true`             | 🔴 400 | Une réponse correcte requise pour NU.                | 🟡         |
-|   9 | `POST` NU avec plusieurs `is_correct=true`          | 🔴 400 | Une seule réponse correcte pour NU.                  | 🟡         |
-|  10 | `POST` SP avec plusieurs `is_correct=true`          | 🟢 201 | Autorisé pour SP.                                    | 🟡         |
-|  11 | `POST` ME avec une réponse is_correct=true          | 🟢 201 | Création OK.                                         | 🟡         |
-|  12 | `POST` AD avec une réponse correcte                 | 🟢 201 | Création OK.                                         | 🟡         |
-|  13 | `POST` AD avec toutes les réponses incorrectes      | 🔴 400 | Au moins une is_correct requise si answers fournies. | 🟡         |
-|  14 | `POST` DB avec réponses fournies                    | 🔴 400 | DB ne doit pas accepter answers.                     | 🟡         |
-|  15 | `POST` question_type invalide (ex. `XX`)            | 🔴 400 | Validation enum.                                     | 🟡         |
-
-_Référence des noms de tests_ : 1 → `test_create_nuggets_success` ; 2 → `test_create_accepts_video_url_audio_url` ; 3 → `test_create_missing_text_returns_400` ; 4 → `test_create_missing_question_type_returns_400` ; 5 → `test_create_requires_answers_for_nu_sp_me_ad` ; 6 → `test_create_db_success_empty_answers` ; 7 → `test_create_nuggets_not_four_answers_returns_400` ; 8 → `test_create_nuggets_no_correct_answer_returns_400` ; 9 → `test_create_nuggets_multiple_correct_returns_400` ; 10 → `test_create_sp_success` ; 11 → `test_create_me_success` ; 12 → `test_create_ad_success` ; 13 → `test_create_ad_all_incorrect_returns_400` ; 14 → `test_create_db_with_answers_returns_400` ; 15 → `test_create_invalid_question_type_returns_400`.
-
-_Tests non implémentés (à ajouter si règle métier)_ : answers en doublon → 400 ; limite max de réponses (ex. 10) → 400 ; transaction rollback si erreur sur answers.
+| Fichier          | Tests                                   |
+| ---------------- | --------------------------------------- |
+| `test_list.py`   | Liste, filtres (type, original, search) |
+| `test_detail.py` | Détail, 404                             |
+| `test_create.py` | Création, validation, règles par type   |
+| `test_update.py` | Mise à jour, validation                 |
+| `test_delete.py` | Suppression, cascade                    |
 
 ---
 
 ### Nuggets (`/api/quiz/nuggets/`)
 
 **Dossier** : `quiz/tests/nuggets/`
+**Exécution** : `uv run manage.py test quiz.tests.nuggets`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
-- **`test_update.py`**
+| Fichier          | Tests métier                        | Tests via mixins               |
+| ---------------- | ----------------------------------- | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes incluses | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                         | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation questions      | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH/PUT                           | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes avec leurs réponses
+- Validation : nombre pair de questions, type `NU` requis
 
 ---
 
 ### Sel ou poivre (`/api/quiz/salt-or-pepper/`)
 
 **Dossier** : `quiz/tests/salt_or_pepper/`
+**Exécution** : `uv run manage.py test quiz.tests.salt_or_pepper`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
-- **`test_update.py`**
+| Fichier          | Tests métier                             | Tests via mixins               |
+| ---------------- | ---------------------------------------- | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes, propositions | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                              | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation propositions        | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH titre                              | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes avec leurs réponses
+- La liste inclut les propositions de la manche
 
 ---
 
 ### Thèmes de menu (`/api/quiz/menu-themes/`)
 
-**Dossier** : `quiz/tests/menu_themes/`
+**Dossier** : `quiz/tests/menu_themes/`  
+**Exécution** : `uv run manage.py test quiz.tests.menu_themes`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
-- **`test_update.py`**
+| Fichier          | Tests                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| `test_list.py`   | Liste (200)                                                             |
+| `test_detail.py` | Détail (200), 404                                                       |
+| `test_create.py` | Création thème CL / TR, validations (titre, type, question inexistante) |
+| `test_update.py` | PATCH titre                                                             |
+
+**Particularités** :
+
+- Pas de `test_delete` pour cette ressource dans la suite actuelle.
 
 ---
 
 ### Manche Menus (`/api/quiz/menus/`)
 
-**Dossier** : `quiz/tests/menus/`
+**Dossier** : `quiz/tests/menus/`  
+**Exécution** : `uv run manage.py test quiz.tests.menus`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
-- **`test_update.py`**
+| Fichier          | Tests                                                                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `test_list.py`   | Liste (200)                                                                                                |
+| `test_detail.py` | Détail (200), 404                                                                                          |
+| `test_create.py` | Création, validations (titre, types de thèmes menu_1 / menu_troll, même thème deux fois, thème inexistant) |
+| `test_update.py` | PATCH titre                                                                                                |
+
+**Particularités** :
+
+- Pas de `test_delete` pour cette ressource dans la suite actuelle.
 
 ---
 
 ### Addition (`/api/quiz/additions/`)
 
 **Dossier** : `quiz/tests/additions/`
+**Exécution** : `uv run manage.py test quiz.tests.additions`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
-- **`test_update.py`**
+| Fichier          | Tests métier                        | Tests via mixins               |
+| ---------------- | ----------------------------------- | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes incluses | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                         | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation questions      | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH/PUT                           | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes avec leurs réponses
+- Validation : questions de type `AD` requis
 
 ---
 
 ### Burger de la mort (`/api/quiz/deadly-burgers/`)
 
 **Dossier** : `quiz/tests/deadly_burgers/`
+**Exécution** : `uv run manage.py test quiz.tests.deadly_burgers`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
-- **`test_update.py`**
+| Fichier          | Tests métier                        | Tests via mixins               |
+| ---------------- | ----------------------------------- | ------------------------------ |
+| `test_list.py`   | Liste, questions complètes incluses | Auth, Author, Tags, Timestamps |
+| `test_detail.py` | Détail, 404                         | Author, Tags, Timestamps       |
+| `test_create.py` | Création, validation 10 questions   | Author, Tags, Timestamps       |
+| `test_update.py` | PATCH/PUT                           | Author, Tags                   |
+
+**Particularités** :
+
+- La liste inclut les questions complètes (questions ouvertes, sans réponses)
+- Validation : exactement 10 questions de type `DB` requis
 
 ---
 
 ### Burger Quiz (`/api/quiz/burger-quizzes/`)
 
 **Dossier** : `quiz/tests/burger_quizzes/`
+**Exécution** : `uv run manage.py test quiz.tests.burger_quizzes`
 
-- **`test_list.py`**
-- **`test_detail.py`**
-- **`test_create.py`**
+Suite logique d'appels API (création end-to-end d'un Burger Quiz) :
+→ `docs/backend/api-reference.md`, section **`3.0.1 End-to-end call sequence (from scratch)`**
+
+| Fichier             | Tests                                                      |
+| ------------------- | ---------------------------------------------------------- |
+| `test_list.py`      | Liste, filtres, timestamps                                 |
+| `test_detail.py`    | Détail, 404, structure incluse dans la réponse             |
+| `test_create.py`    | Création, validation IDs manches, toss                     |
+| `test_structure.py` | GET/PUT structure (ordre manches, interludes, validations) |
+
+### Structure du Burger Quiz (`/api/quiz/burger-quizzes/{id}/structure/`)
+
+**Dossier** : `quiz/tests/burger_quizzes/`  
+**Fichier** : `test_structure.py`  
+**Exécution** : `uv run manage.py test quiz.tests.burger_quizzes.test_structure`
+
+Cette section décrit les **cas couverts par les tests** pour les endpoints de structure du Burger Quiz, en lien avec la spécification API **[§ 3.9 Burger Quiz structure](../backend/api-reference.md#39-burger-quiz-structure)**.
+
+#### Vue d’ensemble des classes de tests
+
+| Classe de test                          | Rôle                                                                                              |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `TestBurgerQuizStructureAuth`           | GET/PUT sans authentification → 401                                                               |
+| `TestBurgerQuizStructureReadEndpoint`   | GET : ordre par défaut, interludes, 404, forme de la réponse (objets imbriqués)                   |
+| `TestBurgerQuizStructureUpdateEndpoint` | PUT : succès, remplacement total, ordre implicite, doublons de manche, interludes, structure vide |
+| `TestBurgerQuizStructurePutValidation`  | PUT : corps invalide (`elements` manquant, type/id/UUID, mauvais modèle pour `type`)              |
+
+#### Endpoints
+
+| Méthode | Chemin                                     | Rôle                                               |
+| ------- | ------------------------------------------ | -------------------------------------------------- |
+| `GET`   | `/api/quiz/burger-quizzes/{id}/structure/` | Lire la structure (ordre, types, objets imbriqués) |
+| `PUT`   | `/api/quiz/burger-quizzes/{id}/structure/` | Remplacer entièrement la structure                 |
+
+Authentification : IsAuthenticated
+
+#### Matrice des cas (tests ↔ comportement attendu)
+
+##### Lecture (`GET`)
+
+| Cas                                                                                                                   | Statut | Méthode de test                                      |
+| --------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------- |
+| Structure par défaut après `create_full` : 5 manches dans l’ordre NU → SP → ME → AD → DB                              | 200    | `test_get_structure_default_order`                   |
+| Ordre persisté reflété dans `elements` (y compris interludes avant/après manches)                                     | 200    | `test_get_structure_with_custom_rows`                |
+| `order` dans la réponse suit l’ordre en base (pas forcément l’ordre de création des types)                            | 200    | `test_get_structure_elements_ordered`                |
+| Chaque élément inclut `order`, `type`, `id` et l’objet détaillé sous la clé du type (`nuggets`, `video_interlude`, …) | 200    | `test_get_structure_elements_include_nested_payload` |
+| Burger Quiz inexistant                                                                                                | 404    | `test_get_structure_not_found`                       |
+| Requête non authentifiée                                                                                              | 401    | `test_get_structure_requires_authentication`         |
+
+##### Mise à jour (`PUT`)
+
+| Cas                                                                                                       | Statut | Méthode de test                                  |
+| --------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------ |
+| Remplacement complet : intro + 5 manches + pubs + outro (payload complet)                                 | 200    | `test_put_structure_success`                     |
+| `PUT` supprime les anciennes lignes et ne garde que le nouveau tableau                                    | 200    | `test_put_structure_replaces_existing`           |
+| Rang `order` = position dans le tableau (1 = premier élément)                                             | 200    | `test_put_structure_order_from_array_position`   |
+| Structure vide `{"elements": []}` : plus aucun `BurgerQuizElement` ; `GET` suivant renvoie `[]`           | 200    | `test_put_structure_empty_elements`              |
+| Référencer une manche **Nuggets** appartenant à un autre quiz (pas d’attache obligatoire au quiz courant) | 200    | `test_put_structure_any_nuggets_allowed`         |
+| Plusieurs entrées `video_interlude` avec le **même** `VideoInterlude`                                     | 200    | `test_put_structure_multiple_interludes_allowed` |
+| Même **slug** de manche deux fois (ex. deux `nuggets`)                                                    | 400    | `test_put_structure_duplicate_round_error`       |
+| Interlude : `id` aléatoire inexistant                                                                     | 400    | `test_put_structure_interlude_not_found_error`   |
+| Burger Quiz inexistant                                                                                    | 404    | `test_put_structure_not_found`                   |
+| Requête non authentifiée                                                                                  | 401    | `test_put_structure_requires_authentication`     |
+
+##### Validation du corps `PUT` (erreurs 400)
+
+Les messages exacts sont produits par `parse_structure_element` et `BurgerQuizStructureSerializer` (`burger_quiz_element.py`).
+
+| Cas                                                                                                        | Statut | Méthode de test                                          |
+| ---------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------- |
+| Corps sans clé `elements`                                                                                  | 400    | `test_put_structure_missing_elements_key`                |
+| `elements` n’est pas une liste                                                                             | 400    | `test_put_structure_elements_not_a_list`                 |
+| Un élément du tableau n’est pas un objet                                                                   | 400    | `test_put_structure_element_not_an_object`               |
+| `type` inconnu (hors `nuggets`, `salt_or_pepper`, `menus`, `addition`, `deadly_burger`, `video_interlude`) | 400    | `test_put_structure_unknown_type`                        |
+| `type` absent                                                                                              | 400    | `test_put_structure_missing_type`                        |
+| `id` absent                                                                                                | 400    | `test_put_structure_missing_id`                          |
+| `id` mal formé (pas un UUID)                                                                               | 400    | `test_put_structure_invalid_uuid`                        |
+| `type` = `salt_or_pepper` mais `id` est celui d’un **Nuggets** (mauvais modèle)                            | 400    | `test_put_structure_id_wrong_model_for_type`             |
+| `type` = `video_interlude` mais `id` pointe vers une manche (ex. Nuggets)                                  | 400    | `test_put_structure_video_interlude_id_is_not_interlude` |
+| `type` = `nuggets` et UUID sans ligne **Nuggets** correspondante                                           | 400    | `test_put_structure_round_id_not_found`                  |
+
+#### Règles métier rappelées (côté API)
+
+- **Ordre implicite** : la position dans `elements` définit `order` (1…n).
+- **Manches** : chaque slug de manche (`nuggets`, etc.) ne peut apparaître **qu’une fois** ; le même UUID de manche ne peut pas être dupliqué.
+- **Interludes** : le même `VideoInterlude` peut être réutilisé plusieurs fois dans la liste.
+- **`id` pour une manche** : UUID aligné avec le registre `Round` et la manche concrète (Nuggets, …) — voir commentaire modèle `Round` et signaux dans `quiz/signals.py`.
+
+Pour le détail des champs de réponse et du corps de requête, se reporter à **[api-reference.md § 3.9](../backend/api-reference.md#39-burger-quiz-structure)**.
 
 ---
 
 ## Divers
 
-##### Constantes partagées (`quiz/tests/__init__.py`)
+### Constantes partagées (`quiz/tests/__init__.py`)
 
-##### URLs et vues factices
+Messages d'erreur DRF et métier, types de questions, types de menus, types d'interludes.
 
-Pour que les tests puissent appeler `reverse()` sur les noms d’URL du quiz, le module `quiz` expose des routes via `quiz/urls.py` et un `PlaceholderViewSet` dans `quiz/views.py`. Lors de l’implémentation réelle des endpoints, remplacer ce viewset par les ViewSets métier ; les tests restent inchangés et valideront le comportement attendu.
+**Types d'interludes** :
+
+| Constante           | Valeur | Description         |
+| ------------------- | ------ | ------------------- |
+| `INTERLUDE_TYPE_IN` | `"IN"` | Intro               |
+| `INTERLUDE_TYPE_OU` | `"OU"` | Outro               |
+| `INTERLUDE_TYPE_PU` | `"PU"` | Pub                 |
+| `INTERLUDE_TYPE_IL` | `"IL"` | Interlude générique |
+
+**Messages d'erreur structure** :
+
+| Constante                        | Description                                         |
+| -------------------------------- | --------------------------------------------------- |
+| `INTERLUDE_INVALID_YOUTUBE_URL`  | URL YouTube invalide                                |
+| `INTERLUDE_IN_USE`               | Interlude utilisé dans un Burger Quiz (suppression) |
+| `STRUCTURE_DUPLICATE_ROUND_TYPE` | Type de manche dupliqué dans la structure           |
+| `STRUCTURE_ROUND_NOT_ATTACHED`   | Manche non attachée au Burger Quiz                  |
+| `STRUCTURE_INTERLUDE_NOT_FOUND`  | Interlude référencé inexistant                      |

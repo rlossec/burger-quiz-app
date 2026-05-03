@@ -1,9 +1,10 @@
-from datetime import timedelta
-from django.contrib.auth import password_validation
 
 import os
 import sys
 from pathlib import Path
+from datetime import timedelta
+
+from django.contrib.auth import password_validation
 
 from dotenv import load_dotenv
 
@@ -37,16 +38,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
+    'django.contrib.sites',
 
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'djoser',
+    'taggit',
 
     'accounts',
     'quiz',
 ]
+
+# Django Sites Framework (utilisé par Djoser pour les URLs dans les emails)
+SITE_ID = int(os.environ.get('SITE_ID', 1))
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -130,6 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+# Tests run in English for consistent error message assertions
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -165,6 +173,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    # drf-spectacular ignore les requestBody sur DELETE ; Djoser envoie current_password.
+    'DEFAULT_SCHEMA_CLASS': 'config.schema.DeleteBodyAwareSchema',
 }
 
 # Simple JWT (authentification par username/password par défaut via Django authenticate)
@@ -179,13 +191,27 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# Djoser - authentification JWT avec username
+# Djoser - authentication JWT with username
 DJOSER = {
     'TOKEN_MODEL': None,
     'PASSWORD_RESET_CONFIRM_URL': 'auth/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': 'auth/username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'auth/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
+    'PERMISSIONS': {
+        # `CurrentUserOrAdmin` ensures has_object_permission (404 if HIDE_USERS, not 200 / illegal deletion).
+        'user': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user_list': ['djoser.permissions.CurrentUserOrAdmin'],
+        'user_create': ['rest_framework.permissions.AllowAny'],
+        'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
+        'activation': ['rest_framework.permissions.AllowAny'],
+        'password_reset': ['rest_framework.permissions.AllowAny'],
+        'password_reset_confirm': ['rest_framework.permissions.AllowAny'],
+        'username_reset': ['rest_framework.permissions.AllowAny'],
+        'username_reset_confirm': ['rest_framework.permissions.AllowAny'],
+        'set_password': ['djoser.permissions.CurrentUserOrAdmin'],
+        'set_username': ['djoser.permissions.CurrentUserOrAdmin'],
+    },
     'SERIALIZERS': {
         'user_create': 'accounts.serializers.CustomUserCreateSerializer',
         'user': 'accounts.serializers.CustomUserSerializer',
@@ -213,19 +239,56 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True
 }
 
-# Swagger / drf-yasg - authentification
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT Bearer. Exemple: "Bearer <access_token>". Obtenir un token via POST /api/auth/jwt/create/'
+# Rapport des tests unitaires (fichier HTML généré à chaque run)
+TEST_RUNNER = "config.test_runner.HtmlReportTestRunner"
+TEST_REPORT_DIR = BASE_DIR / "reports"
+
+# CORS - Allow frontend URLs
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    "CORS_ALLOWED_ORIGINS",
+    "https://example.com"
+).split(",")
+
+CORS_ALLOW_CREDENTIALS = os.environ.get("CORS_ALLOW_CREDENTIALS", "False").lower() in ("true", "1", "yes")
+
+# Email - Configuration SMTP (MailHog en dev)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 1025))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False').lower() in ('true', '1', 'yes')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@burgerquiz.local')
+
+# drf-spectacular - OpenAPI schema
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Burger Quiz API',
+    'DESCRIPTION': 'API for Burger Quiz',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [{'BearerAuth': []}],
+    'TAGS': [
+        {
+            'name': 'Authentification',
         },
-    },
-    'SECURITY_REQUIREMENTS': [{'Bearer': []}],
-    # api-auth : login/logout pour l’authentification par session (browsable API)
-    'USE_SESSION_AUTH': True,
-    'LOGIN_URL': '/api-auth/login/',
-    'LOGOUT_URL': '/api-auth/logout/',
+        {
+            'name': 'Compte personnel',
+        },
+        {
+            'name': 'Utilisateurs — administration',
+        },
+        {'name': 'Questions'},
+        {'name': 'Manche Nuggets'},
+        {'name': 'Manche Sel ou poivre'},
+        {'name': 'Manche Menus'},
+        {'name': 'Thèmes de menu'},
+        {'name': 'Manche Addition'},
+        {'name': 'Manche Burger de la mort'},
+        {'name': 'Interludes vidéo'},
+        {'name': 'Burger Quiz'},
+    ],
 }

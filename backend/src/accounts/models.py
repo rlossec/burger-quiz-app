@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     class Meta:
+        ordering = ("pk",)
         verbose_name = "Utilisateur"
         verbose_name_plural = "Utilisateurs"
 

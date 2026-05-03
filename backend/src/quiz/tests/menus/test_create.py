@@ -3,6 +3,7 @@
 
 import uuid
 
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -10,11 +11,20 @@ from rest_framework.test import APITestCase
 from ...models import Menus
 from ...tests.factories import MenuThemeFactory
 
+User = get_user_model()
+
 
 class TestMenusCreateEndpoint(APITestCase):
     """POST /api/quiz/menus/ — 2 classiques + 1 troll, IDs distincts."""
 
     def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username="quiz_test_user",
+            email="quiz_test@example.com",
+            password="QuizTestPassword123!",
+        )
+        self.client.force_authenticate(user=self.user)
         self.url = reverse("menus-list")
         self.theme_1 = MenuThemeFactory.create_classic(title="CL 1")
         self.theme_2 = MenuThemeFactory.create_classic(title="CL 2")

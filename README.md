@@ -1,19 +1,26 @@
 # Burger Quiz 🍔
 
-Application web pour animer des soirées Burger Quiz : préparation des manches, diffusion des questions et gestion des scores des équipes.
+Application web pour animer des soirées Burger Quiz :
+
+- Création des manches et émissions
+- Création de session de jeu
+- Diffusion des questions et animations
+- Gestion des scores des équipes.
 
 ## Stack
 
-| Composant | Techno |
-|-----------|--------|
-| Backend | Django 6, Django REST Framework, Python 3.12 |
-| Frontend | React, TypeScript, Vite |
-| Base de données | PostgreSQL 18 |
-| Infra | Docker Compose |
+| Composant       | Techno                                       |
+| --------------- | -------------------------------------------- |
+| Backend         | Django 6, Django REST Framework, Python 3.12 |
+| Frontend        | React, TypeScript, Vite, Tailwind CSS        |
+| Base de données | PostgreSQL 18                                |
+| Infra           | Docker Compose                               |
 
-## Démarrage rapide
+## Quick Start
 
 **Prérequis :** Docker & Docker Compose
+
+- **`env/`** : fichiers par service — voir fx`env/README.md`
 
 ```bash
 # 1. Configurer l'environnement
@@ -31,16 +38,16 @@ docker compose up -d
 docker compose --profile tools up -d
 ```
 
-## URLs
+On retrouver les élements de l'application :
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:8000 |
+| Service      | URL                          |
+| ------------ | ---------------------------- |
+| Frontend     | http://localhost:5173        |
+| Backend API  | http://localhost:8000        |
 | Django Admin | http://localhost:8000/admin/ |
-| pgAdmin | http://localhost:5050 |
+| pgAdmin      | http://localhost:5050        |
 
-## Fixtures
+### Fixtures
 
 Le dossier `backend/src/fixtures` est monté dans le conteneur. Les commandes Django doivent être exécutées **dans le conteneur** :
 
@@ -73,15 +80,3 @@ burger-quiz-app/
 ├── env/                  # Variables par service (db, backend, pgadmin)
 └── docker-compose.yml
 ```
-
-## Développement local
-
-```bash
-cd backend
-uv run python src/manage.py migrate
-uv run python src/manage.py runserver
-```
-
-## Variables d'environnement
-
-- **`env/`** : fichiers par service — voir `env/README.md`

@@ -1,5 +1,6 @@
 # python manage.py test accounts.tests.test_register
 
+from django.contrib.auth import get_user_model
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -7,6 +8,8 @@ from rest_framework import status
 from ..tests import USERNAME_ALREADY_TAKEN_ERROR_MESSAGE, \
     PASSWORD_TOO_SHORT_ERROR_MESSAGE, PASSWORD_TOO_CLOSE_USERNAME_ERROR_MESSAGE, TOO_COMMON_PASSWORD_ERROR_MESSAGE, \
     EMAIL_ALREADY_TAKEN_ERROR_MESSAGE
+
+User = get_user_model()
 
 
 class TestRegister(APITestCase):
@@ -26,6 +29,14 @@ class TestRegister(APITestCase):
         self.assertIn('id', response.data)
         self.assertIn('email', response.data)
         self.assertEqual(response.data['email'], self.valid_payload['email'])
+
+    def test_registration_user_is_inactive(self):
+        """Test que l'utilisateur est inactif après l'inscription (nécessite activation par email)"""
+        response = self.client.post(self.url, self.valid_payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        user = User.objects.get(username=self.valid_payload['username'])
+        self.assertFalse(user.is_active, "L'utilisateur devrait être inactif après l'inscription")
 
     # Missing fields
     def test_registration_missing_username(self):

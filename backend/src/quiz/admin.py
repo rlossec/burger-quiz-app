@@ -11,6 +11,7 @@ from .models import (
     AdditionQuestion,
     Answer,
     BurgerQuiz,
+    BurgerQuizElement,
     DeadlyBurger,
     DeadlyBurgerQuestion,
     MenuTheme,
@@ -21,6 +22,7 @@ from .models import (
     Question,
     SaltOrPepper,
     SaltOrPepperQuestion,
+    VideoInterlude,
 )
 from .models.enums import QuestionType
 
@@ -242,20 +244,40 @@ class DeadlyBurgerAdmin(admin.ModelAdmin):
         return obj.questions.count()
 
 
+@admin.register(VideoInterlude)
+class VideoInterludeAdmin(admin.ModelAdmin):
+    list_display = ("title", "youtube_video_id", "author", "structure_elements_count", "created_at")
+    search_fields = ("title", "youtube_url")
+    autocomplete_fields = ["author"]
+    list_per_page = 25
+    readonly_fields = ("youtube_video_id", "created_at", "updated_at")
+
+    @admin.display(description="Usages dans les structures")
+    def structure_elements_count(self, obj):
+        return obj.structure_usages.count()
+
+
 # ========== Burger Quiz ==========
+
+
+class BurgerQuizElementInline(admin.TabularInline):
+    model = BurgerQuizElement
+    extra = 0
+    fields = ("order", "element_type", "round", "interlude")
+    ordering = ("order",)
 
 
 @admin.register(BurgerQuiz)
 class BurgerQuizAdmin(admin.ModelAdmin):
-    list_display = ("title", "nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger")
-    list_filter = ("nuggets", "menus", "addition", "deadly_burger")
+    list_display = ("title", "author", "structure_elements_count", "created_at")
     search_fields = ("title", "toss")
-    autocomplete_fields = ["nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger"]
+    autocomplete_fields = ["author"]
     list_per_page = 25
+    inlines = [BurgerQuizElementInline]
     fieldsets = (
-        (None, {"fields": ("title", "toss")}),
-        ("Manches", {
-            "fields": ("nuggets", "salt_or_pepper", "menus", "addition", "deadly_burger"),
-            "description": "Associer une manche à chaque étape du quiz.",
-        }),
+        (None, {"fields": ("title", "toss", "author")}),
     )
+
+    @admin.display(description="Éléments de structure")
+    def structure_elements_count(self, obj):
+        return obj.structure_elements.count()
